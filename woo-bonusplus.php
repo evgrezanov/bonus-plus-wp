@@ -1,5 +1,5 @@
 <?php
-
+//namespace WooBonusPlus;
 /**
  * Plugin Name: Woo-bonusplus
  * Plugin URI: https://github.com/evgrezanov/wooms-bonusplus
@@ -23,7 +23,8 @@ class WooBonusPlus
     public static function inc_components()
     {
         require_once WOOBPP_PLUGIN_DIR_PATH . '/inc/settings.php';
-        require_once WOOBPP_PLUGIN_DIR_PATH . '/inc/bonus_tab.php';
+        require_once WOOBPP_PLUGIN_DIR_PATH . '/inc/api.php';
+        require_once WOOBPP_PLUGIN_DIR_PATH . '/inc/profile.php';
     }
 
 }

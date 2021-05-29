@@ -55,21 +55,39 @@ class WooBonusPlus_Profile
     }
 
     /**
-     *  display template
+     *  display tab template
      */
     public static function bonus_plus_account_content()
     {
         $woobonusplus_options = get_option( 'woobonusplus_option_name' );
-        $text = $woobonusplus_options['___4'];
-        echo $text;
-
-        echo '<div>';
-        echo '<input class="regular-text" type="text" name="woobonusplus_login" value=""><br/>';
-        echo '<input class="regular-text" type="text" name="woobonusplus_pass" value=""><br/>';
-        echo '<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes">';
+        $profile_text = $woobonusplus_options['___4'];
+        echo $profile_text;
+        echo '<br>';
+        $current_account_info = self::render_bonus_plus_customer_info();
+        if ( is_admin() ){
+            echo '<div class="bonus-plus-client-form">';
+            self::render_bonus_plus_customer_info();
+            echo '</div>';
+        }
+        echo '<div class="bonus-plus-client-form">';
+        echo '<p class="woocommerce-form-row woocommerce-form-row--bonus-plus-card-number form-row form-row-bonus-plus-card-number">
+		        <label for="account_bonus_plus_card_number">Номер карты клиента</label>
+		        <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_bonus_plus_card_number" id="account_bonus_plus_card_number" value="">
+                <span><em>Формат EAN-8 или EAN13 (только цифры)</em></span>
+	        </p>';
+        echo '
+            <p class="woocommerce-form-row woocommerce-form-row--bonuspassword form-row form-row-bonuspassword">
+                <label for="account_bonus_plus_password">Номер телефона</label>
+                <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_bonus_plus_phone_number" id="account_bonus_plus_phone_number" value="">
+                <span><em>Формат не имеет значение. Обязан содержать минимум 11 цифр</em></span>
+            </p>';
+        echo '<input type="submit" name="submit" id="submit" class="button button-primary" value="Сохранить">';
         echo '</div>';
     }
 
+    /**
+     *  render Company Account info
+     */
     public static function render_bonus_plus_login_info()
     {
         $res = WooBonusPlus_API::bp_api_get_login_curl();
@@ -85,6 +103,32 @@ class WooBonusPlus_Profile
         endforeach;
 
         return ob_get_clean();
+    }
+
+    /**
+     *  render Customer Account info
+     */
+    public static function render_bonus_plus_customer_info()
+    {
+        $res = WooBonusPlus_API::bp_api_get_customer_data_curl();
+
+        $info = json_decode($res);
+
+        //ob_start();
+
+        foreach ($info as $key => $value) :
+            if ($key != 'person') {
+                print($key . ' = ' . $value . '<br />');
+            } else {
+                $person_data = json_decode($value);
+                foreach ($person_data as $dkey => $data){
+                    print($dkey . ' = ' . $data . '<br />');
+                }
+            }
+        endforeach;
+
+        //return ob_get_clean();
+
     }
 }
 

@@ -133,6 +133,15 @@ class WooBonusPlus_Profile
         //return ob_get_clean();
 
     }
-}
 
+    public static function get_customer_phone($customer_id = ''){
+        if (empty($customer_id)){
+            $customer_id = get_current_user_id();
+        }
+        $phone = get_user_meta( $customer_id, 'billing_phone', true );
+        $phone = apply_filters('bp_api_filter_user_phone', $phone);
+
+        return $phone;
+    }
+}
 WooBonusPlus_Profile::init();

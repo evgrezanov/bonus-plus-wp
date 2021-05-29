@@ -63,8 +63,10 @@ class WooBonusPlus_Profile
         $profile_text = $woobonusplus_options['___4'];
         echo $profile_text;
         echo '<br>';
+        echo '<a href="">редактировать данные для входа</a>';
+        echo '<br>';
         $current_account_info = self::render_bonus_plus_customer_info();
-        if ( is_admin() ){
+        /*if ( is_admin() ){
             echo '<div class="bonus-plus-client-form">';
             self::render_bonus_plus_customer_info();
             echo '</div>';
@@ -83,6 +85,7 @@ class WooBonusPlus_Profile
             </p>';
         echo '<input type="submit" name="submit" id="submit" class="button button-primary" value="Сохранить">';
         echo '</div>';
+        */
     }
 
     /**
@@ -110,7 +113,7 @@ class WooBonusPlus_Profile
      */
     public static function render_bonus_plus_customer_info()
     {
-        $res = WooBonusPlus_API::bp_api_get_customer_data_curl();
+        $res = WooBonusPlus_API::bp_api_request('customer', array('phone'=>'79119387283'), 'GET');
 
         $info = json_decode($res);
 
@@ -120,7 +123,7 @@ class WooBonusPlus_Profile
             if ($key != 'person') {
                 print($key . ' = ' . $value . '<br />');
             } else {
-                $person_data = json_decode($value);
+                $person_data = $value;
                 foreach ($person_data as $dkey => $data){
                     print($dkey . ' = ' . $data . '<br />');
                 }

@@ -113,7 +113,7 @@ class WooBonusPlus_Profile
      */
     public static function render_bonus_plus_customer_info()
     {
-        $res = WooBonusPlus_API::bp_api_request('customer', array('phone'=>'79119387283'), 'GET');
+        $res = WooBonusPlus_API::bp_api_request('customer', array('phone'=>self::get_customer_phone()), 'GET');
 
         $info = json_decode($res);
 
@@ -134,6 +134,9 @@ class WooBonusPlus_Profile
 
     }
 
+    /**
+     *  return customer billing phone
+     */
     public static function get_customer_phone($customer_id = ''){
         if (empty($customer_id)){
             $customer_id = get_current_user_id();

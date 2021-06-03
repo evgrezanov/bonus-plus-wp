@@ -48,8 +48,17 @@ class WooBonusPlus_Settings
 				$info = json_decode($res);
 
 				foreach ($info as $key => $value) :
-					if ($key != 'companies') {
-						print($key . ' = ' . $value . '<br />');
+					if ($key == 'balance') {
+						print('Балланс: ' . $value . '<br />');
+					}
+					if ($key == 'tariff') {
+						print('Тарифф: ' . $value . '<br />');
+					}
+					if ($key == 'smsPrice') {
+						print('Стоимость СМС: ' . $value . '<br />');
+					}
+					if ($key == 'pushPrice') {
+						print('Стоимость push: ' . $value . '<br />');
 					}
 				endforeach;
 			

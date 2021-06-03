@@ -12,7 +12,8 @@ class WooBonusPlus_Profile
         add_filter('woocommerce_account_menu_items', [__CLASS__, 'bonus_plus_account_links'], 10);
         add_action('woocommerce_account_bonus-plus_endpoint', array(__CLASS__, 'render_bonus_plus_customer_info'));
 
-        //add_shortcode('bp_api_user_info', array(__CLASS__, 'bp_api_user_info'));
+
+        add_action('wp_login', array(__CLASS__, 'bp_customer_login'),10, 2);
     }
 
     /**
@@ -86,14 +87,6 @@ class WooBonusPlus_Profile
                 if ($key == 'nextCardName') {
                     print('Следующий уровень: ' . $value . '<br />');
                 }
-                /*if ($key != 'person') {
-                    print($key . ' = ' . $value . '<br />');
-                } else {
-                    $person_data = $value;
-                    foreach ($person_data as $dkey => $data){
-                        print($dkey . ' = ' . $data . '<br />');
-                    }
-                }*/
             endforeach;
 
         } else {
@@ -161,6 +154,49 @@ class WooBonusPlus_Profile
                 }
             endforeach;
         }
+    }
+
+    /**
+     *  Save alailable bonuses count at user meta, after user login
+     */
+    public static function bp_customer_login($user_login, $user)
+    {
+        
+        $bonuses = get_user_meta($user->ID, 'bpw_availableBonuses', true);
+
+        if (empty($bonuses) || $bonuses=='0') {
+        
+            $phone = self::get_customer_phone($user->ID);
+
+            if (!empty($phone)) {
+
+                $res = WooBonusPlus_API::bp_api_request(
+                    'customer',
+                    array('phone' => $phone),
+                    'GET'
+                );
+
+                $info = json_decode($res);
+
+
+                foreach ($info as $key => $value) :
+                    if ($key == 'availableBonuses') {
+                        update_user_meta($user->ID, 'bpw_availableBonuses', $value);
+                    }
+                endforeach;
+            }
+        }
+    }
+
+    /**
+     * Return available bonuses for customer/current user
+     */
+    public static function bp_customer_get_available_bonuses($customer_id = ''){
+        if ($customer_id = ''){
+            $customer_id = get_current_user_id();
+        }
+        $availableBonuses = get_user_meta($customer_id, 'bpw_availableBonuses', true);
+        return $availableBonuses;
     }
 }
 WooBonusPlus_Profile::init();

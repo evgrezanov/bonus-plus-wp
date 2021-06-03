@@ -4,7 +4,7 @@
  * Plugin Name: Woo-bonusplus
  * Plugin URI: https://github.com/evgrezanov/wooms-bonusplus
  * Description: Добавляет механизм отображения бонусов в Woocommerce. 
- * Version: 1.0
+ * Version: 1.1.0
  */
 
 defined('ABSPATH') || exit; // Exit if accessed directly
@@ -15,7 +15,7 @@ class WooBonusPlus
     {
         define('WOOBPP_PLUGIN_URL', plugins_url('', __FILE__));
         define('WOOBPP_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
-        define('WOOBPP_PLUGIN_VERSION', '1.0');
+        define('WOOBPP_PLUGIN_VERSION', '1.1.0');
 
         add_action('plugins_loaded', [__CLASS__, 'inc_components']);
     }

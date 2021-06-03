@@ -1,6 +1,4 @@
 <?php
-//namespace WooBonusPlus_Profile;
-//use WooBonusPlus_API;
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 
@@ -12,9 +10,9 @@ class WooBonusPlus_Profile
         add_action('init', [__CLASS__, 'bonus_plus_add_my_account_endpoint']);
         add_filter('query_vars', [__CLASS__, 'bonus_plus_query_vars']);
         add_filter('woocommerce_account_menu_items', [__CLASS__, 'bonus_plus_account_links'], 10);
-        add_action('woocommerce_account_bonus-plus_endpoint', array(__CLASS__, 'bonus_plus_account_content'));
-        
-        add_shortcode('bonusplus_login', array(__CLASS__, 'render_bonus_plus_login_info'));
+        add_action('woocommerce_account_bonus-plus_endpoint', array(__CLASS__, 'render_bonus_plus_customer_info'));
+
+        //add_shortcode('bp_api_user_info', array(__CLASS__, 'bp_api_user_info'));
     }
 
     /**
@@ -55,82 +53,54 @@ class WooBonusPlus_Profile
     }
 
     /**
-     *  display tab template
-     */
-    public static function bonus_plus_account_content()
-    {
-        $woobonusplus_options = get_option( 'woobonusplus_option_name' );
-        $profile_text = $woobonusplus_options['___4'];
-        echo $profile_text;
-        echo '<br>';
-        echo '<a href="">редактировать данные для входа</a>';
-        echo '<br>';
-        $current_account_info = self::render_bonus_plus_customer_info();
-        /*if ( is_admin() ){
-            echo '<div class="bonus-plus-client-form">';
-            self::render_bonus_plus_customer_info();
-            echo '</div>';
-        }
-        echo '<div class="bonus-plus-client-form">';
-        echo '<p class="woocommerce-form-row woocommerce-form-row--bonus-plus-card-number form-row form-row-bonus-plus-card-number">
-		        <label for="account_bonus_plus_card_number">Номер карты клиента</label>
-		        <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_bonus_plus_card_number" id="account_bonus_plus_card_number" value="">
-                <span><em>Формат EAN-8 или EAN13 (только цифры)</em></span>
-	        </p>';
-        echo '
-            <p class="woocommerce-form-row woocommerce-form-row--bonuspassword form-row form-row-bonuspassword">
-                <label for="account_bonus_plus_password">Номер телефона</label>
-                <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_bonus_plus_phone_number" id="account_bonus_plus_phone_number" value="">
-                <span><em>Формат не имеет значение. Обязан содержать минимум 11 цифр</em></span>
-            </p>';
-        echo '<input type="submit" name="submit" id="submit" class="button button-primary" value="Сохранить">';
-        echo '</div>';
-        */
-    }
-
-    /**
-     *  render Company Account info
-     */
-    public static function render_bonus_plus_login_info()
-    {
-        $res = WooBonusPlus_API::bp_api_get_login_curl();
-
-        $info = json_decode($res);
-
-        ob_start();
-
-        foreach ($info as $key => $value):
-            if ( $key != 'companies' ) {
-                print($key . ' = ' . $value . '<br />');
-            }
-        endforeach;
-
-        return ob_get_clean();
-    }
-
-    /**
-     *  render Customer Account info
+     *  Render Customer Account info
      */
     public static function render_bonus_plus_customer_info()
     {
-        $res = WooBonusPlus_API::bp_api_request('customer', array('phone'=>self::get_customer_phone()), 'GET');
+        $phone = self::get_customer_phone();
 
-        $info = json_decode($res);
+        if ( !empty($phone) ){
 
-        //ob_start();
+            $res = WooBonusPlus_API::bp_api_request(
+                'customer', 
+                array('phone'=> $phone), 
+                'GET'
+            );
 
-        foreach ($info as $key => $value) :
-            if ($key != 'person') {
-                print($key . ' = ' . $value . '<br />');
-            } else {
-                $person_data = $value;
-                foreach ($person_data as $dkey => $data){
-                    print($dkey . ' = ' . $data . '<br />');
+            $info = json_decode($res);
+
+
+            foreach ($info as $key => $value) :
+                if ($key == 'discountCardNumber') {
+                    print('Номер карты: ' . $value . '<br />');
                 }
-            }
-        endforeach;
+                if ($key == 'discountCardName') {
+                    print('Тип карты: ' . $value . '<br />');
+                }
+                if ($key == 'availableBonuses') {
+                    print('Доступно бонусов: ' . $value . '<br />');
+                }
+                if ($key == 'purchasesSumToNextCard') {
+                    print('Сумма для следующего уровня: ' . $value . '<br />');
+                }
+                if ($key == 'nextCardName') {
+                    print('Следующий уровень: ' . $value . '<br />');
+                }
+                /*if ($key != 'person') {
+                    print($key . ' = ' . $value . '<br />');
+                } else {
+                    $person_data = $value;
+                    foreach ($person_data as $dkey => $data){
+                        print($dkey . ' = ' . $data . '<br />');
+                    }
+                }*/
+            endforeach;
 
-        //return ob_get_clean();
+        } else {
+
+            print_r('Заполните телефон в платежном адресе для доступа к бонусной программе. Ваш телефон в платежном адресе должен совпадать с телефоном в бонусной программе.');
+        
+        }
 
     }
 
@@ -141,10 +111,56 @@ class WooBonusPlus_Profile
         if (empty($customer_id)){
             $customer_id = get_current_user_id();
         }
-        $phone = get_user_meta( $customer_id, 'billing_phone', true );
+
+        $phone = get_user_meta($customer_id, 'billing_phone', true);
+        
         $phone = apply_filters('bp_api_filter_user_phone', $phone);
 
         return $phone;
+    }
+
+    /**
+     *  Render user info from bonusplus
+     */
+    public static function bp_api_user_info(){
+        $phone = self::get_customer_phone();
+        if (!empty($phone)) {
+
+            $res = WooBonusPlus_API::bp_api_request(
+                'customer',
+                array('phone' => $phone),
+                'GET'
+            );
+
+            $info = json_decode($res);
+
+
+            foreach ($info as $key => $value) :
+                if ($key != 'person') {
+                    print($key . ' = ' . $value . '<br />');
+                } else {
+                    $person_data = $value;
+                    foreach ($person_data as $dkey => $data) {
+                        if ($dkey == 'discountCardNumber') {
+                            print('Номер карты: ' . $data . '<br />');
+                        }
+                        if ($dkey == 'discountCardName') {
+                            print('Тип карты: ' . $data . '<br />');
+                        }
+                        if ($dkey == 'availableBonuses') {
+                            print('Доступно бонусов: ' . $data . '<br />');
+                        }
+                        if ($dkey == 'purchasesSumToNextCard') {
+                            print('Сумма для следующего уровня: ' . $data . '<br />');
+                        }
+                        if ($dkey == 'nextCardName') {
+                            print('Следующий уровень: ' . $data . '<br />');
+                        }
+
+                    }
+                }
+            endforeach;
+        }
     }
 }
 WooBonusPlus_Profile::init();

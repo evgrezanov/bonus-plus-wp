@@ -46,7 +46,7 @@ class WooBonusPlus_Settings
 				);
 
 				$info = json_decode($res);
-
+				//print_r($res);
 				foreach ($info as $key => $value) :
 					if ($key == 'balance') {
 						print('Балланс: ' . $value . '<br />');

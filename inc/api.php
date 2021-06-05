@@ -1,5 +1,4 @@
 <?php
-//namespace WooBonusPlus_API;
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 

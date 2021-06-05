@@ -29,7 +29,6 @@ function bp_api_request($endpoint, $params, $type)
 
 
     $headers = array();
-    //$headers[] = 'Authorization: ApiKey NjU4QUQ2MjAtMTkzNS00NDUzLTg1RjgtNTg4MDlGRUQzMEZD';
     $headers[] = 'Authorization: ApiKey ' . $token;
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 

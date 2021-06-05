@@ -37,7 +37,7 @@ class WooBonusPlus_Core
     public static function init()
     {
         require_once __DIR__ . '/functions.php';
-        require_once __DIR__ . '/inc/settings.php';
+        require_once __DIR__ . '/inc/my-account.php';
 
         if (!bpwp_is_woocommerce_activated()) {
             return;

@@ -18,13 +18,13 @@ class WooBonusPlus_Settings
 	public function woobonusplus_add_plugin_page()
 	{
 		add_menu_page(
-			'WooBonusPlus', // page_title
-			'WooBonusPlus', // menu_title
-			'manage_options', // capability
-			'woobonusplus', // menu_slug
-			array($this, 'woobonusplus_create_admin_page'), // function
-			'dashicons-admin-generic', // icon_url
-			2 // position
+			'WooBonusPlus',
+			'WooBonusPlus',
+			'manage_options',
+			'woobonusplus-settings',
+			array($this, 'woobonusplus_create_admin_page'),
+			'dashicons-admin-generic',
+			2,
 		);
 	}
 

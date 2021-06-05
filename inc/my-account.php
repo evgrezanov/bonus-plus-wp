@@ -13,7 +13,7 @@ class WooBonusPlus_My_Account
         add_filter('query_vars', [__CLASS__, 'bpwp_query_vars']);
         add_filter('woocommerce_account_menu_items', [__CLASS__, 'bpwp_account_links'], 10);
         add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_render_customer_info']);
-        add_action('wp_login', [__CLASS__, 'bpwp__customer_login'], 10, 2);
+        add_action('wp_login', [__CLASS__, 'bpwp_customer_login'], 10, 2);
     }
 
     /**
@@ -42,7 +42,7 @@ class WooBonusPlus_My_Account
         $tab_title = trim($options['____3']);
         $tab_title ? '' : 'Бонусная программа';
         $new = array(
-            'bonus-plus'     => $tab_title,
+            'bonus-plus' => $tab_title,
         );
 
         // array_slice() is good when you want to add an element between the other ones
@@ -99,7 +99,7 @@ class WooBonusPlus_My_Account
     /**
      *  Update bonuses data after customer login, save data to meta field
      */
-    public static function bpwp__customer_login($user_login, $user)
+    public static function bpwp_customer_login($user_login, $user)
     {
 
         $bonuses = get_user_meta($user->ID, 'bpw_availableBonuses', true);

@@ -39,7 +39,7 @@ class WooBonusPlus_Settings
 			<p>https://bonusplus.pro/lk</p>
 			<?php 
 				settings_errors();
-				$res = WooBonusPlus_API::bp_api_request(
+				$res = bp_api_request(
 					'account',
 					'',
 					'GET'

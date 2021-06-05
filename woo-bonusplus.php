@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: Woo-bonusplus
  * Plugin URI: https://github.com/evgrezanov/wooms-bonusplus
@@ -23,27 +22,54 @@
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 
-class WooBonusPlus
+class WooBonusPlus_Core
 {
+    /**
+     * $wooms_version
+     */
+    public static $bpwp_version;
+
+    /**
+     * $plugin_file_path
+     */
+    public static $bpwp_plugin_file_path;
+
     public static function init()
     {
-        define('WOOBPP_PLUGIN_URL', plugins_url('', __FILE__));
-        define('WOOBPP_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
-        define('WOOBPP_PLUGIN_VERSION', '1.1.0');
+        require_once __DIR__ . '/functions.php';
+        require_once __DIR__ . '/inc/settings.php';
 
         if (!bpwp_is_woocommerce_activated()) {
             return;
         }
-        
-        add_action('plugins_loaded', [__CLASS__, 'inc_components']);
+
+        require_once __DIR__ . '/inc/my-account.php';
+        require_once __DIR__ . '/inc/profile.php';
+
+        /**
+         * Add hook for activate plugin
+         */
+        register_activation_hook(__FILE__, function () {
+            do_action('bpwp_activate');
+        });
+
+        register_deactivation_hook(__FILE__, function () {
+            do_action('bpwp_deactivate');
+        });
+
+        add_action('plugins_loaded', [__CLASS__, 'bpwp_true_load_plugin_textdomain']);
+
     }
 
-    public static function inc_components()
+    /**
+     * Add languages
+     *
+     * @return void
+     */
+    public static function bpwp_true_load_plugin_textdomain()
     {
-        require_once WOOBPP_PLUGIN_DIR_PATH . '/inc/settings.php';
-        require_once WOOBPP_PLUGIN_DIR_PATH . '/inc/api.php';
-        require_once WOOBPP_PLUGIN_DIR_PATH . '/inc/profile.php';
+        load_plugin_textdomain('bonusplus-wp', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     }
-
+    
 }
-WooBonusPlus::init();
+WooBonusPlus_Core::init();

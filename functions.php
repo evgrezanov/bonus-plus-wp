@@ -60,8 +60,8 @@ function bp_api_get_customer_phone($customer_id = '')
 /**
  * Check if WooCommerce is activated
  */
-if (!function_exists('bpwp_is_woocommerce_activated')) {
-    function bpwp_is_woocommerce_activated()
+if (!function_exists('is_woocommerce_activated')) {
+    function is_woocommerce_activated()
     {
         if (class_exists('woocommerce')) {
             return true;

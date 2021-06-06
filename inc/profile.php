@@ -7,8 +7,10 @@ class WooBonusPlus_Profile
 
     public static function init()
     {
-        //add_shortcode('wpbp_customer_bonuses', [__CLASS__, 'render_customer_bonuses']);
+        add_action('init', [__CLASS__, 'bp_api_bonus_card_shortcode_init']);
+    }
 
+    public static function bp_api_bonus_card_shortcode_init(){
         add_shortcode('bp_api_customer_bonus_card', [__CLASS__, 'bp_api_render_customer_bonus_card']);
     }
 
@@ -80,19 +82,32 @@ class WooBonusPlus_Profile
     public static function bp_api_render_customer_bonus_card()
     {
         $customer_bonuses = self::bp_api_prepare_customer_bonuses_data();
-        if (empty($customer_bonuses)){
-            print_r($customer_bonuses);
-        }
+        /*if (!empty($customer_bonuses)){
+            var_dump($customer_bonuses);
+            die();
+        }*/
         $title  = $customer_bonuses['title'];
         $url    = $customer_bonuses['url'];
         $desc   = $customer_bonuses['desc'];
         $class  = $customer_bonuses['class'];
 
-        ob_start();
+        wp_enqueue_style('bpwp-bonus-card-style');
 
-        require_once ('/bonus-card-template.php');
+        ob_start(); ?>
 
-        //var_dump(__DIR__ . '/bonus-card-template.php'); die();
+        <div class="container">
+            <a class="<?=$class?>" href="<?= $url ?>">
+                <h3 class="bp-bonuses-card-title"><?=$title?></h3>
+                <p class="small bp-bonuses-card"><?=$desc?></p>
+                <div class="go-corner" href="<?=$url?>">
+                    <div class="go-arrow">
+                        →
+                    </div>
+                </div>
+            </a>
+        </div>
+    
+        <?php
 
         return ob_get_clean();
     }
@@ -102,7 +117,7 @@ class WooBonusPlus_Profile
      */
     public static function bp_api_prepare_customer_bonuses_data($customer_id = '')
     {
-        if (empty($customer_id) && !is_user_logged_in()) {
+        if (empty($customer_id) && is_user_logged_in()) {
             $customer_id = get_current_user_id();
         }
 
@@ -115,31 +130,48 @@ class WooBonusPlus_Profile
             $data['url']    =   wc_get_page_permalink('myaccount ');
             $data['desc']   =   'Чтобы увидеть баланс бонусов и расплачиватся ими за покупку';
             $data['class']  =   'card4';
-
-        } else {
-
+            //var_dump(1);
+            
+        } elseif(is_user_logged_in()) {
+            //var_dump(2);
             $bonuses = self::bp_customer_get_available_bonuses($customer_id);
-            $billing_phone = bp_api_get_customer_phone($customer_id);
+            //$billing_phone = bp_api_get_customer_phone($customer_id);
             // Если у пользователя нет бонусов или = 0
             if (empty($bonuses) || $bonuses == 0) {
-
+                //var_dump(2.1);
                 $data['title']  =   'У Вас пока нет бонусов';
                 $data['url']    =   wc_get_page_permalink('shop');
                 $data['desc']   =   'Начните накапливать бонусы после первой покупки!';
                 $data['class']  =   'card3';
 
             } elseif (!empty($bonuses) || $bonuses > 0) {
-
+                //var_dump(2.2);
                 // есть бонусы
                 $data['title']  =   $bonuses . ' Бонусных рублей';
                 $data['url']    =   wc_get_page_permalink('shop');
                 $data['desc']   =   'Не забудте потратить бонусные рубли при оплате следующей покупки!';
                 $data['class']  =   'card1';
 
-            }
-        }
+            } else {
+                //var_dump(2.3);
+                // дефаулт
+                $data['title']  =   'Оплачивайте покупки бонусными рублями';
+                $data['url']    =   wc_get_page_permalink('shop');
+                $data['desc']   =   'Зарегистрируйтесь и сделайте покупку чтобы начать использовать бонусные баллы.';
+                $data['class']  =   'card4';
 
+            }
+        } else {
+            //var_dump(3);
+            // дефаулт
+            $data['title']  =   'Оплачивайте покупки бонусными рублями';
+            $data['url']    =   wc_get_page_permalink('shop');
+            $data['desc']   =   'Зарегистрируйтесь и сделайте покупку чтобы начать использовать бонусные баллы.';
+            $data['class']  =   'card4';
+        }
+        //var_dump($data);
         return $data;
     }
+
 }
 WooBonusPlus_Profile::init();

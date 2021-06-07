@@ -16,7 +16,7 @@
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
  * Tested up to: 5.7
- * Version: 1.0
+ * Version: 1.0.1
  */
 
 
@@ -27,7 +27,7 @@ class WooBonusPlus_Core
 
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '1.0');
+        define('BPWP_PLUGIN_VERSION', '1.0.1');
 
         require_once __DIR__ . '/functions.php';
 
@@ -45,6 +45,9 @@ class WooBonusPlus_Core
         add_action('plugins_loaded', [__CLASS__, 'bpwp_true_load_plugin_textdomain']);
         add_action('plugins_loaded', [__CLASS__, 'bpwp_load_components']);
         
+        add_action('bpwp_activate', [__CLASS__, 'bpwp_plugin_activate']);
+        add_action('bpwp_deactivate', [__CLASS__, 'bpwp_plugin_deactivate']);
+
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_shortcode_wp_enqueue_styles']);
     }
 
@@ -87,6 +90,22 @@ class WooBonusPlus_Core
             BPWP_PLUGIN_VERSION, 
             'all'
         );
+    }
+
+    /**
+     *  Action fire at plugin activation
+     */
+    public static function bpwp_plugin_activate()
+    {
+        flush_rewrite_rules();
+    }
+
+    /**
+     *  Action fire at plugin deactivation
+     */
+    public static function bpwp_plugin_deactivate()
+    {
+        flush_rewrite_rules();
     }
 }
 WooBonusPlus_Core::init();

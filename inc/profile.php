@@ -10,6 +10,9 @@ class WooBonusPlus_Profile
         add_action('init', [__CLASS__, 'bp_api_bonus_card_shortcode_init']);
     }
 
+    /**
+     *  Shortcode init
+     */
     public static function bp_api_bonus_card_shortcode_init(){
         add_shortcode('bp_api_customer_bonus_card', [__CLASS__, 'bp_api_render_customer_bonus_card']);
     }

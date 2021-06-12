@@ -12,7 +12,7 @@ class WooBonusPlus_My_Account
         add_action('init', [__CLASS__, 'bpwp_add_my_account_endpoint']);
         add_filter('query_vars', [__CLASS__, 'bpwp_query_vars']);
         add_filter('woocommerce_account_menu_items', [__CLASS__, 'bpwp_account_links'], 10);
-        add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_render_customer_info']);
+        //add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_render_customer_info']);
         add_action('wp_login', [__CLASS__, 'bpwp_customer_login'], 10, 2);
     }
 
@@ -75,24 +75,24 @@ class WooBonusPlus_My_Account
 
             foreach ($info as $key => $value) :
                 if ($key == 'discountCardNumber') {
-                    print('Номер карты: ' . $value . '<br />');
+                    //print('Номер карты: ' . $value . '<br />');
                 }
                 if ($key == 'discountCardName') {
-                    print('Тип карты: ' . $value . '<br />');
+                    //print('Тип карты: ' . $value . '<br />');
                 }
                 if ($key == 'availableBonuses') {
-                    print('Доступно бонусов: ' . $value . '<br />');
+                    //print('Доступно бонусов: ' . $value . '<br />');
                 }
                 if ($key == 'purchasesSumToNextCard') {
-                    print('Сумма для следующего уровня: ' . $value . '<br />');
+                    //print('Сумма для следующего уровня: ' . $value . '<br />');
                 }
                 if ($key == 'nextCardName') {
-                    print('Следующий уровень: ' . $value . '<br />');
+                    //print('Следующий уровень: ' . $value . '<br />');
                 }
             endforeach;
         } else {
 
-            print_r('Заполните телефон в платежном адресе для доступа к бонусной программе. Ваш телефон в платежном адресе должен совпадать с телефоном в бонусной программе.');
+            print('Заполните телефон в платежном адресе для доступа к бонусной программе. Ваш телефон в платежном адресе должен совпадать с телефоном в бонусной программе.');
         }
     }
 

@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Plugin Name: Woo-bonusplus
  * Plugin URI: https://github.com/evgrezanov/wooms-bonusplus
- * Description: Integration for WooCommerce and MoySklad (moysklad.ru, МойСклад) via REST API (wooms)
+ * Description: Интеграция WooCommerce и БонусПлюс. Для отображения данных пользователя используйте шорткод [bpwp_api_customer_bonus_card]
  * Author: redmonkey73
  * Author URI: http://evgeniyrezanov.site
  * Developer: redmonkey73

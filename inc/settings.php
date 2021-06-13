@@ -88,7 +88,7 @@ class WooBonusPlus_Settings
 			array($this, 'woobonusplus_section_info'), // callback
 			'woobonusplus-admin' // page
 		);
-
+/*
 		add_settings_field(
 			'_0', // id
 			'Логин', // title
@@ -104,7 +104,7 @@ class WooBonusPlus_Settings
 			'woobonusplus-admin', // page
 			'woobonusplus_setting_section' // section
 		);
-
+*/
 		add_settings_field(
 			'_api_2', // id
 			'Ключ API', // title
@@ -159,7 +159,7 @@ class WooBonusPlus_Settings
 	public function woobonusplus_section_info()
 	{
 	}
-
+/*
 	public function _0_callback()
 	{
 		printf(
@@ -175,7 +175,7 @@ class WooBonusPlus_Settings
 			isset($this->bpwp_options['_1']) ? esc_attr($this->bpwp_options['_1']) : ''
 		);
 	}
-
+*/
 	public function _api_2_callback()
 	{
 		printf(

@@ -40,7 +40,7 @@ class WooBonusPlus_Profile
 
             foreach ($info as $key => $value) :
                 if ($key != 'person') {
-                    print($key . ' = ' . $value . '<br />');
+                    //print($key . ' = ' . $value . '<br />');
                     $cdata[$key] = $value;
                 } else {
                     $person_data = $value;

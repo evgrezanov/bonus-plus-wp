@@ -3,7 +3,7 @@
 /**
  * General functions
  */
-function bp_api_request($endpoint, $params, $type)
+function bpwp_api_request($endpoint, $params, $type)
 {
     if (empty($endpoint) || empty($type))
         return;
@@ -44,7 +44,7 @@ function bp_api_request($endpoint, $params, $type)
 /**
  *  Return customer billing phone
  */
-function bp_api_get_customer_phone($customer_id = '')
+function bpwp_api_get_customer_phone($customer_id = '')
 {
     if (empty($customer_id)) {
         $customer_id = get_current_user_id();
@@ -52,7 +52,7 @@ function bp_api_get_customer_phone($customer_id = '')
 
     $phone = get_user_meta($customer_id, 'billing_phone', true);
 
-    $phone = apply_filters('bp_api_filter_get_customer_phone', $phone);
+    $phone = apply_filters('bpwp_api_filter_get_customer_phone', $phone);
 
     return $phone;
 }

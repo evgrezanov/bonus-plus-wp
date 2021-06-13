@@ -7,30 +7,30 @@
 
 class WooBonusPlus_Settings
 {
-	private $woobonusplus_options;
+	private $bpwp_options;
 
 	public function __construct()
 	{
-		add_action('admin_menu', array($this, 'woobonusplus_add_plugin_page'));
-		add_action('admin_init', array($this, 'woobonusplus_page_init'));
+		add_action('admin_menu', array($this, 'bpwp_add_plugin_page'));
+		add_action('admin_init', array($this, 'bpwp_page_init'));
 	}
 
-	public function woobonusplus_add_plugin_page()
+	public function bpwp_add_plugin_page()
 	{
 		add_menu_page(
 			'WooBonusPlus',
 			'WooBonusPlus',
 			'manage_options',
-			'woobonusplus-settings',
-			array($this, 'woobonusplus_create_admin_page'),
+			'bpwp-settings',
+			array($this, 'bpwp_create_admin_page'),
 			'dashicons-admin-generic',
 			2,
 		);
 	}
 
-	public function woobonusplus_create_admin_page()
+	public function bpwp_create_admin_page()
 	{
-		$this->woobonusplus_options = get_option('woobonusplus_option_name');
+		$this->bpwp_options = get_option('woobonusplus_option_name');
 		
 		?>
 		
@@ -39,7 +39,7 @@ class WooBonusPlus_Settings
 			<p>https://bonusplus.pro/lk</p>
 			<?php 
 				settings_errors();
-				$res = bp_api_request(
+				$res = bpwp_api_request(
 					'account',
 					'',
 					'GET'
@@ -74,7 +74,7 @@ class WooBonusPlus_Settings
 		<?php 
 	}
 
-	public function woobonusplus_page_init()
+	public function bpwp_page_init()
 	{
 		register_setting(
 			'woobonusplus_option_group', // option_group
@@ -164,7 +164,7 @@ class WooBonusPlus_Settings
 	{
 		printf(
 			'<input class="regular-text" type="text" name="woobonusplus_option_name[_0]" id="_0" value="%s">',
-			isset($this->woobonusplus_options['_0']) ? esc_attr($this->woobonusplus_options['_0']) : ''
+			isset($this->bpwp_options['_0']) ? esc_attr($this->bpwp_options['_0']) : ''
 		);
 	}
 
@@ -172,7 +172,7 @@ class WooBonusPlus_Settings
 	{
 		printf(
 			'<input class="regular-text" type="text" name="woobonusplus_option_name[_1]" id="_1" value="%s">',
-			isset($this->woobonusplus_options['_1']) ? esc_attr($this->woobonusplus_options['_1']) : ''
+			isset($this->bpwp_options['_1']) ? esc_attr($this->bpwp_options['_1']) : ''
 		);
 	}
 
@@ -180,7 +180,7 @@ class WooBonusPlus_Settings
 	{
 		printf(
 			'<input class="regular-text" type="text" name="woobonusplus_option_name[_api_2]" id="_api_2" value="%s">',
-			isset($this->woobonusplus_options['_api_2']) ? esc_attr($this->woobonusplus_options['_api_2']) : ''
+			isset($this->bpwp_options['_api_2']) ? esc_attr($this->bpwp_options['_api_2']) : ''
 		);
 	}
 
@@ -188,7 +188,7 @@ class WooBonusPlus_Settings
 	{
 		printf(
 			'<input class="regular-text" type="text" name="woobonusplus_option_name[____3]" id="____3" value="%s">',
-			isset($this->woobonusplus_options['____3']) ? esc_attr($this->woobonusplus_options['____3']) : ''
+			isset($this->bpwp_options['____3']) ? esc_attr($this->bpwp_options['____3']) : ''
 		);
 	}
 
@@ -196,7 +196,7 @@ class WooBonusPlus_Settings
 	{
 		printf(
 			'<textarea class="large-text" rows="5" name="woobonusplus_option_name[___4]" id="___4">%s</textarea>',
-			isset($this->woobonusplus_options['___4']) ? esc_attr($this->woobonusplus_options['___4']) : ''
+			isset($this->bpwp_options['___4']) ? esc_attr($this->bpwp_options['___4']) : ''
 		);
 	}
 }
@@ -206,10 +206,10 @@ if (is_admin())
 
 /* 
  * Retrieve this value with:
- * $woobonusplus_options = get_option( 'woobonusplus_option_name' ); // Array of All Options
- * $_0 = $woobonusplus_options['_0']; // Логин
- * $_1 = $woobonusplus_options['_1']; // Пароль
- * $_api_2 = $woobonusplus_options['_api_2']; // Ключ API
- * $____3 = $woobonusplus_options['____3']; // Заголовок вкладки в профиле
- * $___4 = $woobonusplus_options['___4']; // Инструкция для пользователя
+ * $bpwp_options = get_option( 'woobonusplus_option_name' ); // Array of All Options
+ * $_0 = $bpwp_options['_0']; // Логин
+ * $_1 = $bpwp_options['_1']; // Пароль
+ * $_api_2 = $bpwp_options['_api_2']; // Ключ API
+ * $____3 = $bpwp_options['____3']; // Заголовок вкладки в профиле
+ * $___4 = $bpwp_options['___4']; // Инструкция для пользователя
  */

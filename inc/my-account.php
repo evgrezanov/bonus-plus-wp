@@ -58,11 +58,11 @@ class WooBonusPlus_My_Account
      */
     public static function bpwp_render_customer_info()
     {
-        $phone = bp_api_get_customer_phone();
+        $phone = bpwp_api_get_customer_phone();
 
         if (!empty($phone)) {
 
-            $res = bp_api_request(
+            $res = bpwp_api_request(
                 'customer',
                 array(
                     'phone' => $phone
@@ -106,11 +106,11 @@ class WooBonusPlus_My_Account
 
         if (empty($bonuses) || $bonuses == '0') {
 
-            $phone = bp_api_get_customer_phone($user->ID);
+            $phone = bpwp_api_get_customer_phone($user->ID);
 
             if (!empty($phone)) {
 
-                $res = bp_api_request(
+                $res = bpwp_api_request(
                     'customer',
                     array(
                         'phone' => $phone

@@ -7,27 +7,27 @@ class WooBonusPlus_Profile
 
     public static function init()
     {
-        add_action('init', [__CLASS__, 'bp_api_bonus_card_shortcode_init']);
-        add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bp_api_print_user_info']);
+        add_action('init', [__CLASS__, 'bpwp_api_bonus_card_shortcode_init']);
+        add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_api_print_user_info']);
     }
 
     /**
      *  Shortcode init
      */
-    public static function bp_api_bonus_card_shortcode_init()
+    public static function bpwp_api_bonus_card_shortcode_init()
     {
-        add_shortcode('bp_api_customer_bonus_card', [__CLASS__, 'bp_api_render_customer_bonus_card']);
+        add_shortcode('bpwp_api_customer_bonus_card', [__CLASS__, 'bpwp_api_render_customer_bonus_card']);
     }
 
     /**
      *  Print customer info from bonusplus
      */
-    public static function bp_api_print_user_info()
+    public static function bpwp_api_print_user_info()
     {
-        $phone = bp_api_get_customer_phone();
+        $phone = bpwp_api_get_customer_phone();
         if (!empty($phone)) {
 
-            $res = bp_api_request(
+            $res = bpwp_api_request(
                 'customer',
                 array(
                     'phone' => $phone
@@ -96,7 +96,7 @@ class WooBonusPlus_Profile
                     </a>
 
                     <a class="card4" href="#">
-                        <small>Следующий уровень:</small>
+                        <small>Следующий уровень</small>
                         <h3>**** **** ****</h3>
                         <p class="small"><?= $nextCardName ?></p>
                         <div class="dimmer"></div>
@@ -112,14 +112,14 @@ class WooBonusPlus_Profile
     /**
      * Return available bonuses for customer
      */
-    public static function bp_customer_get_available_bonuses($customer_id = '')
+    public static function bpwp_customer_get_available_bonuses($customer_id = '')
     {
         if ($customer_id == '') {
             $customer_id = get_current_user_id();
         }
         $availableBonuses = get_user_meta($customer_id, 'bpw_availableBonuses', true);
 
-        $availableBonuses = apply_filters('bp_api_filter_client_available_bonuses', $availableBonuses);
+        $availableBonuses = apply_filters('bpwp_api_filter_client_available_bonuses', $availableBonuses);
 
         return $availableBonuses;
     }
@@ -128,10 +128,10 @@ class WooBonusPlus_Profile
     /**
      * Render client bonus card
      */
-    public static function bp_api_render_customer_bonus_card()
+    public static function bpwp_api_render_customer_bonus_card()
     {
         //todo заменить на apply_filter
-        $customer_bonuses = self::bp_api_prepare_customer_bonuses_data();
+        $customer_bonuses = self::bpwp_api_prepare_customer_bonuses_data();
         /*if (!empty($customer_bonuses)){
             var_dump($customer_bonuses);
             die();
@@ -166,9 +166,9 @@ class WooBonusPlus_Profile
     /**
      * Render my-profile client bonus cards and loyal
      */
-    public static function bp_api_render_myprofile_bonus_card()
+    public static function bpwp_api_render_myprofile_bonus_card()
     {
-        $customer_bonuses = self::bp_api_prepare_customer_bonuses_data();
+        $customer_bonuses = self::bpwp_api_prepare_customer_bonuses_data();
         /*if (!empty($customer_bonuses)){
             var_dump($customer_bonuses);
             die();
@@ -224,7 +224,7 @@ class WooBonusPlus_Profile
     /**
      *  Prepare customer data for display bonus card
      */
-    public static function bp_api_prepare_customer_bonuses_data($customer_id = '')
+    public static function bpwp_api_prepare_customer_bonuses_data($customer_id = '')
     {
         if (empty($customer_id) && is_user_logged_in()) {
             $customer_id = get_current_user_id();
@@ -243,7 +243,7 @@ class WooBonusPlus_Profile
 
         } elseif (is_user_logged_in()) {
             //var_dump(2);
-            $bonuses = self::bp_customer_get_available_bonuses($customer_id);
+            $bonuses = self::bpwp_customer_get_available_bonuses($customer_id);
             //$billing_phone = bp_api_get_customer_phone($customer_id);
             // Если у пользователя нет бонусов или = 0
             if (empty($bonuses) || $bonuses == 0) {

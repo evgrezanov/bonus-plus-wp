@@ -5,10 +5,14 @@ defined('ABSPATH') || exit; // Exit if accessed directly
 class WooBonusPlus_Profile
 {
 
+    /**
+     *  Init
+     */
     public static function init()
     {
         add_action('init', [__CLASS__, 'bpwp_api_bonus_card_shortcode_init']);
         add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_api_print_customer_card_info']);
+        add_action('wp_login', [__CLASS__, 'bpwp_customer_login'], 10, 2);
     }
 
     /**
@@ -17,95 +21,6 @@ class WooBonusPlus_Profile
     public static function bpwp_api_bonus_card_shortcode_init()
     {
         add_shortcode('bpwp_api_customer_bonus_card', [__CLASS__, 'bpwp_api_render_customer_bonus_card']);
-    }
-
-    /**
-     *  DEPRICATED Print customer info from bonusplus
-     */
-    public static function bpwp_api_print_user_info()
-    {
-        $phone = bpwp_api_get_customer_phone();
-        if (!empty($phone)) {
-
-            $res = bpwp_api_request(
-                'customer',
-                array(
-                    'phone' => $phone
-                ),
-                'GET'
-            );
-
-            $info = json_decode($res);
-            $cdata = array();
-
-            foreach ($info as $key => $value) :
-                if ($key != 'person') {
-                    //print($key . ' = ' . $value . '<br />');
-                    $cdata[$key] = $value;
-                } else {
-                    $person_data = $value;
-                    foreach ($person_data as $dkey => $data) {
-                        $cdata[$dkey] = $data;
-                        /*if ($dkey == 'discountCardNumber') {
-                            print('Номер карты: ' . $data . '<br />');
-                        }
-                        if ($dkey == 'discountCardName') {
-                            print('Тип карты: ' . $data . '<br />');
-                        }
-                        if ($dkey == 'availableBonuses') {
-                            print('Доступно бонусов: ' . $data . '<br />');
-                        }
-                        if ($dkey == 'purchasesSumToNextCard') {
-                            print('Сумма для следующего уровня: ' . $data . '<br />');
-                        }
-                        if ($dkey == 'nextCardName') {
-                            print('Следующий уровень: ' . $data . '<br />');
-                        }*/
-                    }
-                }
-            endforeach;
-
-            if (!empty($cdata)) {
-                /*$title  = $cdata['title'];
-                $url    = $customer_bonuses['url'];
-                $desc   = $customer_bonuses['desc'];
-                $class  = $customer_bonuses['class'];*/
-
-                $discountCardNumber = $cdata['discountCardNumber'];
-                $discountCardName = $cdata['discountCardName'];
-                $nextCardName = $cdata['nextCardName'];
-                $purchasesSumToNextCard = $cdata['purchasesSumToNextCard'];
-                $sumBonuses = $cdata['availableBonuses'] + $cdata['notActiveBonuses'];
-
-                wp_enqueue_style('bpwp-bonus-card-style');
-
-                ob_start(); ?>
-
-                <div class="container">
-                    <a class="card4" href="#">
-                        <small>Уровень вашей карты: <?= $discountCardName ?></small>
-                        <h3><?= $discountCardNumber ?></h3>
-                        <p class="small">Доступно <?= $sumBonuses ?> бонусов. Сумма для следующего уровня: <?= $purchasesSumToNextCard ?></p>
-                        <div class="dimmer"></div>
-                        <div class="go-corner" href="#">
-                            <div class="go-arrow">
-                                →
-                            </div>
-                        </div>
-                    </a>
-
-                    <a class="card4" href="#">
-                        <small>Следующий уровень: <?= $nextCardName ?></small>
-                        <h3>**** **** ****</h3>
-                        <p class="small">Чтобы получить уровень <span class="bpwp-customer-next-level">платиновый</span> Вам необходимо совершить покупки на сумму <span class="bpwp-customer-next-level">345</span> руб.</p>
-                        <div class="dimmer"></div>
-                    </a>
-                </div>
-
-            <?php
-
-            }
-        }
     }
 
     /**
@@ -199,7 +114,7 @@ class WooBonusPlus_Profile
     /**
      * Return available bonuses for customer
      */
-    public static function bpwp_customer_get_available_bonuses($customer_id = '')
+    /*public static function bpwp_customer_get_available_bonuses($customer_id = '')
     {
         if ($customer_id == '') {
             $customer_id = get_current_user_id();
@@ -209,7 +124,7 @@ class WooBonusPlus_Profile
         $availableBonuses = apply_filters('bpwp_api_filter_client_available_bonuses', $availableBonuses);
 
         return $availableBonuses;
-    }
+    }*/
 
 
     /**
@@ -273,7 +188,7 @@ class WooBonusPlus_Profile
 
         } elseif (is_user_logged_in()) {
             //var_dump(2);
-            $bonuses = self::bpwp_customer_get_available_bonuses($customer_id);
+            //$bonuses = self::bpwp_customer_get_available_bonuses($customer_id);
             //$billing_phone = bp_api_get_customer_phone($customer_id);
             // Если у пользователя нет бонусов или = 0
             if (empty($bonuses) || $bonuses == 0) {
@@ -307,6 +222,34 @@ class WooBonusPlus_Profile
         }
         //var_dump($data);
         return $data;
+    }
+
+    /**
+     *  Update bonuses data after customer login, save data to meta field
+     *  
+     *  @param string $user_login
+     *  @param array $user
+     *
+     *  @return array
+     */
+    public static function bpwp_customer_login($user_login, $user)
+    {
+        $phone = bpwp_api_get_customer_phone($user->ID);
+
+        if (!empty($phone)) {
+
+            $res = bpwp_api_request(
+                'customer',
+                array(
+                    'phone' => $phone
+                ),
+                'GET'
+            );
+
+            $info = json_decode($res);
+
+            update_user_meta($user->ID, 'bonus-plus', $info);
+        }
     }
 }
 WooBonusPlus_Profile::init();

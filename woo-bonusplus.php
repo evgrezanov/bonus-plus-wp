@@ -25,7 +25,9 @@ defined('ABSPATH') || exit; // Exit if accessed directly
 
 class WooBonusPlus_Core
 {
-
+    /**
+     *  Init
+     */
     public static function init()
     {
         define('BPWP_PLUGIN_VERSION', '1.0.2-dev');
@@ -73,10 +75,10 @@ class WooBonusPlus_Core
         /*if (!bpwp_is_woocommerce_activated()) {
             return;
         }*/
-        require_once __DIR__ . '/inc/my-account.php';
+        require_once __DIR__ . '/inc/WooAccount.php';
         require_once __DIR__ . '/inc/profile.php';
         require_once __DIR__ . '/inc/settings.php';
-        //require_once __DIR__ . '/inc/MenuSettings.php';
+        require_once __DIR__ . '/inc/MenuSettings.php';
     }
 
     /**
@@ -95,6 +97,11 @@ class WooBonusPlus_Core
         );
     }
 
+    /**
+     * Register scripts
+     *
+     * @return void
+     */
     public static function bpwp_qrcode_scripts()
     {
         wp_enqueue_script(
@@ -114,7 +121,7 @@ class WooBonusPlus_Core
 
         $cardNumber = '';
 
-        if (is_user_logged_in()) {
+        if ( is_user_logged_in() ) {
             $cardNumber = get_user_meta(get_current_user_id(), 'bpwp_discountCardNumber', true);
         }
 
@@ -129,6 +136,8 @@ class WooBonusPlus_Core
 
     /**
      *  Action fire at plugin activation
+     *
+     *  @return array
      */
     public static function bpwp_plugin_activate()
     {
@@ -137,6 +146,8 @@ class WooBonusPlus_Core
 
     /**
      *  Action fire at plugin deactivation
+     *
+     *  @return array
      */
     public static function bpwp_plugin_deactivate()
     {

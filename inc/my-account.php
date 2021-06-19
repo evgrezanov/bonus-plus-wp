@@ -125,6 +125,9 @@ class WooBonusPlus_My_Account
                     if ($key == 'availableBonuses') {
                         update_user_meta($user->ID, 'bpw_availableBonuses', $value);
                     }
+                    if ($key == 'discountCardNumber') {
+                        update_user_meta($user->ID, 'bpwp_discountCardNumber', $value);
+                    }
                 endforeach;
             }
         }

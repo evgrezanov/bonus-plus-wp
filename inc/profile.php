@@ -8,7 +8,7 @@ class WooBonusPlus_Profile
     public static function init()
     {
         add_action('init', [__CLASS__, 'bpwp_api_bonus_card_shortcode_init']);
-        add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_api_print_user_info']);
+        add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_api_print_customer_card_info']);
     }
 
     /**
@@ -75,7 +75,7 @@ class WooBonusPlus_Profile
                 $discountCardName = $cdata['discountCardName'];
                 $nextCardName = $cdata['nextCardName'];
                 $purchasesSumToNextCard = $cdata['purchasesSumToNextCard'];
-                $availableBonuses = $cdata['availableBonuses'];
+                $sumBonuses = $cdata['availableBonuses'] + $cdata['notActiveBonuses'];
 
                 wp_enqueue_style('bpwp-bonus-card-style');
 
@@ -83,10 +83,9 @@ class WooBonusPlus_Profile
 
                 <div class="container">
                     <a class="card4" href="#">
-                        <small><?= $discountCardName ?></small>
+                        <small>Уровень вашей карты: <?= $discountCardName ?></small>
                         <h3><?= $discountCardNumber ?></h3>
-                        <p class="small">Доступно <?= $availableBonuses ?> бонусов</p>
-                        <p class="small">Сумма для следующего уровня: <?=$purchasesSumToNextCard?></p>
+                        <p class="small">Доступно <?= $sumBonuses ?> бонусов. Сумма для следующего уровня: <?= $purchasesSumToNextCard ?></p>
                         <div class="dimmer"></div>
                         <div class="go-corner" href="#">
                             <div class="go-arrow">
@@ -96,16 +95,86 @@ class WooBonusPlus_Profile
                     </a>
 
                     <a class="card4" href="#">
-                        <small>Следующий уровень</small>
+                        <small>Следующий уровень: <?= $nextCardName ?></small>
                         <h3>**** **** ****</h3>
-                        <p class="small"><?= $nextCardName ?></p>
+                        <p class="small">Чтобы получить уровень <span class="bpwp-customer-next-level">платиновый</span> Вам необходимо совершить покупки на сумму <span class="bpwp-customer-next-level">345</span> руб.</p>
                         <div class="dimmer"></div>
                     </a>
                 </div>
 
-        <?php
+            <?php
 
             }
+        }
+    }
+
+    /**
+     *  Print customer card loyality information
+     */
+    public static function bpwp_api_print_customer_card_info()
+    {
+        $phone = bpwp_api_get_customer_phone();
+        if (!empty($phone)) {
+
+            $res = bpwp_api_request(
+                'customer',
+                array(
+                    'phone' => $phone
+                ),
+                'GET'
+            );
+
+            $info = json_decode($res);
+            //$cdata = array();
+
+            echo '<h2>Информация по карте лояльности</h2>';
+            echo '<br>';
+            echo '<div id="qrcode"></div>';
+            echo '<br>';
+            foreach ($info as $key => $value) {
+                if ($key != 'person') {
+                    if ($key == 'discountCardName') {
+                        print('Тип карты: ' . $value . '<br />');
+                    }
+                    if ($key == 'discountCardNumber') {
+                        print('Номер карты: ' . $value . '<br />');
+                        $_discountCardNumber = $value;
+                    }
+                    if ($key == 'availableBonuses') {
+                        print('Доступных бонусов: ' . $value . '<br />');
+                    }
+                    if ($key == 'notActiveBonuses') {
+                        print('Неактивных бонусов: ' . $value . '<br />');
+                    }
+                    if ($key == 'purchasesTotalSum') {
+                        print('Сумма покупок: ' . $value . '<br />');
+                    }
+                    if ($key == 'purchasesSumToNextCard') {
+                        print('Сумма покупок для смены карты: ' . $value . '<br />');
+                    }
+                    if ($key == 'lastPurchaseDate') {
+                        print('Последняя покупка: ' . $value . '<br />');
+                    }
+                } else {
+                    $person_data = $value;
+                    $person = array();
+                    foreach ($person_data as $pkey => $pvalue) {
+                        if ($pkey == 'ln' || $pkey == 'fn' || $pkey == 'mn'){
+                            $person[$pkey] = $pvalue;
+                        }
+                    } 
+                    if (!empty($person)){
+                        $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
+                        if (!empty($owner)) {
+                            print('Держатель: ' . $owner . '<br />');
+                        }
+                    }
+                    
+                }
+            }
+            ?>
+            
+        <?php
         }
     }
 
@@ -163,63 +232,6 @@ class WooBonusPlus_Profile
         return ob_get_clean();
     }
 
-    /**
-     * Render my-profile client bonus cards and loyal
-     */
-    public static function bpwp_api_render_myprofile_bonus_card()
-    {
-        $customer_bonuses = self::bpwp_api_prepare_customer_bonuses_data();
-        /*if (!empty($customer_bonuses)){
-            var_dump($customer_bonuses);
-            die();
-        }*/
-
-        $title  = $customer_bonuses['title'];
-        $url    = $customer_bonuses['url'];
-        $desc   = $customer_bonuses['desc'];
-        $class  = $customer_bonuses['class'];
-
-        wp_enqueue_style('bpwp-bonus-card-style');
-
-        ob_start(); ?>
-
-        <div class="container">
-            <a class="<?= $class ?>" href="<?= $url ?>">
-                <h3 class="bp-bonuses-card-title"><?= $title ?></h3>
-                <p class="small bp-bonuses-card"><?= $desc ?></p>
-                <div class="go-corner" href="<?= $url ?>">
-                    <div class="go-arrow">
-                        →
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <a class="card4" href="#">
-            <small>Виртуальная карта</small>
-            <h3>4601 7400 6128</h3>
-            <p class="small">Доступно 0 бонусов</p>
-            <p class="small">Сумма для следующего уровня: 10000</p>
-            <div class="dimmer"></div>
-            <div class="go-corner" href="#">
-                <div class="go-arrow">
-                    →
-                </div>
-            </div>
-        </a>
-
-        <a class="card4" href="#">
-            <small>Следующий уровень:</small>
-            <h3>**** **** ****</h3>
-            <p class="small">карта 1 го уровня готова к выдаче</p>
-            <div class="dimmer"></div>
-        </a>
-
-
-        <?php
-
-        return ob_get_clean();
-    }
 
     /**
      *  Prepare customer data for display bonus card

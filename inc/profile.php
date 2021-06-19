@@ -20,7 +20,7 @@ class WooBonusPlus_Profile
     }
 
     /**
-     *  Print customer info from bonusplus
+     *  DEPRICATED Print customer info from bonusplus
      */
     public static function bpwp_api_print_user_info()
     {
@@ -109,7 +109,7 @@ class WooBonusPlus_Profile
     }
 
     /**
-     *  Print customer card loyality information
+     *  Print customer card loyality information in my-profile
      */
     public static function bpwp_api_print_customer_card_info()
     {
@@ -125,52 +125,70 @@ class WooBonusPlus_Profile
             );
 
             $info = json_decode($res);
-            //$cdata = array();
-
-            echo '<h2>Информация по карте лояльности</h2>';
-            echo '<br>';
-            echo '<div id="qrcode"></div>';
-            echo '<br>';
-            foreach ($info as $key => $value) {
-                if ($key != 'person') {
-                    if ($key == 'discountCardName') {
-                        print('Тип карты: ' . $value . '<br />');
-                    }
-                    if ($key == 'discountCardNumber') {
-                        print('Номер карты: ' . $value . '<br />');
-                        $_discountCardNumber = $value;
-                    }
-                    if ($key == 'availableBonuses') {
-                        print('Доступных бонусов: ' . $value . '<br />');
-                    }
-                    if ($key == 'notActiveBonuses') {
-                        print('Неактивных бонусов: ' . $value . '<br />');
-                    }
-                    if ($key == 'purchasesTotalSum') {
-                        print('Сумма покупок: ' . $value . '<br />');
-                    }
-                    if ($key == 'purchasesSumToNextCard') {
-                        print('Сумма покупок для смены карты: ' . $value . '<br />');
-                    }
-                    if ($key == 'lastPurchaseDate') {
-                        print('Последняя покупка: ' . $value . '<br />');
-                    }
-                } else {
-                    $person_data = $value;
-                    $person = array();
-                    foreach ($person_data as $pkey => $pvalue) {
-                        if ($pkey == 'ln' || $pkey == 'fn' || $pkey == 'mn'){
-                            $person[$pkey] = $pvalue;
+            // for debug
+            
+            $is_debug = isset($_REQUEST['bpwp-debug']) ? $_REQUEST['bpwp-debug'] : '';
+            if (empty($is_debug)) {
+                echo '<h1>'. $is_debug .'</h1>';
+                echo '<h2>Информация по карте лояльности</h2>';
+                echo '<br>';
+                echo '<div id="qrcode"></div>';
+                echo '<br>';
+                foreach ($info as $key => $value) {
+                    if ($key != 'person') {
+                        if ($key == 'discountCardName') {
+                            print('Тип карты: ' . $value . '<br />');
                         }
-                    } 
-                    if (!empty($person)){
-                        $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
-                        if (!empty($owner)) {
-                            print('Держатель: ' . $owner . '<br />');
+                        if ($key == 'discountCardNumber') {
+                            print('Номер карты: ' . $value . '<br />');
+                            $_discountCardNumber = $value;
                         }
+                        if ($key == 'availableBonuses') {
+                            print('Доступных бонусов: ' . $value . '<br />');
+                        }
+                        if ($key == 'notActiveBonuses') {
+                            print('Неактивных бонусов: ' . $value . '<br />');
+                        }
+                        if ($key == 'purchasesTotalSum') {
+                            print('Сумма покупок: ' . $value . '<br />');
+                        }
+                        if ($key == 'purchasesSumToNextCard') {
+                            print('Сумма покупок для смены карты: ' . $value . '<br />');
+                        }
+                        if ($key == 'lastPurchaseDate') {
+                            print('Последняя покупка: ' . $value . '<br />');
+                        }
+                    } else {
+                        $person_data = $value;
+                        $person = array();
+                        foreach ($person_data as $pkey => $pvalue) {
+                            if ($pkey == 'ln' || $pkey == 'fn' || $pkey == 'mn'){
+                                $person[$pkey] = $pvalue;
+                            }
+                        } 
+                        if (!empty($person)){
+                            $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
+                            if (!empty($owner)) {
+                                print('Держатель: ' . $owner . '<br />');
+                            }
+                        }
+                        
                     }
-                    
                 }
+            
+            }  else {
+                foreach ($info as $key => $value) {
+                    if ($key != 'person') {
+                        print($key .' : ' . $value . '<br />');
+                    } else {
+                        $personalInfo = $value;
+                        foreach ($personalInfo as $pkey => $pvalue){
+                            if (!is_array($pvalue)){
+                                print($pkey . ' : ' . $pvalue . '<br />');
+                            }
+                        }
+                    }
+                }   
             }
             ?>
             

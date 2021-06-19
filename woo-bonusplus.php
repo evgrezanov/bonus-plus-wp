@@ -76,6 +76,7 @@ class WooBonusPlus_Core
         require_once __DIR__ . '/inc/my-account.php';
         require_once __DIR__ . '/inc/profile.php';
         require_once __DIR__ . '/inc/settings.php';
+        //require_once __DIR__ . '/inc/MenuSettings.php';
     }
 
     /**

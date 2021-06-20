@@ -12,6 +12,8 @@ class WooBonusPlus_My_Account
         add_action('init', [__CLASS__, 'bpwp_add_my_account_endpoint']);
         add_filter('query_vars', [__CLASS__, 'bpwp_query_vars']);
         add_filter('woocommerce_account_menu_items', [__CLASS__, 'bpwp_account_links'], 10);
+        add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_api_print_customer_card_info']);
+        add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_qrcode_scripts']);
     }
 
     /**
@@ -26,10 +28,6 @@ class WooBonusPlus_My_Account
 
     /**
      *  Add query var
-     *  
-     *  @param array $vars
-     * 
-     *  @return array
      */
     public static function bpwp_query_vars($vars)
     {
@@ -39,16 +37,13 @@ class WooBonusPlus_My_Account
 
     /**
      *  Add new item in my profile sidebar menu
-     *  
-     *  @param array $menu_links
-     *
-     *  @return array
      */
     public static function bpwp_account_links($menu_links)
     {
-        $options = get_option('woobonusplus_option_name');
-        $tab_title = trim($options['____3']);
-        $tab_title ? '' : 'Бонусная программа';
+        $tab_title = 'Бонус+';
+        $tab_title = apply_filters('bpwp_filter_woo_profile_tab_title', $tab_title);
+
+
         $new = array(
             'bonus-plus' => $tab_title,
         );
@@ -59,6 +54,121 @@ class WooBonusPlus_My_Account
             + array_slice($menu_links, 1, NULL, true);
 
         return $menu_links;
+    }
+
+    /**
+     *  Выводит блок "Информация по карте лояльности" в профиле пользователя
+     */
+    public static function bpwp_api_print_customer_card_info()
+    {
+        // get data
+        $info = bpwp_api_get_customer_data();
+
+        if ( $info && is_array($info) ) {
+            // for debug
+            $is_debug = isset($_REQUEST['bpwp-debug']) ? $_REQUEST['bpwp-debug'] : '';
+            if ( empty($is_debug) ) {
+
+                printf('<h2>%s</h2>', 'Информация по карте лояльности');
+
+                do_action('bpwp_after_bonus_card_info_title');
+
+                echo '<br><div id="qrcode"></div><br>';
+                foreach ($info as $key => $value) {
+                    if ($key != 'person') {
+                        if ($key == 'discountCardName') {
+                            print('Тип карты: ' . $value . '<br />');
+                        }
+                        if ($key == 'discountCardNumber') {
+                            print('Номер карты: ' . $value . '<br />');
+                            $_discountCardNumber = $value;
+                        }
+                        if ($key == 'availableBonuses') {
+                            print('Доступных бонусов: ' . $value . '<br />');
+                        }
+                        if ($key == 'notActiveBonuses') {
+                            print('Неактивных бонусов: ' . $value . '<br />');
+                        }
+                        if ($key == 'purchasesTotalSum') {
+                            print('Сумма покупок: ' . $value . '<br />');
+                        }
+                        if ($key == 'purchasesSumToNextCard') {
+                            print('Сумма покупок для смены карты: ' . $value . '<br />');
+                        }
+                        if ($key == 'lastPurchaseDate') {
+                            print('Последняя покупка: ' . $value . '<br />');
+                        }
+                    } else {
+                        $person_data = $value;
+                        $person = array();
+                        foreach ($person_data as $pkey => $pvalue) {
+                            if ($pkey == 'ln' || $pkey == 'fn' || $pkey == 'mn') {
+                                $person[$pkey] = $pvalue;
+                            }
+                        }
+                        if (!empty($person)) {
+                            $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
+                            if (!empty($owner)) {
+                                print('Держатель: ' . $owner . '<br />');
+                            }
+                        }
+                    }
+                }
+            } else {
+                foreach ($info as $key => $value) {
+                    if ($key != 'person') {
+                        print($key . ' : ' . $value . '<br />');
+                    } else {
+                        $personalInfo = $value;
+                        foreach ($personalInfo as $pkey => $pvalue) {
+                            if (!is_array($pvalue)) {
+                                print($pkey . ' : ' . $pvalue . '<br />');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ?>
+            
+        <?php
+    }
+
+    /**
+     * Подключение скриптов для генерации QR кода в блоке "Информация по карте лояльности" в профиле
+     *
+     * @return void
+     */
+    public static function bpwp_qrcode_scripts()
+    {
+        if( !is_user_logged_in() ){
+            return;
+        }
+        $customerData = bpwp_api_get_customer_data();
+        $cardNumber = !empty($customerData['discountCardNumber']) ? $customerData['discountCardNumber'] : '';
+        
+        wp_enqueue_script(
+            'bpwp-qrcodejs',
+            plugins_url('/assets/qrcodejs/qrcode.min.js', __DIR__),
+            array(),
+            BPWP_PLUGIN_VERSION,
+            'in_footer'
+        );
+        wp_enqueue_script(
+            'bpwp-qrcodejs-action',
+            plugins_url('/assets/script.js', __DIR__),
+            array('bpwp-qrcodejs'),
+            BPWP_PLUGIN_VERSION,
+            'in_footer'
+        );
+
+        wp_localize_script(
+            'bpwp-qrcodejs-action',
+            'discountCardNumber',
+            array(
+                'cardNumber' => $cardNumber
+            )
+        );
     }
 
 }

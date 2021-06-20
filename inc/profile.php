@@ -11,8 +11,9 @@ class WooBonusPlus_Profile
     public static function init()
     {
         add_action('init', [__CLASS__, 'bpwp_api_bonus_card_shortcode_init']);
-        add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_api_print_customer_card_info']);
         add_action('wp_login', [__CLASS__, 'bpwp_customer_login'], 10, 2);
+        //add_action('bpwp_after_bonus_card_info_title', [__CLASS__, 'bpwp_render_debug_card_link']);
+        add_filter('bpwp_replace_customer_card_desc', [__CLASS__, 'bpwp_replace_customer_card_desc'], 10, 2);
     }
 
     /**
@@ -23,112 +24,11 @@ class WooBonusPlus_Profile
         add_shortcode('bpwp_api_customer_bonus_card', [__CLASS__, 'bpwp_api_render_customer_bonus_card']);
     }
 
-    /**
-     *  Print customer card loyality information in my-profile
-     */
-    public static function bpwp_api_print_customer_card_info()
-    {
-        $phone = bpwp_api_get_customer_phone();
-        if (!empty($phone)) {
-
-            $res = bpwp_api_request(
-                'customer',
-                array(
-                    'phone' => $phone
-                ),
-                'GET'
-            );
-
-            $info = json_decode($res);
-            // for debug
-            
-            $is_debug = isset($_REQUEST['bpwp-debug']) ? $_REQUEST['bpwp-debug'] : '';
-            if (empty($is_debug)) {
-                echo '<h1>'. $is_debug .'</h1>';
-                echo '<h2>Информация по карте лояльности</h2>';
-                echo '<br>';
-                echo '<div id="qrcode"></div>';
-                echo '<br>';
-                foreach ($info as $key => $value) {
-                    if ($key != 'person') {
-                        if ($key == 'discountCardName') {
-                            print('Тип карты: ' . $value . '<br />');
-                        }
-                        if ($key == 'discountCardNumber') {
-                            print('Номер карты: ' . $value . '<br />');
-                            $_discountCardNumber = $value;
-                        }
-                        if ($key == 'availableBonuses') {
-                            print('Доступных бонусов: ' . $value . '<br />');
-                        }
-                        if ($key == 'notActiveBonuses') {
-                            print('Неактивных бонусов: ' . $value . '<br />');
-                        }
-                        if ($key == 'purchasesTotalSum') {
-                            print('Сумма покупок: ' . $value . '<br />');
-                        }
-                        if ($key == 'purchasesSumToNextCard') {
-                            print('Сумма покупок для смены карты: ' . $value . '<br />');
-                        }
-                        if ($key == 'lastPurchaseDate') {
-                            print('Последняя покупка: ' . $value . '<br />');
-                        }
-                    } else {
-                        $person_data = $value;
-                        $person = array();
-                        foreach ($person_data as $pkey => $pvalue) {
-                            if ($pkey == 'ln' || $pkey == 'fn' || $pkey == 'mn'){
-                                $person[$pkey] = $pvalue;
-                            }
-                        } 
-                        if (!empty($person)){
-                            $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
-                            if (!empty($owner)) {
-                                print('Держатель: ' . $owner . '<br />');
-                            }
-                        }
-                        
-                    }
-                }
-            
-            }  else {
-                foreach ($info as $key => $value) {
-                    if ($key != 'person') {
-                        print($key .' : ' . $value . '<br />');
-                    } else {
-                        $personalInfo = $value;
-                        foreach ($personalInfo as $pkey => $pvalue){
-                            if (!is_array($pvalue)){
-                                print($pkey . ' : ' . $pvalue . '<br />');
-                            }
-                        }
-                    }
-                }   
-            }
-            ?>
-            
-        <?php
-        }
-    }
-
-    /**
-     * Return available bonuses for customer
-     */
-    /*public static function bpwp_customer_get_available_bonuses($customer_id = '')
-    {
-        if ($customer_id == '') {
-            $customer_id = get_current_user_id();
-        }
-        $availableBonuses = get_user_meta($customer_id, 'bpw_availableBonuses', true);
-
-        $availableBonuses = apply_filters('bpwp_api_filter_client_available_bonuses', $availableBonuses);
-
-        return $availableBonuses;
-    }*/
-
 
     /**
      * Render client bonus card
+     * 
+     *  @return void
      */
     public static function bpwp_api_render_customer_bonus_card()
     {
@@ -168,73 +68,72 @@ class WooBonusPlus_Profile
 
     /**
      *  Prepare customer data for display bonus card
+     * 
+     *  @return array
      */
     public static function bpwp_api_prepare_customer_bonuses_data($customer_id = '')
     {
-        if (empty($customer_id) && is_user_logged_in()) {
-            $customer_id = get_current_user_id();
-        }
-
         $data = array();
-
         // Если пользователь неавторизован
-        if (!is_user_logged_in()) {
-
+        if ( !is_user_logged_in() ) {
+            // Описание неопознанного пользователя
+            $desc = get_option('bpwp_msg_unknow_customers');
+            
             $data['title']  =   'Войдите, на сайт';
             $data['url']    =   wc_get_page_permalink('myaccount ');
-            $data['desc']   =   'Чтобы увидеть баланс бонусов и расплачиватся ими за покупку';
+            $data['desc']   =   $desc;
             $data['class']  =   'card4';
-            //var_dump(1);
 
-        } elseif (is_user_logged_in()) {
-            //var_dump(2);
-            //$bonuses = self::bpwp_customer_get_available_bonuses($customer_id);
-            //$billing_phone = bp_api_get_customer_phone($customer_id);
-            // Если у пользователя нет бонусов или = 0
-            if (empty($bonuses) || $bonuses == 0) {
-                //var_dump(2.1);
-                $data['title']  =   'У Вас пока нет бонусов';
-                $data['url']    =   wc_get_page_permalink('shop');
-                $data['desc']   =   'Начните накапливать бонусы после первой покупки!';
-                $data['class']  =   'card3';
-            } elseif (!empty($bonuses) || $bonuses > 0) {
-                //var_dump(2.2);
-                // есть бонусы
-                $data['title']  =   $bonuses . ' Бонусных рублей';
-                $data['url']    =   wc_get_page_permalink('shop');
-                $data['desc']   =   'Не забудте потратить бонусные рубли при оплате следующей покупки!';
-                $data['class']  =   'card1';
-            } else {
-                //var_dump(2.3);
-                // дефаулт
-                $data['title']  =   'Оплачивайте покупки бонусными рублями';
-                $data['url']    =   wc_get_page_permalink('shop');
-                $data['desc']   =   'Зарегистрируйтесь и сделайте покупку чтобы начать использовать бонусные баллы.';
-                $data['class']  =   'card4';
-            }
         } else {
-            //var_dump(3);
-            // дефаулт
-            $data['title']  =   'Оплачивайте покупки бонусными рублями';
+            // Если пользователь авторизован 
+            $data = bpwp_api_get_customer_data();
+            // Описание опознанного пользователя
+            $desc = get_option('bpwp_msg_know_customers');
+            $availablekeys = array(
+                'discountCardName',
+                'purchasesTotalSum',
+                'purchasesSumToNextCard',
+                'nextCardName',
+                'availableBonuses',
+                'notActiveBonuses',
+                'allBonuses'
+            );
+
+            $allBonuses = $data['availableBonuses'] + $data['notActiveBonuses'];
+            foreach ($availablekeys as $v) {
+                if ($v != 'allBonuses'){
+                    if (!empty($data[$v])) {
+                        $desc = str_replace($v, $data[$v], $desc);
+                    }
+                } else {
+                    $desc = str_replace($v, $allBonuses, $desc);
+                }
+            }
+            // Возвращаем массив для бонусной карты
+            $data['title']  =   $allBonuses . ' бонусных рублей';
             $data['url']    =   wc_get_page_permalink('shop');
-            $data['desc']   =   'Зарегистрируйтесь и сделайте покупку чтобы начать использовать бонусные баллы.';
-            $data['class']  =   'card4';
+            $data['desc']   =   $desc;
+            $data['class']  =   'card3';
+
         }
-        //var_dump($data);
+
+        $data = apply_filters('bpwp_filter_bonus_card_data', $data);
+        
         return $data;
     }
 
     /**
-     *  Update bonuses data after customer login, save data to meta field
+     *  Update bonuses data after customer login, store data to user meta field bonus-plus
      *  
      *  @param string $user_login
      *  @param array $user
      *
-     *  @return array
+     *  @return void
      */
     public static function bpwp_customer_login($user_login, $user)
     {
-        $phone = bpwp_api_get_customer_phone($user->ID);
+        $user_id = $user->ID;
+        $phone = bpwp_api_get_customer_phone($user_id);
 
         if (!empty($phone)) {
 
@@ -248,7 +147,30 @@ class WooBonusPlus_Profile
 
             $info = json_decode($res);
 
-            update_user_meta($user->ID, 'bonus-plus', $info);
+            update_user_meta($user_id, 'bonus-plus', $info);
+        }
+    }
+
+    /**
+     *  Replace dinamic data at customer card description
+     */
+    public static function bpwp_replace_customer_card_desc($desc, $data){
+        if (!$desc || !$data){
+            return;
+        }
+        $availablekeys = array(
+            'discountCardName', 
+            'purchasesTotalSum', 
+            'purchasesSumToNextCard', 
+            'nextCardName', 
+            'availableBonuses', 
+            'notActiveBonuses', 
+            'allBonuses'
+        );
+        foreach ($availablekeys as $key){
+            if (!empty($data[$key])){
+                $desc = str_replace($key, $data[$key], $desc);
+            }
         }
     }
 }

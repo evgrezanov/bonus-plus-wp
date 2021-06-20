@@ -52,7 +52,6 @@ class WooBonusPlus_Core
         add_action('bpwp_deactivate', [__CLASS__, 'bpwp_plugin_deactivate']);
 
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_shortcode_wp_enqueue_styles']);
-        add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_qrcode_scripts']);
     }
 
     /**
@@ -77,12 +76,11 @@ class WooBonusPlus_Core
         }*/
         require_once __DIR__ . '/inc/WooAccount.php';
         require_once __DIR__ . '/inc/profile.php';
-        require_once __DIR__ . '/inc/settings.php';
         require_once __DIR__ . '/inc/MenuSettings.php';
     }
 
     /**
-     * Register styles
+     * Register styles for bonus card widget
      *
      * @return void
      */
@@ -94,43 +92,6 @@ class WooBonusPlus_Core
             array(),
             BPWP_PLUGIN_VERSION, 
             'all'
-        );
-    }
-
-    /**
-     * Register scripts
-     *
-     * @return void
-     */
-    public static function bpwp_qrcode_scripts()
-    {
-        wp_enqueue_script(
-            'bpwp-qrcodejs',
-            plugins_url('/assets/qrcodejs/qrcode.min.js', __FILE__),
-            array(),
-            BPWP_PLUGIN_VERSION,
-            'in_footer'
-        );
-        wp_enqueue_script(
-            'bpwp-qrcodejs-action',
-            plugins_url('/assets/script.js', __FILE__),
-            array('bpwp-qrcodejs'),
-            BPWP_PLUGIN_VERSION,
-            'in_footer'
-        );
-
-        $cardNumber = '';
-
-        if ( is_user_logged_in() ) {
-            $cardNumber = get_user_meta(get_current_user_id(), 'bpwp_discountCardNumber', true);
-        }
-
-        wp_localize_script(
-            'bpwp-qrcodejs-action',
-            'discountCardNumber', 
-            array(
-                'cardNumber' => $cardNumber
-            )
         );
     }
 

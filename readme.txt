@@ -5,7 +5,7 @@ Tags: bonus, woocommerce, sync, integration
 Requires at least: 4.0
 Tested up to: 5.3
 Stable tag: 4.3
-Requires PHP: 5.6
+Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,7 @@ Integration WordPress/WooCommerce & BonusPlus http://bonusplus.pro (for Russia)
 *   Синхронизация данных бонусной карты пользователя
 *   Шорткод для отображения данных пользователя
 *   WooCommerce добавлена новая вкладка в ЛК
+*   Генерация QR кода, для предъявления на кассе
 
 == Installation ==
 
@@ -31,12 +32,12 @@ e.g.
 
 1. Upload plugin to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Go to Settings / MoySklad and setup
-1. Got to Tools / MoySklad and run sync
+1. Go to Settings / BonusPlus and setup
+1. Got to Tools / BonusPlus and run sync
 
 == Frequently Asked Questions ==
 
-= Какие товары синхронизируются? =
+= Какие данные синхронизируются? =
 
 По умолчанию только с артикулами. Чтобы можно было синхронизировать товары МойСклад и сайта без удаления.
 Но если включить опцию UUID, то товары можно синхронизировать без артикула. В этом случае придется сначала удалить продукты с сайта.
@@ -47,21 +48,24 @@ e.g.
 
 = Как устроен механизм синхронизации? =
 
-Используется протокол REST API. Без протокола CommerceML. Вся логика находится на стороне сайта и сайт сам запрашиует данные из МойСклад.
-В зависимости от особенностей конфигурации сервера бот синхронизации может зависать из-за таймаутов. Для этого в плагине встроен супервайзер, который следит за ботом и пинает его в случае остановки.
+Используется протокол REST API. Для идентификации клиента используется платежный номер телефона клиента из WooCommerce (<strong>billing_phone</strong>).
+
+= Как изменить название вкладки в личном кабинете клиента? =
+
+Используйте фильтр add_filter('bpwp_filter_woo_profile_tab_title', $title).
 
 = Какие минимальные требования? =
 
 WordPress 4.5
-WooCommerce 3.0 - мб будет работать на Woo 2.х но не факт.
-PHP 5.6
+WooCommerce 3.0
+PHP 7.1
 
 
 == Screenshots ==
 
-1. Страница настроек.
-2. Страница продуктов
-3. Журнал обработки
+1. Страница настроек
+2. Страница личного кабинета WooCommerce
+3. Виджет бонусной карты
 
 == Changelog ==
 

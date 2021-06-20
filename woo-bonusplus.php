@@ -17,7 +17,7 @@
  * PHP requires at least: 5.6
  * WP requires at least: 5.0
  * Tested up to: 5.7
- * Version: 1.0.2-dev
+ * Version: 1.0.3-dev
  */
 
 
@@ -30,7 +30,7 @@ class WooBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '1.0.2-dev');
+        define('BPWP_PLUGIN_VERSION', '1.0.3-dev');
 
         require_once __DIR__ . '/functions.php';
 

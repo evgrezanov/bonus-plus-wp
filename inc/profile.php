@@ -12,7 +12,6 @@ class WooBonusPlus_Profile
     {
         add_action('init', [__CLASS__, 'bpwp_api_bonus_card_shortcode_init']);
         add_action('wp_login', [__CLASS__, 'bpwp_customer_login'], 10, 2);
-        //add_action('bpwp_after_bonus_card_info_title', [__CLASS__, 'bpwp_render_debug_card_link']);
         add_filter('bpwp_replace_customer_card_desc', [__CLASS__, 'bpwp_replace_customer_card_desc'], 10, 2);
     }
 

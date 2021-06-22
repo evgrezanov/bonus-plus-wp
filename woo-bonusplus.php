@@ -1,33 +1,35 @@
 <?php
+
 /**
  * Plugin Name: Woo-bonusplus
  * Plugin URI: https://github.com/evgrezanov/wooms-bonusplus
- * Description: Integration for WooCommerce and MoySklad (moysklad.ru, МойСклад) via REST API (wooms)
+ * Description: Интеграция WooCommerce и БонусПлюс. Для отображения данных пользователя используйте шорткод [bpwp_api_customer_bonus_card]
  * Author: redmonkey73
  * Author URI: http://evgeniyrezanov.site
  * Developer: redmonkey73
  * Developer URI: http://evgeniyrezanov.site
- * Text Domain: bonusplus-wp
+ * Text Domain: wp-bonus-plus
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * WC requires at least: 4.0
- * WC tested up to: 5.2.0
- * PHP requires at least: 5.6
+ * WC tested up to: 5.7.2
+ * PHP requires at least: 7.0
  * WP requires at least: 5.0
  * Tested up to: 5.7
- * Version: 1.0.1
+ * Version: 1.0
  */
-
+namespace BPWP;
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 
-class WooBonusPlus_Core
+class BPWPBonusPlus_Core
 {
-
+    /**
+     *  Init
+     */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '1.0.1');
+        define('BPWP_PLUGIN_VERSION', '1.0');
 
         require_once __DIR__ . '/functions.php';
 
@@ -58,7 +60,7 @@ class WooBonusPlus_Core
      */
     public static function bpwp_true_load_plugin_textdomain()
     {
-        load_plugin_textdomain('bonusplus-wp', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+        load_plugin_textdomain('wp-bonus-plus', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     }
 
     /**
@@ -68,16 +70,15 @@ class WooBonusPlus_Core
      */
     public static function bpwp_load_components()
     {
-        /*if (!bpwp_is_woocommerce_activated()) {
-            return;
-        }*/
-        require_once __DIR__ . '/inc/my-account.php';
-        require_once __DIR__ . '/inc/profile.php';
-        require_once __DIR__ . '/inc/settings.php';
+        if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+            require_once __DIR__ . '/inc/WooAccount.php';
+        }
+        require_once __DIR__ . '/inc/Profile.php';
+        require_once __DIR__ . '/inc/MenuSettings.php';
     }
 
     /**
-     * Register styles
+     * Register styles for bonus card widget
      *
      * @return void
      */
@@ -94,18 +95,23 @@ class WooBonusPlus_Core
 
     /**
      *  Action fire at plugin activation
+     *
+     *  @return array
      */
     public static function bpwp_plugin_activate()
     {
         flush_rewrite_rules();
+        update_option('bpwp_plugin_permalinks_flushed', 0);
     }
 
     /**
      *  Action fire at plugin deactivation
+     *
+     *  @return array
      */
     public static function bpwp_plugin_deactivate()
     {
         flush_rewrite_rules();
     }
 }
-WooBonusPlus_Core::init();
+BPWPBonusPlus_Core::init();

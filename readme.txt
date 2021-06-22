@@ -15,13 +15,13 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Integration WordPress/WooCommerce & BonusPlus http://bonusplus.pro (for Russia)
 
-Интеграция приложения БонусПлюс (программа лояльности) и WooCommerce (WordPress)
+Интеграция приложения БонусПлюс (программа лояльности) и WordPress/WooCommerce
 
 Особенности:
 
 *   Синхронизация данных бонусной карты пользователя
-*   Шорткод для отображения данных пользователя
-*   WooCommerce добавлена новая вкладка в ЛК
+*   Шорткод для отображения данных карты пользователя
+*   WooCommerce добавлена новая вкладка в личном кабинете
 *   Генерация QR кода, для предъявления на кассе
 
 == Installation ==
@@ -30,25 +30,31 @@ This section describes how to install the plugin and get it working.
 
 e.g.
 
-1. Upload plugin to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Go to Settings / BonusPlus and setup
-1. Got to Tools / BonusPlus and run sync
+= Automatic installation =
+
+Automatic installation is the easiest option -- WordPress will handles the file transfer, and you won’t need to leave your web browser. To do an automatic install of WP-bonus-plus, log in to your WordPress dashboard, navigate to the Plugins menu, and click “Add New.”
+
+In the search field type “wp-bonus-plus,” then click “Search Plugins.” Once you’ve found us,  you can view details about it such as the point release, rating, and description. Most importantly of course, you can install it by! Click “Install Now,” and WordPress will take it from there.
+
+= Manual installation =
+
+Manual installation method requires downloading the wp-bonus-plus plugin and uploading it to your web server via your favorite FTP application. The WordPress codex contains [instructions on how to do this here](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
+
+
 
 == Frequently Asked Questions ==
 
 = Какие данные синхронизируются? =
 
-По умолчанию только с артикулами. Чтобы можно было синхронизировать товары МойСклад и сайта без удаления.
-Но если включить опцию UUID, то товары можно синхронизировать без артикула. В этом случае придется сначала удалить продукты с сайта.
+Синхронизируютс все данные по бонусной карте пользователя: Номер карты, Тип карты, Доступных бонусов, Неактивных бонусов, Дата последней покупки, Сумма покупок, Сумма покупок для смены карты и тд.
 
 = Что нужно чтобы синхронизация заработала? =
 
-Нужно правильно указать реквизиты доступа на странице настроек плагина в панели управления сайтом. На стороне МойСклад ничего делать не нужно.
+Нужно правильно указать реквизиты доступа на странице настроек плагина в панели управления сайтом. На стороне БонусПлюс ннужно активировать API Ключ.
 
 = Как устроен механизм синхронизации? =
 
-Используется протокол REST API. Для идентификации клиента используется платежный номер телефона клиента из WooCommerce (<strong>billing_phone</strong>).
+Используется API Бонус+. Для идентификации клиента используется платежный номер телефона клиента из WooCommerce (<strong>billing_phone</strong>).
 
 = Как изменить название вкладки в личном кабинете клиента? =
 
@@ -56,26 +62,27 @@ e.g.
 
 = Какие минимальные требования? =
 
-WordPress 4.5
-WooCommerce 3.0
+WordPress 5.0
 PHP 7.1
+
+= Будет работать без WooCommerce? =
+
+Да, будет, используйте хук bpwp_api_filter_get_customer_phone для фильтрации номера телефона 
 
 
 == Screenshots ==
 
 1. Страница настроек
 2. Страница личного кабинета WooCommerce
-3. Виджет бонусной карты
+3. Шорткод для отображения бонусной карты клиента
 
 == Changelog ==
 
-= 8.2 =
-- Проверка совместимости с WooCommerce 5.0 https://github.com/wpcraft-ru/wooms/issues/396
-- Полное и краткое описание товара https://github.com/wpcraft-ru/wooms/issues/347
-- XT: Сокрытие wooms_id из деталей Заказа видимых клиенту https://github.com/wpcraft-ru/wooms/issues/398
-- XT: Загрузка изображения у модификаций Продукта https://github.com/wpcraft-ru/wooms/issues/359
-- XT: При создании нового контрагента - нет email https://github.com/wpcraft-ru/wooms/issues/346
+= 1.0 =
+- Страница настроек подключения
+- Шорткод бонусной карты
+- Интеграция с WooCommerce
 
-= 8.1 =
-- Краткое описание товара вместо полного как опция https://github.com/wpcraft-ru/wooms/issues/347
-- XT: При создании нового контрагента - нет email https://github.com/wpcraft-ru/wooms/issues/346
+== Upgrade Notice ==
+= 1.0 =
+Upgrade immediately.

@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 /**
  * Settings
  */
-class MenuSettings
+class BPWPMenuSettings
 {
     
     
@@ -116,8 +116,8 @@ class MenuSettings
     public static function display_msg_know_customers()
     {
         printf('<input class="regular-text" type="text" name="bpwp_msg_know_customers" value="%s"/>', get_option('bpwp_msg_know_customers'));
+        
         printf('<p><small>%s</small></p>', 'Отобразится для пользователей авторизованных на сайте и зарегистрированных в Бонус+, сумма активных и неактивных бонусов у которых больше 0. В тексте можно использовать тэги: <strong>discountCardName, purchasesTotalSum, purchasesSumToNextCard, nextCardName, availableBonuses, notActiveBonuses, allBonuses</strong>');
-
     }
 
     /**
@@ -142,7 +142,6 @@ class MenuSettings
         printf('<input class="regular-text" type="url" name="bpwp_lk_url" value="%s"/>', get_option('bpwp_lk_url'));
 
         printf('<p><small>%s</small></p>', 'Ссылка на личный кабинет Бонус+');
-
     }
 
     /**
@@ -212,4 +211,4 @@ class MenuSettings
 			
     }
 }
-MenuSettings::init();
+BPWPMenuSettings::init();

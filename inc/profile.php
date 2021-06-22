@@ -4,7 +4,7 @@ namespace BPWP;
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 
-class WooBonusPlus_Profile
+class BPWPProfile
 {
 
     /**
@@ -75,9 +75,16 @@ class WooBonusPlus_Profile
         if ( !is_user_logged_in() ) {
             // Описание неопознанного пользователя
             $desc = get_option('bpwp_msg_unknow_customers');
-            
+
+            if ( function_exists('wc_get_page_permalink') ){
+                $url = wc_get_page_permalink('myaccount ');
+            } else {
+                $url = site_url();
+            }
+            $url = apply_filters('bpwp_filter_goto_register_url', $url);
+
             $data['title']  =   'Войдите, на сайт';
-            $data['url']    =   wc_get_page_permalink('myaccount ');
+            $data['url']    =   $url;
             $data['desc']   =   $desc;
             $data['class']  =   'card4';
 
@@ -106,9 +113,17 @@ class WooBonusPlus_Profile
                     $desc = str_replace($v, $allBonuses, $desc);
                 }
             }
+
+            if (function_exists('wc_get_page_permalink')) {
+                $url = wc_get_page_permalink('shop ');
+            } else {
+                $url = site_url();
+            }
+            $url = apply_filters('bpwp_filter_goto_shop_url', $url);
+
             // Возвращаем массив для бонусной карты
             $data['title']  =   $allBonuses . ' бонусных рублей';
-            $data['url']    =   wc_get_page_permalink('shop');
+            $data['url']    =   $url;
             $data['desc']   =   $desc;
             $data['class']  =   'card3';
 
@@ -171,4 +186,4 @@ class WooBonusPlus_Profile
         }
     }
 }
-WooBonusPlus_Profile::init();
+BPWPProfile::init();

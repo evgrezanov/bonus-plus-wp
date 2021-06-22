@@ -4,7 +4,7 @@ namespace BPWP;
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 
-class WooBonusPlus_My_Account
+class BPWPMyAccount
 {
     /**
      *  Init
@@ -26,6 +26,10 @@ class WooBonusPlus_My_Account
     public static function bpwp_add_my_account_endpoint()
     {
         add_rewrite_endpoint('bonus-plus', EP_ROOT | EP_PAGES);
+        if (!get_option('bpwp_plugin_permalinks_flushed')) {
+            flush_rewrite_rules(false);
+            update_option('bpwp_plugin_permalinks_flushed', 1);
+        }
     }
 
     /**
@@ -83,7 +87,6 @@ class WooBonusPlus_My_Account
                         }
                         if ($key == 'discountCardNumber') {
                             print('Номер карты: ' . $value . '<br />');
-                            $_discountCardNumber = $value;
                         }
                         if ($key == 'availableBonuses') {
                             print('Доступных бонусов: ' . $value . '<br />');
@@ -174,4 +177,4 @@ class WooBonusPlus_My_Account
     }
 
 }
-WooBonusPlus_My_Account::init();
+BPWPMyAccount::init();

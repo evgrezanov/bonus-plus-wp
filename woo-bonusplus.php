@@ -8,29 +8,28 @@
  * Author URI: http://evgeniyrezanov.site
  * Developer: redmonkey73
  * Developer URI: http://evgeniyrezanov.site
- * Text Domain: bonusplus-wp
+ * Text Domain: wp-bonus-plus
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * WC requires at least: 4.0
- * WC tested up to: 5.2.0
- * PHP requires at least: 5.6
+ * WC tested up to: 5.7.2
+ * PHP requires at least: 7.0
  * WP requires at least: 5.0
  * Tested up to: 5.7
- * Version: 1.0.3-dev
+ * Version: 1.0
  */
 namespace BPWP;
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 
-class BonusPlus_Core
+class BPWPBonusPlus_Core
 {
     /**
      *  Init
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '1.0.3-dev');
+        define('BPWP_PLUGIN_VERSION', '1.0');
 
         require_once __DIR__ . '/functions.php';
 
@@ -61,7 +60,7 @@ class BonusPlus_Core
      */
     public static function bpwp_true_load_plugin_textdomain()
     {
-        load_plugin_textdomain('bonusplus-wp', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+        load_plugin_textdomain('wp-bonus-plus', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     }
 
     /**
@@ -71,7 +70,9 @@ class BonusPlus_Core
      */
     public static function bpwp_load_components()
     {
-        require_once __DIR__ . '/inc/WooAccount.php';
+        if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+            require_once __DIR__ . '/inc/WooAccount.php';
+        }
         require_once __DIR__ . '/inc/Profile.php';
         require_once __DIR__ . '/inc/MenuSettings.php';
     }
@@ -100,6 +101,7 @@ class BonusPlus_Core
     public static function bpwp_plugin_activate()
     {
         flush_rewrite_rules();
+        update_option('bpwp_plugin_permalinks_flushed', 0);
     }
 
     /**
@@ -112,4 +114,4 @@ class BonusPlus_Core
         flush_rewrite_rules();
     }
 }
-BonusPlus_Core::init();
+BPWPBonusPlus_Core::init();

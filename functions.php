@@ -81,18 +81,3 @@ function bpwp_api_get_customer_data($customer_id = '')
     
     return $data;
 }
-
-/**
- * Check if WooCommerce is activated
- */
-if (!function_exists('is_woocommerce_activated')) {
-    function is_woocommerce_activated()
-    {
-        if (class_exists('woocommerce')) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-}
-

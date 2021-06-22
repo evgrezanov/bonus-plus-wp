@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Plugin Name: Woo-bonusplus
- * Plugin URI: https://github.com/evgrezanov/wooms-bonusplus
+ * Plugin Name: WP-Bonus-Plus
+ * Plugin URI: https://github.com/evgrezanov/wp-bonus-plus
  * Description: Интеграция WooCommerce и БонусПлюс. Для отображения данных пользователя используйте шорткод [bpwp_api_customer_bonus_card]
  * Author: redmonkey73
  * Author URI: http://evgeniyrezanov.site

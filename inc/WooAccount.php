@@ -1,5 +1,7 @@
 <?php
 
+namespace BPWP;
+
 defined('ABSPATH') || exit; // Exit if accessed directly
 
 class WooBonusPlus_My_Account

@@ -1,5 +1,7 @@
 <?php
 
+namespace BPWP;
+
 defined('ABSPATH') || exit; // Exit if accessed directly
 
 class WooBonusPlus_Profile
@@ -33,10 +35,6 @@ class WooBonusPlus_Profile
     {
         //todo заменить на apply_filter
         $customer_bonuses = self::bpwp_api_prepare_customer_bonuses_data();
-        /*if (!empty($customer_bonuses)){
-            var_dump($customer_bonuses);
-            die();
-        }*/
 
         $title  = $customer_bonuses['title'];
         $url    = $customer_bonuses['url'];

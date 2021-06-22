@@ -19,11 +19,11 @@
  * Tested up to: 5.7
  * Version: 1.0.3-dev
  */
-
+namespace BPWP;
 
 defined('ABSPATH') || exit; // Exit if accessed directly
 
-class WooBonusPlus_Core
+class BonusPlus_Core
 {
     /**
      *  Init
@@ -71,11 +71,8 @@ class WooBonusPlus_Core
      */
     public static function bpwp_load_components()
     {
-        /*if (!bpwp_is_woocommerce_activated()) {
-            return;
-        }*/
         require_once __DIR__ . '/inc/WooAccount.php';
-        require_once __DIR__ . '/inc/profile.php';
+        require_once __DIR__ . '/inc/Profile.php';
         require_once __DIR__ . '/inc/MenuSettings.php';
     }
 
@@ -115,4 +112,4 @@ class WooBonusPlus_Core
         flush_rewrite_rules();
     }
 }
-WooBonusPlus_Core::init();
+BonusPlus_Core::init();

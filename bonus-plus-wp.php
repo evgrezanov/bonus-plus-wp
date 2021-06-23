@@ -15,8 +15,8 @@
  * WC tested up to: 5.7.2
  * PHP requires at least: 7.0
  * WP requires at least: 5.0
- * Tested up to: 5.7
- * Version: 1.0
+ * Tested up to: 5.7.2
+ * Version: 1.1
  */
 namespace BPWP;
 
@@ -29,7 +29,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '1.0');
+        define('BPWP_PLUGIN_VERSION', '1.1');
 
         require_once __DIR__ . '/functions.php';
 
@@ -60,7 +60,7 @@ class BPWPBonusPlus_Core
      */
     public static function bpwp_true_load_plugin_textdomain()
     {
-        load_plugin_textdomain('wp-bonus-plus', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+        load_plugin_textdomain('bonus-plus-wp', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     }
 
     /**

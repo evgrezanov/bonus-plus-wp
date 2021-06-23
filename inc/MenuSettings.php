@@ -56,6 +56,7 @@ class BPWPMenuSettings
             'api-docs' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://bonusplus.pro/api', 'БонусПлюс для разработчиков'),
         ];
 
+        //$menu = $nav_items['lk'] . '|' . $nav_items['diagnostic'] . '|' . $nav_items['api-docs'];
         echo implode(' | ', $nav_items);
     }
 
@@ -167,7 +168,7 @@ class BPWPMenuSettings
         ?>
         <form method="POST" action="options.php">
 
-            <h1>Настройки интеграции Бонус+</h1>
+            <h1><?php esc_html_e('Настройки интеграции Бонус+', 'bonus-plus-wp'); ?></h1>
 
             <?php do_action('bpwp_settings_after_header') ?>
 
@@ -195,8 +196,7 @@ class BPWPMenuSettings
 			'',
 			'GET'
 		);
-
-		$info = json_decode($res);
+        
         if ( !empty($info) ) {
             print('<div class="wrap">');
             print('<div id="message" class="updated notice is-dismissible">');

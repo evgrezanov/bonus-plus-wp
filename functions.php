@@ -18,7 +18,7 @@ function bpwp_api_request($endpoint, $params, $type)
 
     $token = get_option('bpwp_api_key');
     $token = base64_encode($token);
-
+    /*
     $ch = curl_init();
 
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -35,7 +35,23 @@ function bpwp_api_request($endpoint, $params, $type)
         error_log('Error:' . curl_error($ch));
     }
     curl_close($ch);
+    */
+    
+    $args = array(
+        'method'      => $type,
+        'headers'     => array(
+            'Authorization' => 'ApiKey ' . $token,
+        ),
+    );
 
+    $response = wp_remote_get($url, $args);
+    $response_code = wp_remote_retrieve_response_code($response);
+    $response_body = wp_remote_retrieve_body($response);
+    $result = array(
+        'response'  => $response,
+        'code'      => $response_code,
+        'body'      => $response_body,
+    );
     return $result;
 }
 

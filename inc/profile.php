@@ -46,10 +46,10 @@ class BPWPProfile
         ob_start(); ?>
 
         <div class="container">
-            <a class="<?= $class ?>" href="<?= $url ?>">
-                <h3 class="bp-bonuses-card-title"><?= $title ?></h3>
-                <p class="small bp-bonuses-card"><?= $desc ?></p>
-                <div class="go-corner" href="<?= $url ?>">
+            <a class="<?php echo esc_attr($class); ?>" href="<?php echo esc_url_raw($url); ?>">
+                <h3 class="bp-bonuses-card-title"><?php esc_html_e($title); ?></h3>
+                <p class="small bp-bonuses-card"><?php esc_html_e($desc); ?></p>
+                <div class="go-corner" href="<?php echo esc_url_raw($url); ?>">
                     <div class="go-arrow">
                         →
                     </div>
@@ -104,13 +104,13 @@ class BPWPProfile
             );
 
             $allBonuses = $data['availableBonuses'] + $data['notActiveBonuses'];
-            foreach ($availablekeys as $v) {
-                if ($v != 'allBonuses'){
-                    if (!empty($data[$v])) {
-                        $desc = str_replace($v, $data[$v], $desc);
+            foreach ($availablekeys as $val) {
+                if ($val != 'allBonuses'){
+                    if (!empty($data[$val])) {
+                        $desc = str_replace($val, $data[$val], $desc);
                     }
                 } else {
-                    $desc = str_replace($v, $allBonuses, $desc);
+                    $desc = str_replace($val, $allBonuses, $desc);
                 }
             }
 

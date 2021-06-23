@@ -72,7 +72,10 @@ class BPWPMyAccount
 
         if ( $info && is_array($info) ) {
             // for debug
-            $is_debug = isset($_REQUEST['bpwp-debug']) ? $_REQUEST['bpwp-debug'] : '';
+
+            if ( isset($_REQUEST['bpwp-debug']) && !empty($_REQUEST['bpwp-debug']) ){
+                $is_debug = sanitize_text_field($_REQUEST['bpwp-debug']);
+            }
             if ( empty($is_debug) ) {
 
                 printf('<h2>%s</h2>', 'Информация по карте лояльности');
@@ -121,7 +124,7 @@ class BPWPMyAccount
                 }
             } else {
                 foreach ($info as $key => $value) {
-                    if ($key != 'person') {
+                    if ($key !== 'person') {
                         print($key . ' : ' . $value . '<br />');
                     } else {
                         $personalInfo = $value;

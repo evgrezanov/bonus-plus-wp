@@ -241,7 +241,7 @@ class BPWPMenuSettings
             printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class) );
             foreach ($info as $key => $value) {
                 if (!is_array($value)) {
-                    $hkey = $fields[esc_html($key)];
+                    $hkey = isset($fields[$key]) && !empty($fields[$key]) ? $fields[$key] : '';
                     if (!empty($hkey)){
                         printf('<li>%s : %s</li>', esc_html($hkey), esc_html($value));
                     }

@@ -47,28 +47,12 @@ function bpwp_api_request($endpoint, $params, $type)
             $type = 'BPWP-Request',
             $title = 'REST API вернулся без требуемых данных'
         );
-        //$msg = __('REST API вернулся без требуемых данных', 'bonus-plus-wp');
-        //$class = 'notice notice-error';
         return false;
     }
 
     $response = json_decode($request['body'], true);
 
     if (!empty($response["errors"]) and is_array($response["errors"])) {
-        /*$msg = '<ul>';
-        foreach ($response["errors"] as $error) {
-            do_action(
-                'bpwp_logger_error',
-                $type = 'BPWP-Request',
-                $title = $url,
-                $response
-            );
-            $msg .= sprintf('<li>%s</li>', $error);
-        }
-        $msg .= '</ul>';
-        $class = 'notice notice-error';
-        $response['class'] = $class;
-        $response['body'] = $msg;*/
         return false;
     }
 

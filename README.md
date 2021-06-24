@@ -1,4 +1,4 @@
-=== WPBonusPlus ===
+=== Bonus-plus-wp ===
 Contributors: redmonkey73
 Donate link: https://github.com/evgrezanov
 Tags: bonus, woocommerce, sync, integration

@@ -44,15 +44,50 @@ function bpwp_api_request($endpoint, $params, $type)
         ),
     );
 
-    $response = wp_remote_get($url, $args);
-    $response_code = wp_remote_retrieve_response_code($response);
-    $response_body = wp_remote_retrieve_body($response);
-    $result = array(
+    //$response = wp_remote_request($url, $args);
+    
+    $request = wp_remote_request($url, $args);
+    if (is_wp_error($request)) {
+        do_action(
+            'bpwp_logger_error',
+            $type = 'BPWP-Request',
+            $title = 'Ошибка REST API WP Error',
+            $desc = $request->get_error_message()
+        );
+
+        return false;
+    }
+
+    if (empty($request['body'])) {
+        do_action(
+            'bpwp_logger_error',
+            $type = 'BPWP-Request',
+            $title = 'REST API вернулся без требуемых данных'
+        );
+
+        return false;
+    }
+
+    $response = json_decode($request['body'], true);
+
+    if (!empty($response["errors"]) and is_array($response["errors"])) {
+        foreach ($response["errors"] as $error) {
+            do_action(
+                'bpwp_logger_error',
+                $type = 'BPWP-Request',
+                $title = $url,
+                $response
+            );
+        }
+    }
+    //if ($response_code != 200)
+    /*$result = array(
         'response'  => $response,
         'code'      => $response_code,
         'body'      => $response_body,
-    );
-    return $result;
+    );*/
+
+    return $response;
 }
 
 /**

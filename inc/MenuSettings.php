@@ -49,15 +49,23 @@ class BPWPMenuSettings
      */
     public static function render_nav_menu()
     {
-
-        $nav_items = [
-            'lk' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://bonusplus.pro/lk', 'Вход в ЛК БонусПлюс'),
-            'diagnostic' => sprintf('<a href="%s">%s</a>', admin_url('site-health.php'), 'Диагностика проблем'),
-            'api-docs' => sprintf('<a href="%s" target="_blank">%s</a>', 'https://bonusplus.pro/api', 'БонусПлюс для разработчиков'),
-        ];
-
-        //$menu = $nav_items['lk'] . '|' . $nav_items['diagnostic'] . '|' . $nav_items['api-docs'];
-        echo implode(' | ', $nav_items);
+        $html = '';
+        $html .= sprintf(
+            '<a href="%s" target="_blank">%s</a> | ', 
+            esc_url('https://bonusplus.pro/lk'),
+            esc_html(__('Вход в ЛК БонусПлюс', 'bonus-plus-wp'))
+        );
+        $html .= sprintf(
+            '<a href="%s">%s</a> | ', 
+            esc_url(admin_url('site-health.php')),
+            esc_html(__('Диагностика проблем', 'bonus-plus-wp'))
+        );
+        $html .= sprintf(
+            '<a href="%s" target="_blank">%s</a>', 
+            esc_url('https://bonusplus.pro/api'), 
+            esc_html(__('БонусПлюс для разработчиков', 'bonus-plus-wp'))
+        );
+        echo $html;
     }
 
     /**
@@ -116,9 +124,16 @@ class BPWPMenuSettings
      */
     public static function display_msg_know_customers()
     {
-        printf('<input class="regular-text" type="text" name="bpwp_msg_know_customers" value="%s"/>', get_option('bpwp_msg_know_customers'));
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_msg_know_customers" value="%s"/>', 
+            esc_attr(get_option('bpwp_msg_know_customers'))
+        );
         
-        printf('<p><small>%s</small></p>', 'Отобразится для пользователей авторизованных на сайте и зарегистрированных в Бонус+, сумма активных и неактивных бонусов у которых больше 0. В тексте можно использовать тэги: <strong>discountCardName, purchasesTotalSum, purchasesSumToNextCard, nextCardName, availableBonuses, notActiveBonuses, allBonuses</strong>');
+        printf(
+            '<p><small>%s <strong>%s</strong></small></p>', 
+            esc_html(__('Отобразится для пользователей авторизованных на сайте и зарегистрированных в Бонус+, сумма активных и неактивных бонусов у которых больше 0. В тексте можно использовать тэги:', 'bonus-plus-wp')),
+            esc_html('discountCardName, purchasesTotalSum, purchasesSumToNextCard, nextCardName, availableBonuses, notActiveBonuses, allBonuses')
+        );
     }
 
     /**
@@ -128,9 +143,16 @@ class BPWPMenuSettings
      */
     public static function display_msg_unknow_customers()
     {
-        printf('<input class="regular-text" type="text" name="bpwp_msg_unknow_customers" value="%s"/>', get_option('bpwp_msg_unknow_customers'));
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_msg_unknow_customers" value="%s"/>', 
+            esc_attr(get_option('bpwp_msg_unknow_customers'))
+        );
 
-        printf('<p><small>%s</small></p>', 'Отобразится для пользователей неавторизованных на сайте, либо не имеющих аккаунта в Бонус+, либо с некорректным <strong>Платежным номером телефона (billing_phone)</strong>');
+        printf(
+            '<p><small>%s <strong>%s</strong></small></p>',
+            esc_html(__('Отобразится для пользователей неавторизованных на сайте, либо не имеющих аккаунта в Бонус+, либо с некорректным', 'bonus-plus-wp')),
+            esc_html(__('Платежным номером телефона (billing_phone)', 'bonus-plus-wp'))
+        );
     }
 
     /**
@@ -140,9 +162,9 @@ class BPWPMenuSettings
      */
     public static function display_lk_url()
     {
-        printf('<input class="regular-text" type="url" name="bpwp_lk_url" value="%s"/>', get_option('bpwp_lk_url'));
+        printf('<input class="regular-text" type="url" name="bpwp_lk_url" value="%s"/>', esc_url(get_option('bpwp_lk_url')));
 
-        printf('<p><small>%s</small></p>', 'Ссылка на личный кабинет Бонус+');
+        printf('<p><small>%s</small></p>', esc_html(__('Ссылка на личный кабинет Бонус+', 'bonus-plus-wp')));
     }
 
     /**
@@ -152,9 +174,17 @@ class BPWPMenuSettings
      */
     public static function display_api_key()
     {
-        printf('<input class="regular-text" type="text" name="bpwp_api_key" value="%s"/>', get_option('bpwp_api_key'));
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_api_key" value="%s"/>', 
+            esc_attr(get_option('bpwp_api_key'))
+        );
 
-        printf('<p><small>Вводить нужно только API Key здесь. На стороне БонусПлюс ничего настраивать не нужно. Получить ключ можно <a href="%s" target="_blank">здесь</a></small></p>', BPWP_LK_URL);
+        printf(
+            '<p><small>%s<a href="%s" target="_blank">%s</a></small></p>',
+            esc_html(__('Вводить API Key нужно только  здесь. На стороне БонусПлюс ничего настраивать не нужно. Получить ключ можно', 'bonus-plus-wp')),
+            esc_url(BPWP_LK_URL),
+            esc_html(__('здесь', 'bonus-plus-wp'))
+        );
     }
 
     /**
@@ -191,13 +221,15 @@ class BPWPMenuSettings
      */
     public static function display_status()
     {
-		$res = bpwp_api_request(
+        $info = bpwp_api_request(
 			'account',
 			'',
 			'GET'
 		);
         
         if ( !empty($info) ) {
+            //$code = $info['code'];
+            //$html = '<div class="wrap"><div id="message" class="$s"></div></div>'
             print('<div class="wrap">');
             print('<div id="message" class="updated notice is-dismissible">');
             print('<ul>');

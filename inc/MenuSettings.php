@@ -180,7 +180,7 @@ class BPWPMenuSettings
         );
 
         printf(
-            '<p><small>%s<a href="%s" target="_blank">%s</a></small></p>',
+            '<p><small>%s <a href="%s" target="_blank">%s</a></small></p>',
             esc_html(__('Вводить API Key нужно только  здесь. На стороне БонусПлюс ничего настраивать не нужно. Получить ключ можно', 'bonus-plus-wp')),
             esc_url(BPWP_LK_URL),
             esc_html(__('здесь', 'bonus-plus-wp'))
@@ -229,7 +229,8 @@ class BPWPMenuSettings
         
         if ( !empty($info) ) {
             //$code = $info['code'];
-            //$html = '<div class="wrap"><div id="message" class="$s"></div></div>'
+            //if $code !== 200 $class
+            //$html = '<div class="wrap"><div id="message" class="%s"></div></div>',  esc_attr($class)
             print('<div class="wrap">');
             print('<div id="message" class="updated notice is-dismissible">');
             print('<ul>');

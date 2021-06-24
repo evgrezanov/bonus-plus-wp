@@ -83,7 +83,7 @@ class BPWPProfile
             }
             $url = apply_filters('bpwp_filter_goto_register_url', $url);
 
-            $data['title']  =   'Войдите, на сайт';
+            $data['title']  =   __('Войдите, на сайт', 'bonus-plus-wp');
             $data['url']    =   $url;
             $data['desc']   =   $desc;
             $data['class']  =   'card4';
@@ -122,7 +122,7 @@ class BPWPProfile
             $url = apply_filters('bpwp_filter_goto_shop_url', $url);
 
             // Возвращаем массив для бонусной карты
-            $data['title']  =   $allBonuses . ' бонусных рублей';
+            $data['title']  =   sprintf('%s %s', $allBonuses, __('бонусных рублей', 'bonus-plus-wp'));
             $data['url']    =   $url;
             $data['desc']   =   $desc;
             $data['class']  =   'card3';
@@ -157,9 +157,7 @@ class BPWPProfile
                 'GET'
             );
 
-            $info = json_decode($res);
-
-            update_user_meta($user_id, 'bonus-plus', $info);
+            update_user_meta($user_id, 'bonus-plus', $res);
         }
     }
 

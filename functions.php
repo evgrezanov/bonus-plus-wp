@@ -46,7 +46,8 @@ function bpwp_api_request($endpoint, $params, $type)
 
     //$response = wp_remote_request($url, $args);
     
-    $request = wp_remote_request($url, $args);
+    $request = wp_safe_remote_request($url, $args);
+    
     if (is_wp_error($request)) {
         do_action(
             'bpwp_logger_error',

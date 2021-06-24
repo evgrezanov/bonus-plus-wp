@@ -174,7 +174,7 @@ class BPWPMyAccount
             'bpwp-qrcodejs-action',
             'discountCardNumber',
             array(
-                'cardNumber' => $cardNumber
+                'cardNumber' => esc_attr($cardNumber)
             )
         );
     }

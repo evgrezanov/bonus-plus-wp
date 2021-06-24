@@ -70,7 +70,7 @@ class BPWPProfile
      */
     public static function bpwp_api_prepare_customer_bonuses_data($customer_id = '')
     {
-        $data = array();
+        $data = [];
         // Если пользователь неавторизован
         if ( !is_user_logged_in() ) {
             // Описание неопознанного пользователя
@@ -93,7 +93,9 @@ class BPWPProfile
             $data = bpwp_api_get_customer_data();
             // Описание опознанного пользователя
             $desc = get_option('bpwp_msg_know_customers');
-            $availablekeys = array(
+            $allBonuses = $data['availableBonuses'] + $data['notActiveBonuses'];
+            
+            $availablekeys = [
                 'discountCardName',
                 'purchasesTotalSum',
                 'purchasesSumToNextCard',
@@ -101,18 +103,19 @@ class BPWPProfile
                 'availableBonuses',
                 'notActiveBonuses',
                 'allBonuses'
-            );
+            ];
 
-            $allBonuses = $data['availableBonuses'] + $data['notActiveBonuses'];
-            foreach ($availablekeys as $val) {
-                if ($val != 'allBonuses'){
-                    if (!empty($data[$val])) {
-                        $desc = str_replace($val, $data[$val], $desc);
-                    }
-                } else {
-                    $desc = str_replace($val, $allBonuses, $desc);
-                }
-            }
+            $tavailablekeys = [
+                $data['discountCardName'],
+                $data['purchasesTotalSum'],
+                $data['purchasesSumToNextCard'],
+                $data['nextCardName'],
+                $data['availableBonuses'],
+                $data['notActiveBonuses'],
+                $allBonuses
+            ];
+
+            $desc = str_replace($availablekeys, $tavailablekeys, $desc);
 
             if (function_exists('wc_get_page_permalink')) {
                 $url = wc_get_page_permalink('shop ');
@@ -156,7 +159,6 @@ class BPWPProfile
                 ),
                 'GET'
             );
-
             update_user_meta($user_id, 'bonus-plus', $res);
         }
     }
@@ -168,7 +170,7 @@ class BPWPProfile
         if (!$desc || !$data){
             return;
         }
-        $availablekeys = array(
+        $availablekeys = [
             'discountCardName', 
             'purchasesTotalSum', 
             'purchasesSumToNextCard', 
@@ -176,9 +178,9 @@ class BPWPProfile
             'availableBonuses', 
             'notActiveBonuses', 
             'allBonuses'
-        );
+        ];
         foreach ($availablekeys as $key){
-            if (!empty($data[$key])){
+            if (isset($data[$key]) && !empty($data[$key])){
                 $desc = str_replace($key, $data[$key], $desc);
             }
         }

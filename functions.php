@@ -18,24 +18,6 @@ function bpwp_api_request($endpoint, $params, $type)
 
     $token = get_option('bpwp_api_key');
     $token = base64_encode($token);
-    /*
-    $ch = curl_init();
-
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $type);
-
-
-    $headers = array();
-    $headers[] = 'Authorization: ApiKey ' . $token;
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-    $result = curl_exec($ch);
-    if (curl_errno($ch)) {
-        error_log('Error:' . curl_error($ch));
-    }
-    curl_close($ch);
-    */
     
     $args = array(
         'method'      => $type,
@@ -43,10 +25,10 @@ function bpwp_api_request($endpoint, $params, $type)
             'Authorization' => 'ApiKey ' . $token,
         ),
     );
-
-    //$response = wp_remote_request($url, $args);
     
     $request = wp_safe_remote_request($url, $args);
+
+    $response_code = wp_remote_retrieve_response_code($request);
     
     if (is_wp_error($request)) {
         do_action(
@@ -55,7 +37,7 @@ function bpwp_api_request($endpoint, $params, $type)
             $title = 'Ошибка REST API WP Error',
             $desc = $request->get_error_message()
         );
-
+        $msg = $request->get_error_message();
         return false;
     }
 
@@ -65,13 +47,15 @@ function bpwp_api_request($endpoint, $params, $type)
             $type = 'BPWP-Request',
             $title = 'REST API вернулся без требуемых данных'
         );
-
+        //$msg = __('REST API вернулся без требуемых данных', 'bonus-plus-wp');
+        //$class = 'notice notice-error';
         return false;
     }
 
     $response = json_decode($request['body'], true);
 
     if (!empty($response["errors"]) and is_array($response["errors"])) {
+        /*$msg = '<ul>';
         foreach ($response["errors"] as $error) {
             do_action(
                 'bpwp_logger_error',
@@ -79,14 +63,16 @@ function bpwp_api_request($endpoint, $params, $type)
                 $title = $url,
                 $response
             );
+            $msg .= sprintf('<li>%s</li>', $error);
         }
+        $msg .= '</ul>';
+        $class = 'notice notice-error';
+        $response['class'] = $class;
+        $response['body'] = $msg;*/
+        return false;
     }
-    //if ($response_code != 200)
-    /*$result = array(
-        'response'  => $response,
-        'code'      => $response_code,
-        'body'      => $response_body,
-    );*/
+
+    $response['code'] = $response_code;
 
     return $response;
 }
@@ -119,7 +105,7 @@ function bpwp_api_get_customer_data($customer_id = '')
 
     $bonusData = get_user_meta($customer_id, 'bonus-plus', true);
     
-    $data = array();
+    $data = [];
     foreach ($bonusData as $key => $value){
         if ($key != 'person'){
             $data[$key] = $value;

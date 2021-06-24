@@ -46,7 +46,7 @@ class BPWPMyAccount
      */
     public static function bpwp_account_links($menu_links)
     {
-        $tab_title = 'Бонус+';
+        $tab_title = __('Бонус+', 'bonus-plus-wp');
         $tab_title = apply_filters('bpwp_filter_woo_profile_tab_title', $tab_title);
 
 
@@ -86,25 +86,31 @@ class BPWPMyAccount
                 foreach ($info as $key => $value) {
                     if ($key != 'person') {
                         if ($key == 'discountCardName') {
-                            print('Тип карты: ' . $value . '<br />');
+                            printf('%s:%s<br />', esc_html(__('Тип карты', 'bonus-plus-wp')), esc_html($value));
                         }
                         if ($key == 'discountCardNumber') {
-                            print('Номер карты: ' . $value . '<br />');
+                            printf('%s:%s<br />', esc_html(__('Номер карты', 'bonus-plus-wp')), esc_html($value));
+
                         }
                         if ($key == 'availableBonuses') {
-                            print('Доступных бонусов: ' . $value . '<br />');
+                            printf('%s:%s<br />', esc_html(__('Доступных бонусов', 'bonus-plus-wp')), esc_html($value));
+
                         }
                         if ($key == 'notActiveBonuses') {
-                            print('Неактивных бонусов: ' . $value . '<br />');
+                            printf('%s:%s<br />', esc_html(__('Неактивных бонусов', 'bonus-plus-wp')), esc_html($value));
+
                         }
                         if ($key == 'purchasesTotalSum') {
-                            print('Сумма покупок: ' . $value . '<br />');
+                            printf('%s:%s<br />', esc_html(__('Сумма покупок', 'bonus-plus-wp')), esc_html($value));
+
                         }
                         if ($key == 'purchasesSumToNextCard') {
-                            print('Сумма покупок для смены карты: ' . $value . '<br />');
+                            printf('%s:%s<br />', esc_html(__('Сумма покупок для смены карты', 'bonus-plus-wp')), esc_html($value));
+
                         }
                         if ($key == 'lastPurchaseDate') {
-                            print('Последняя покупка: ' . $value . '<br />');
+                            printf('%s:%s<br />', esc_html(__('Последняя покупка', 'bonus-plus-wp')), esc_html($value));
+
                         }
                     } else {
                         $person_data = $value;
@@ -117,7 +123,8 @@ class BPWPMyAccount
                         if (!empty($person)) {
                             $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
                             if (!empty($owner)) {
-                                print('Держатель: ' . $owner . '<br />');
+                                printf('%s:%s<br />', esc_html(__('Держатель', 'bonus-plus-wp')), esc_html($owner));
+
                             }
                         }
                     }
@@ -125,12 +132,12 @@ class BPWPMyAccount
             } else {
                 foreach ($info as $key => $value) {
                     if ($key !== 'person') {
-                        print($key . ' : ' . $value . '<br />');
+                        printf('%s:%s<br />', esc_html($key), esc_html($value));
                     } else {
                         $personalInfo = $value;
                         foreach ($personalInfo as $pkey => $pvalue) {
                             if (!is_array($pvalue)) {
-                                print($pkey . ' : ' . $pvalue . '<br />');
+                                printf('%s:%s<br />', esc_html($pkey), esc_html($pvalue));
                             }
                         }
                     }

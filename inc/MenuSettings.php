@@ -25,8 +25,8 @@ class BPWPMenuSettings
             function () {
                 if (current_user_can('manage_options')) {
                     add_menu_page(
-                        $page_title = 'БонусПлюс',
-                        $menu_title = 'БонусПлюс',
+                        $page_title = __('БонусПлюс', 'bonus-plus-wp'),
+                        $menu_title = __('БонусПлюс', 'bonus-plus-wp'),
                         $capability = 'manage_options',
                         $menu_slug = 'bonus-plus',
                         $function = array(__CLASS__, 'display_settings'),
@@ -76,12 +76,12 @@ class BPWPMenuSettings
     public static function settings_general()
     {
 
-        add_settings_section('bpwp_section_access', 'Данные для доступа Бонус+', null, 'bpwp-settings');
+        add_settings_section('bpwp_section_access', __('Данные для доступа Бонус+', 'bonus-plus-wp'), null, 'bpwp-settings');
 
         register_setting('bpwp-settings', 'bpwp_api_key');
         add_settings_field(
             $id = 'bpwp_api_key',
-            $title = 'Ключ API',
+            $title = __( 'Ключ API', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_api_key',),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_access'
@@ -90,18 +90,18 @@ class BPWPMenuSettings
         register_setting('bpwp-settings', 'bpwp_lk_url');
         add_settings_field(
             $id = 'bpwp_lk_url',
-            $title = 'URL Личного кабинета',
+            $title = __( 'URL Личного кабинета', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_lk_url'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_access'
         );
 
-        add_settings_section('bpwp_section_front_msgs', 'Текст виджета бонусной карты', null, 'bpwp-settings');
+        add_settings_section('bpwp_section_front_msgs', __( 'Текст виджета бонусной карты', 'bonus-plus-wp'), null, 'bpwp-settings');
         
         register_setting('bpwp-settings', 'bpwp_msg_know_customers');
         add_settings_field(
             $id = 'bpwp_msg_know_customers',
-            $title = 'Идентифицированные пользователи',
+            $title = __( 'Идентифицированные пользователи', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_msg_know_customers'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_front_msgs'
@@ -110,7 +110,7 @@ class BPWPMenuSettings
         register_setting('bpwp-settings', 'bpwp_msg_unknow_customers');
         add_settings_field(
             $id = 'bpwp_msg_unknow_customers',
-            $title = 'Неопознанные пользователи',
+            $title = __( 'Неопознанные пользователи', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_msg_unknow_customers'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_front_msgs'
@@ -226,17 +226,25 @@ class BPWPMenuSettings
 			'',
 			'GET'
 		);
-        
+
+        $fields = [
+            'balance'   => __('Текущий балланс', 'bonus-plus-wp'),
+            'tariff'    => __('Тарифный план', 'bonus-plus-wp'),
+            'username'  => __('Пользователь', 'bonus-plus-wp'),
+            'smsPrice'  => __('Стоимость SMS', 'bonus-plus-wp'),
+            'pushPrice' => __('Стоимость push-уведомлений', 'bonus-plus-wp'),
+        ];
+
         if ( !empty($info) ) {
-            //$code = $info['code'];
-            //if $code !== 200 $class
-            //$html = '<div class="wrap"><div id="message" class="%s"></div></div>',  esc_attr($class)
-            print('<div class="wrap">');
-            print('<div id="message" class="updated notice is-dismissible">');
-            print('<ul>');
+            $response_code = $info['code'];
+            $response_code != 200 ? $class = 'notice notice-error' : $class = 'updated notice is-dismissible';
+            printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class) );
             foreach ($info as $key => $value) {
                 if (!is_array($value)) {
-                    printf('<li>%s : %s</li>', $key, $value);
+                    $hkey = $fields[esc_html($key)];
+                    if (!empty($hkey)){
+                        printf('<li>%s : %s</li>', esc_html($hkey), esc_html($value));
+                    }
                 }
             }
             print('</ul></div></div>');

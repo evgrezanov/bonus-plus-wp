@@ -4,7 +4,7 @@ Donate link: https://github.com/evgrezanov
 Tags: bonus, woocommerce, sync, integration
 Requires at least: 4.0
 Tested up to: 5.7.2
-Stable tag: 1.1
+Stable tag: 1.0
 Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -82,7 +82,3 @@ PHP 7.1
 - Страница настроек подключения
 - Шорткод бонусной карты
 - Интеграция с WooCommerce
-
-== Upgrade Notice ==
-= 1.0 =
-Upgrade immediately.

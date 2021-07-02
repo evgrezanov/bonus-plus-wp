@@ -4,7 +4,7 @@ Donate link: https://github.com/evgrezanov
 Tags: bonus, woocommerce, sync, integration
 Requires at least: 4.0
 Tested up to: 5.7.2
-Stable tag: 1.0
+Stable tag: 1.1
 Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -23,6 +23,14 @@ Integration WordPress/WooCommerce & BonusPlus http://bonusplus.pro (for Russia)
 *   Шорткод для отображения данных карты пользователя
 *   WooCommerce добавлена новая вкладка в личном кабинете
 *   Генерация QR кода, для предъявления на кассе
+
+[Оффициальный сайт Бонус+](https://bonusplus.pro/new/#about)
+
+[Обработка персональных данных](https://bonusplus.pro/new/data-processing/)
+
+Документация разработчика: [https://bonusplus.pro/api](https://bonusplus.pro/api)
+
+Примеры получаемых данных REST API Бонус+: [https://bonusplus.pro/api/Help](https://bonusplus.pro/api/Help)
 
 == Installation ==
 
@@ -77,6 +85,11 @@ PHP 7.1
 3. Шорткод для отображения бонусной карты клиента
 
 == Changelog ==
+
+= 1.1 =
+- Исправлена проблема с версиями в файлах readme
+- Добавлена проверка при выводе ссылок в настройках плагина
+- Добавлены комментарии к функциям и переменным связанным с API Бонус+
 
 = 1.0 =
 - Страница настроек подключения

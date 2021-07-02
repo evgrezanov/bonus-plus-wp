@@ -11,14 +11,38 @@ if (!defined('ABSPATH')) {
  */
 class BPWPMenuSettings
 {
-    
-    
+    /**
+     *  Client dashboard bonusplus URL 
+     * 
+     *  @var string
+     */
+    public static $bpwp_client_url;
+
+    /**
+     *  Developer documentation bonusplus URL 
+     *  
+     *  @var string
+     */
+    public static $bpwp_dev_doc_url;
+
+    /**
+     *  Shop owner dashboard bonusplus URL 
+     * 
+     *  @var string
+     */
+    public static $bpwp_owner_url;
+
+
     /**
      * The Init
      */
     public static function init()
     {
-        define('BPWP_LK_URL', 'https://bonusplus.pro/lk/Pages/Cabinet/Module/Loyalty/API_Preferences.aspx');
+        self::$bpwp_owner_url = 'https://bonusplus.pro/lk/Pages/Cabinet/Module/Loyalty/API_Preferences.aspx';
+        
+        self::$bpwp_dev_doc_url = 'https://bonusplus.pro/api';
+
+        self::$bpwp_client_url = 'https://bonusplus.pro/lk';
 
         add_action(
             'admin_menu',
@@ -49,23 +73,21 @@ class BPWPMenuSettings
      */
     public static function render_nav_menu()
     {
-        $html = '';
-        $html .= sprintf(
-            '<a href="%s" target="_blank">%s</a> | ', 
-            esc_url('https://bonusplus.pro/lk'),
-            esc_html(__('Вход в ЛК БонусПлюс', 'bonus-plus-wp'))
+        printf(
+            '<a href="%s" target="_blank">%s</a> | ',
+            esc_url(self::$bpwp_client_url),
+            esc_html(
+                __('Вход в ЛК БонусПлюс', 'bonus-plus-wp')
+            )
         );
-        $html .= sprintf(
-            '<a href="%s">%s</a> | ', 
-            esc_url(admin_url('site-health.php')),
-            esc_html(__('Диагностика проблем', 'bonus-plus-wp'))
+
+        printf(
+            '<a href="%s" target="_blank">%s</a>',
+            esc_url(self::$bpwp_dev_doc_url),
+            esc_html(
+                __('БонусПлюс для разработчиков', 'bonus-plus-wp')
+            )
         );
-        $html .= sprintf(
-            '<a href="%s" target="_blank">%s</a>', 
-            esc_url('https://bonusplus.pro/api'), 
-            esc_html(__('БонусПлюс для разработчиков', 'bonus-plus-wp'))
-        );
-        echo $html;
     }
 
     /**
@@ -81,27 +103,27 @@ class BPWPMenuSettings
         register_setting('bpwp-settings', 'bpwp_api_key');
         add_settings_field(
             $id = 'bpwp_api_key',
-            $title = __( 'Ключ API', 'bonus-plus-wp'),
+            $title = __('Ключ API', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_api_key',),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_access'
         );
 
-        register_setting('bpwp-settings', 'bpwp_lk_url');
+        register_setting('bpwp-settings', 'self::$bpwp_owner_url');
         add_settings_field(
-            $id = 'bpwp_lk_url',
-            $title = __( 'URL Личного кабинета', 'bonus-plus-wp'),
+            $id = 'self::$bpwp_owner_url',
+            $title = __('URL Личного кабинета', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_lk_url'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_access'
         );
 
-        add_settings_section('bpwp_section_front_msgs', __( 'Текст виджета бонусной карты', 'bonus-plus-wp'), null, 'bpwp-settings');
-        
+        add_settings_section('bpwp_section_front_msgs', __('Текст виджета бонусной карты', 'bonus-plus-wp'), null, 'bpwp-settings');
+
         register_setting('bpwp-settings', 'bpwp_msg_know_customers');
         add_settings_field(
             $id = 'bpwp_msg_know_customers',
-            $title = __( 'Идентифицированные пользователи', 'bonus-plus-wp'),
+            $title = __('Идентифицированные пользователи', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_msg_know_customers'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_front_msgs'
@@ -110,7 +132,7 @@ class BPWPMenuSettings
         register_setting('bpwp-settings', 'bpwp_msg_unknow_customers');
         add_settings_field(
             $id = 'bpwp_msg_unknow_customers',
-            $title = __( 'Неопознанные пользователи', 'bonus-plus-wp'),
+            $title = __('Неопознанные пользователи', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_msg_unknow_customers'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_front_msgs'
@@ -125,12 +147,12 @@ class BPWPMenuSettings
     public static function display_msg_know_customers()
     {
         printf(
-            '<input class="regular-text" type="text" name="bpwp_msg_know_customers" value="%s"/>', 
+            '<input class="regular-text" type="text" name="bpwp_msg_know_customers" value="%s"/>',
             esc_attr(get_option('bpwp_msg_know_customers'))
         );
-        
+
         printf(
-            '<p><small>%s <strong>%s</strong></small></p>', 
+            '<p><small>%s <strong>%s</strong></small></p>',
             esc_html(__('Отобразится для пользователей авторизованных на сайте и зарегистрированных в Бонус+, сумма активных и неактивных бонусов у которых больше 0. В тексте можно использовать тэги:', 'bonus-plus-wp')),
             esc_html('discountCardName, purchasesTotalSum, purchasesSumToNextCard, nextCardName, availableBonuses, notActiveBonuses, allBonuses')
         );
@@ -144,7 +166,7 @@ class BPWPMenuSettings
     public static function display_msg_unknow_customers()
     {
         printf(
-            '<input class="regular-text" type="text" name="bpwp_msg_unknow_customers" value="%s"/>', 
+            '<input class="regular-text" type="text" name="bpwp_msg_unknow_customers" value="%s"/>',
             esc_attr(get_option('bpwp_msg_unknow_customers'))
         );
 
@@ -175,14 +197,14 @@ class BPWPMenuSettings
     public static function display_api_key()
     {
         printf(
-            '<input class="regular-text" type="text" name="bpwp_api_key" value="%s"/>', 
+            '<input class="regular-text" type="text" name="bpwp_api_key" value="%s"/>',
             esc_attr(get_option('bpwp_api_key'))
         );
 
         printf(
             '<p><small>%s <a href="%s" target="_blank">%s</a></small></p>',
             esc_html(__('Вводить API Key нужно только  здесь. На стороне БонусПлюс ничего настраивать не нужно. Получить ключ можно', 'bonus-plus-wp')),
-            esc_url(BPWP_LK_URL),
+            esc_url(self::$bpwp_owner_url),
             esc_html(__('здесь', 'bonus-plus-wp'))
         );
     }
@@ -195,7 +217,7 @@ class BPWPMenuSettings
     public static function display_settings()
     {
 
-        ?>
+    ?>
         <form method="POST" action="options.php">
 
             <h1><?php esc_html_e('Настройки интеграции Бонус+', 'bonus-plus-wp'); ?></h1>
@@ -211,7 +233,7 @@ class BPWPMenuSettings
         </form>
 
 
-        <?php 
+<?php
     }
 
     /**
@@ -222,10 +244,10 @@ class BPWPMenuSettings
     public static function display_status()
     {
         $info = bpwp_api_request(
-			'account',
-			'',
-			'GET'
-		);
+            'account',
+            '',
+            'GET'
+        );
 
         $fields = [
             'balance'   => __('Текущий балланс', 'bonus-plus-wp'),
@@ -235,21 +257,20 @@ class BPWPMenuSettings
             'pushPrice' => __('Стоимость push-уведомлений', 'bonus-plus-wp'),
         ];
 
-        if ( !empty($info) ) {
+        if (!empty($info)) {
             $response_code = $info['code'];
             $response_code != 200 ? $class = 'notice notice-error' : $class = 'updated notice is-dismissible';
-            printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class) );
+            printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
             foreach ($info as $key => $value) {
                 if (!is_array($value)) {
                     $hkey = isset($fields[$key]) && !empty($fields[$key]) ? $fields[$key] : '';
-                    if (!empty($hkey)){
+                    if (!empty($hkey)) {
                         printf('<li>%s : %s</li>', esc_html($hkey), esc_html($value));
                     }
                 }
             }
             print('</ul></div></div>');
         }
-			
     }
 }
 BPWPMenuSettings::init();

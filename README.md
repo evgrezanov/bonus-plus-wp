@@ -12,7 +12,7 @@
 
 БонусПлюс (bonusplus.pro) and WordPress/WooCommerce - sync, integration, connection
 
-== Description ==
+## Description
 
 Integration WordPress/WooCommerce & [BonusPlus](http://bonusplus.pro) (for Russia)
 
@@ -24,6 +24,15 @@ Integration WordPress/WooCommerce & [BonusPlus](http://bonusplus.pro) (for Russi
 *   Шорткод для отображения данных карты пользователя
 *   WooCommerce добавлена новая вкладка в личном кабинете
 *   Генерация QR кода, для предъявления на кассе
+
+[Оффициальный сайт Бонус+](https://bonusplus.pro/new/#about)
+
+[Обработка персональных данных](https://bonusplus.pro/new/data-processing/)
+
+Документация разработчика: [https://bonusplus.pro/api](https://bonusplus.pro/api)
+
+Примеры получаемых данных REST API Бонус+: [https://bonusplus.pro/api/Help](https://bonusplus.pro/api/Help)
+
 
 ## Installation
 
@@ -71,7 +80,7 @@ PHP 7.1
 Да, будет, используйте хук bpwp_api_filter_get_customer_phone для фильтрации номера телефона 
 
 
-== Screenshots ==
+# Screenshots
 
 1. Страница настроек
 2. Страница личного кабинета WooCommerce
@@ -79,11 +88,12 @@ PHP 7.1
 
 == Changelog ==
 
+= 1.1 =
+- Исправлена проблема с версиями в файлах readme
+- Добавлена проверка при выводе ссылок в настройках плагина
+- Добавлены комментарии к функциям и переменным связанным с API Бонус+
+
 = 1.0 =
 - Страница настроек подключения
 - Шорткод бонусной карты
 - Интеграция с WooCommerce
-
-== Upgrade Notice ==
-= 1.0 =
-Upgrade immediately.

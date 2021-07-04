@@ -1,11 +1,17 @@
 <?php
 
 /**
- * General functions
+ * Обертка для вызова API Бонус+
+ * 
+ *  @param $endpoint variant
+ *  @param $params array
+ *  @param $type variant
  */
 function bpwp_api_request($endpoint, $params, $type)
 {
-    if (empty($endpoint) || empty($type))
+    $token = get_option('bpwp_api_key');
+
+    if (empty($endpoint) || empty($type) || empty($token))
         return;
 
     $url = 'https://bonusplus.pro/api/' . $endpoint;
@@ -16,7 +22,6 @@ function bpwp_api_request($endpoint, $params, $type)
         }
     }
 
-    $token = get_option('bpwp_api_key');
     $token = base64_encode($token);
     
     $args = array(

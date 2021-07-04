@@ -109,9 +109,9 @@ class BPWPMenuSettings
             $section = 'bpwp_section_access'
         );
 
-        register_setting('bpwp-settings', 'self::$bpwp_owner_url');
+        register_setting('bpwp-settings', 'bpwp_lk_url');
         add_settings_field(
-            $id = 'self::$bpwp_owner_url',
+            $id = 'bpwp_lk_url',
             $title = __('URL Личного кабинета', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_lk_url'),
             $page = 'bpwp-settings',

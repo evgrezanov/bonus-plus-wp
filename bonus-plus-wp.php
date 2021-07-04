@@ -72,7 +72,7 @@ class BPWPBonusPlus_Core
         if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
             require_once __DIR__ . '/inc/WooAccount.php';
         }
-        require_once __DIR__ . '/inc/Profile.php';
+        require_once __DIR__ . '/inc/profile.php';
         require_once __DIR__ . '/inc/MenuSettings.php';
     }
 

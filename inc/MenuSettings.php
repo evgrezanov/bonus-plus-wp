@@ -39,7 +39,7 @@ class BPWPMenuSettings
     public static function init()
     {
         self::$bpwp_owner_url = 'https://bonusplus.pro/lk/Pages/Cabinet/Module/Loyalty/API_Preferences.aspx';
-        
+
         self::$bpwp_dev_doc_url = 'https://bonusplus.pro/api';
 
         self::$bpwp_client_url = 'https://bonusplus.pro/lk';
@@ -118,11 +118,20 @@ class BPWPMenuSettings
             $section = 'bpwp_section_access'
         );
 
-        register_setting('bpwp-settings', 'bpwp_user_identificatyon_by');
+        register_setting('bpwp-settings', 'bpwp_user_identification_by');
         add_settings_field(
-            $id = 'bpwp_user_identificatyon_by',
+            $id = 'bpwp_user_identification_by',
             $title = __('Идентифицировать пользователей по', 'bonus-plus-wp'),
-            $callback = array(__CLASS__, 'display_user_identificatyon_by'),
+            $callback = array(__CLASS__, 'display_user_identification_by'),
+            $page = 'bpwp-settings',
+            $section = 'bpwp_section_access'
+        );
+
+        register_setting('bpwp-settings', 'bpwp_shop_name');
+        add_settings_field(
+            $id = 'bpwp_shop_name',
+            $title = __('Название магазина в Бонус+', 'bonus-plus-wp'),
+            $callback = array(__CLASS__, 'display_shop_name'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_access'
         );
@@ -199,30 +208,39 @@ class BPWPMenuSettings
     }
 
     /**
-     * display_user_identificatyon_by
+     * display_user_identification_by
      * 
      *  @return mixed
      */
-    public static function display_user_identificatyon_by()
+    public static function display_user_identification_by()
     {
-        $options_array = [
-            'phone' => __('Телефон', 'bonus-plus-wp'),
-            'email' => __('Email', 'bonus-plus-wp'),
-            'both'  => __('Сначала email, затем телефон', 'bonus-plus-wp'),
-        ];
 
-        $identification_by = esc_html(get_option('bpwp_user_identificatyon_by'));
-        $selectbox = '<select name="wpt_select_box" id="identificate_user_by">';
-        foreach ($options_array as $key => $value){
-            if ($key == $identification_by){
-                $selectbox .= '<option selected="selected" value="'.$key.'">' . $value . '</option>';
-            } else {
-                $selectbox .= '<option value="' . $key . '">' . $value . '</option>';
-            }
-        }
-        $selectbox .= '</select>';
-        printf ($selectbox);
-        printf('<p><small>%s</small></p>', esc_html(__('По какому параметру идентифицировать пользователя?', 'bonus-plus-wp')));
+        $identification_by = get_option('bpwp_user_identification_by');
+        ?>
+        <select class="check_prefix_postfix" name="bpwp_user_identification_by">
+            <?php
+            printf(
+                '<option value="%s" %s>%s</option>',
+                'email',
+                selected('email', $identification_by, false),
+                'Email'
+            );
+            printf(
+                '<option value="%s" %s>%s</option>',
+                'phone',
+                selected('phone', $identification_by, false),
+                'Телефон'
+            );
+            printf(
+                '<option value="%s" %s>%s</option>',
+                'both',
+                selected('both', $identification_by, false),
+                'Сначала email, затем телефон'
+            );
+            ?>
+        </select>
+        <?php
+        printf('<p><small>%s</small></p>', esc_html(__('Выберите как идентифицировать клиентов: по email, по номеру телефона или сначала по email, при неудаче по номеру телефона', 'bonus-plus-wp')));
     }
 
     /**
@@ -246,6 +264,24 @@ class BPWPMenuSettings
     }
 
     /**
+     * display_shop_name
+     * 
+     *  @return mixed
+     */
+    public static function display_shop_name()
+    {
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_shop_name" value="%s"/>',
+            esc_attr(get_option('bpwp_shop_name'))
+        );
+
+        printf(
+            '<p><small>%s</small></p>',
+            esc_html(__('Необходим для импорта товаров в Бонус+', 'bonus-plus-wp')),
+        );
+    }
+
+    /**
      * display_settings
      * 
      *  @return mixed
@@ -253,7 +289,7 @@ class BPWPMenuSettings
     public static function display_settings()
     {
 
-        ?>
+    ?>
         <form method="POST" action="options.php">
 
             <h1><?php esc_html_e('Настройки интеграции Бонус+', 'bonus-plus-wp'); ?></h1>
@@ -269,7 +305,7 @@ class BPWPMenuSettings
         </form>
 
 
-        <?php
+<?php
     }
 
     /**
@@ -295,13 +331,13 @@ class BPWPMenuSettings
 
         if (!empty($info)) {
             $response_code = $info['code'];
-            if ($response_code == 200){
+            if ($response_code == 200) {
                 $class = 'updated notice is-dismissible';
                 printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
                 foreach ($info as $key => $value) {
                     if (!is_array($value) && key_exists($key, $fields)) {
                         printf('<li>%s : %s</li>', esc_html($fields[$key]), esc_html($value));
-                    } 
+                    }
                 }
                 print('</ul></div></div>');
             } else {

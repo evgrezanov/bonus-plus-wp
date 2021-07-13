@@ -4,7 +4,7 @@ Donate link: https://github.com/evgrezanov
 Tags: bonus, woocommerce, sync, integration
 Requires at least: 4.0
 Tested up to: 5.7.2
-Stable tag: 1.1
+Stable tag: 1.2
 Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ PHP 7.1
 3. Шорткод для отображения бонусной карты клиента
 
 == Changelog ==
+
+= 1.2 =
+- Исправлено предупреждение https://github.com/evgrezanov/bonus-plus-wp/issues/6
+- Добавлена проверка при выводе ссылок в настройках плагина
+- Добавлены комментарии к функциям и переменным связанным с API Бонус+
 
 = 1.1 =
 - Исправлена проблема с версиями в файлах readme

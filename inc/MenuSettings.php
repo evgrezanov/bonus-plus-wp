@@ -118,6 +118,15 @@ class BPWPMenuSettings
             $section = 'bpwp_section_access'
         );
 
+        register_setting('bpwp-settings', 'bpwp_user_identificatyon_by');
+        add_settings_field(
+            $id = 'bpwp_user_identificatyon_by',
+            $title = __('Идентифицировать пользователей по', 'bonus-plus-wp'),
+            $callback = array(__CLASS__, 'display_user_identificatyon_by'),
+            $page = 'bpwp-settings',
+            $section = 'bpwp_section_access'
+        );
+
         add_settings_section('bpwp_section_front_msgs', __('Текст виджета бонусной карты', 'bonus-plus-wp'), null, 'bpwp-settings');
 
         register_setting('bpwp-settings', 'bpwp_msg_know_customers');
@@ -190,6 +199,33 @@ class BPWPMenuSettings
     }
 
     /**
+     * display_user_identificatyon_by
+     * 
+     *  @return mixed
+     */
+    public static function display_user_identificatyon_by()
+    {
+        $options_array = [
+            'phone' => __('Телефон', 'bonus-plus-wp'),
+            'email' => __('Email', 'bonus-plus-wp'),
+            'both'  => __('Сначала email, затем телефон', 'bonus-plus-wp'),
+        ];
+
+        $identification_by = esc_html(get_option('bpwp_user_identificatyon_by'));
+        $selectbox = '<select name="wpt_select_box" id="identificate_user_by">';
+        foreach ($options_array as $key => $value){
+            if ($key == $identification_by){
+                $selectbox .= '<option selected="selected" value="'.$key.'">' . $value . '</option>';
+            } else {
+                $selectbox .= '<option value="' . $key . '">' . $value . '</option>';
+            }
+        }
+        $selectbox .= '</select>';
+        printf ($selectbox);
+        printf('<p><small>%s</small></p>', esc_html(__('По какому параметру идентифицировать пользователя?', 'bonus-plus-wp')));
+    }
+
+    /**
      * display_api_key
      * 
      *  @return mixed
@@ -217,7 +253,7 @@ class BPWPMenuSettings
     public static function display_settings()
     {
 
-    ?>
+        ?>
         <form method="POST" action="options.php">
 
             <h1><?php esc_html_e('Настройки интеграции Бонус+', 'bonus-plus-wp'); ?></h1>
@@ -233,7 +269,7 @@ class BPWPMenuSettings
         </form>
 
 
-<?php
+        <?php
     }
 
     /**
@@ -259,18 +295,25 @@ class BPWPMenuSettings
 
         if (!empty($info)) {
             $response_code = $info['code'];
-            $response_code != 200 ? $class = 'notice notice-error' : $class = 'updated notice is-dismissible';
-            printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
-            foreach ($info as $key => $value) {
-                if (!is_array($value)) {
-                    $hkey = isset($fields[$key]) && !empty($fields[$key]) ? $fields[$key] : '';
-                    if (!empty($hkey)) {
-                        printf('<li>%s : %s</li>', esc_html($hkey), esc_html($value));
-                    }
+            if ($response_code == 200){
+                $class = 'updated notice is-dismissible';
+                printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
+                foreach ($info as $key => $value) {
+                    if (!is_array($value) && key_exists($key, $fields)) {
+                        printf('<li>%s : %s</li>', esc_html($fields[$key]), esc_html($value));
+                    } 
                 }
-            }
-            print('</ul></div></div>');
+                print('</ul></div></div>');
+            } else {
+                $response_msg = $info['message'];
+                $class = 'notice notice-error';
+                printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
+                printf('<li>%s : %s</li>', esc_html($response_code), esc_html($response_msg));
+                print('</ul></div></div>');
+            } // todo дописать обработку для 412 ошибки, объект Error[msg, devMsg, code]
+
         }
     }
 }
+
 BPWPMenuSettings::init();

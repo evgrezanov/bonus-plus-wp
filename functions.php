@@ -62,7 +62,9 @@ function bpwp_api_request($endpoint, $params, $type)
     }
 
     $response['code'] = $response_code;
-
+    if ($response_code != 200 && is_numeric($response_code)){
+        $response['message'] = bpwp_api_get_error_msg($response_code);
+    }
     return $response;
 }
 
@@ -107,4 +109,18 @@ function bpwp_api_get_customer_data($customer_id = '')
     }
     
     return $data;
+}
+
+function bpwp_api_get_error_msg($code)
+{
+    $errors = [
+        '400' => __('Ошибка в структуре JSON передаваемого запроса', 'bonus-plus-wp'),
+        '401' => __('Не удалось аутентифицировать запрос. Возможные причины: схема аутентификации или токен указаны неверно; отсутствует заголовок Authorization в запросе;', 'bonus-plus-wp'),
+        '403' => __('Нет прав на просмотр данного объекта', 'bonus-plus-wp'),
+        '404' => __('Запрошенный ресурс не существует', 'bonus-plus-wp'),
+        '412' => __('В процессе обработки запроса произошла ошибка связанная с: некорректными данными в параметрах запроса; невозможностью выполнить данное действие; по каким-то другим причинам', 'bonus-plus-wp'),
+        '500' => __('При обработке запроса возникла непредвиденная ошибка', 'bonus-plus-wp'),
+    ];
+
+    return $code && key_exists($code, $errors) ? $errors[$code] : $errors['500'];
 }

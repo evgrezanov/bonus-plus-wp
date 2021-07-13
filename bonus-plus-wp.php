@@ -15,7 +15,7 @@
  * PHP requires at least: 7.0
  * WP requires at least: 5.0
  * Tested up to: 5.7.2
- * Version: 1.1
+ * Version: 1.2
  */
 namespace BPWP;
 
@@ -28,7 +28,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '1.1');
+        define('BPWP_PLUGIN_VERSION', '1.2');
 
         require_once __DIR__ . '/functions.php';
 

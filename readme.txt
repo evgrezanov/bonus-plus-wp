@@ -88,8 +88,8 @@ PHP 7.1
 
 = 1.2 =
 - Исправлено предупреждение https://github.com/evgrezanov/bonus-plus-wp/issues/6
-- Добавлена проверка при выводе ссылок в настройках плагина
-- Добавлены комментарии к функциям и переменным связанным с API Бонус+
+- Добавлена опция "Идентифицировать клиента по" https://github.com/evgrezanov/bonus-plus-wp/issues/11
+- Добавлена опция "Название магазина" https://github.com/evgrezanov/bonus-plus-wp/issues/10
 
 = 1.1 =
 - Исправлена проблема с версиями в файлах readme

@@ -87,6 +87,7 @@ PHP 7.1
 3. Шорткод для отображения бонусной карты клиента
 
 == Changelog ==
+
 = 1.2 =
 - Исправлено предупреждение [https://github.com/evgrezanov/bonus-plus-wp/issues/6](https://github.com/evgrezanov/bonus-plus-wp/issues/6)
 - Добавлена опция "Идентифицировать клиента по" [https://github.com/evgrezanov/bonus-plus-wp/issues/11](https://github.com/evgrezanov/bonus-plus-wp/issues/11)

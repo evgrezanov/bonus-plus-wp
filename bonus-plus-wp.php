@@ -74,6 +74,7 @@ class BPWPBonusPlus_Core
         }
         require_once __DIR__ . '/inc/profile.php';
         require_once __DIR__ . '/inc/MenuSettings.php';
+        //require_once __DIR__ . '/inc/class-wordpress-plugin-template-settings.php';
     }
 
     /**

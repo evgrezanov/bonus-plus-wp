@@ -32,6 +32,11 @@ Integration WordPress/WooCommerce & BonusPlus http://bonusplus.pro (for Russia)
 
 Примеры получаемых данных REST API Бонус+: [https://bonusplus.pro/api/Help](https://bonusplus.pro/api/Help)
 
+[Документация по началу работы](https://github.com/evgrezanov/bonus-plus-wp/wiki)
+
+[Нужна доработка плагина?](https://github.com/evgrezanov/bonus-plus-wp/issues/new)
+
+
 == Installation ==
 
 This section describes how to install the plugin and get it working.

@@ -91,6 +91,9 @@ PHP 7.1
 
 # Changelog
 
+## 1.3
+- Bug fix
+
 ## 1.2 
 - Исправлено предупреждение [https://github.com/evgrezanov/bonus-plus-wp/issues/6](https://github.com/evgrezanov/bonus-plus-wp/issues/6)
 - Добавлена опция "Идентифицировать клиента по" [https://github.com/evgrezanov/bonus-plus-wp/issues/11](https://github.com/evgrezanov/bonus-plus-wp/issues/11)

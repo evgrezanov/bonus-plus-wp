@@ -277,7 +277,7 @@ class BPWPMenuSettings
 
         printf(
             '<p><small>%s</small></p>',
-            esc_html(__('Необходим для импорта товаров в Бонус+', 'bonus-plus-wp')),
+            esc_html(__('Необходим для импорта товаров в Бонус+', 'bonus-plus-wp'))
         );
     }
 

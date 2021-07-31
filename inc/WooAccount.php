@@ -12,6 +12,7 @@ class BPWPMyAccount
     public static function init()
     {
         add_action('init', [__CLASS__, 'bpwp_add_my_account_endpoint']);
+        add_action('init', [__CLASS__, 'bpwp_customer_data_shortcode_init']);
         add_filter('query_vars', [__CLASS__, 'bpwp_query_vars']);
         add_filter('woocommerce_account_menu_items', [__CLASS__, 'bpwp_account_links'], 10);
         add_action('woocommerce_account_bonus-plus_endpoint', [__CLASS__, 'bpwp_api_print_customer_card_info']);
@@ -30,6 +31,14 @@ class BPWPMyAccount
             flush_rewrite_rules(false);
             update_option('bpwp_plugin_permalinks_flushed', 1);
         }
+    }
+
+    /**
+     *  Shortcode init [bpwp_api_customer_data]
+     */
+    public static function bpwp_customer_data_shortcode_init()
+    {
+        add_shortcode('bpwp_api_customer_data', [__CLASS__, 'bpwp_api_render_customer_data']);
     }
 
     /**
@@ -70,13 +79,13 @@ class BPWPMyAccount
         // get data
         $info = bpwp_api_get_customer_data();
 
-        if ( $info && is_array($info) ) {
+        if ($info && is_array($info)) {
             // for debug
 
-            if ( isset($_REQUEST['bpwp-debug']) && !empty($_REQUEST['bpwp-debug']) ){
+            if (isset($_REQUEST['bpwp-debug']) && !empty($_REQUEST['bpwp-debug'])) {
                 $is_debug = sanitize_text_field($_REQUEST['bpwp-debug']);
             }
-            if ( empty($is_debug) ) {
+            if (empty($is_debug)) {
 
                 printf('<h2>%s</h2>', 'Информация по карте лояльности');
 
@@ -90,27 +99,21 @@ class BPWPMyAccount
                         }
                         if ($key == 'discountCardNumber') {
                             printf('%s:%s<br />', esc_html(__('Номер карты', 'bonus-plus-wp')), esc_html($value));
-
                         }
                         if ($key == 'availableBonuses') {
                             printf('%s:%s<br />', esc_html(__('Доступных бонусов', 'bonus-plus-wp')), esc_html($value));
-
                         }
                         if ($key == 'notActiveBonuses') {
                             printf('%s:%s<br />', esc_html(__('Неактивных бонусов', 'bonus-plus-wp')), esc_html($value));
-
                         }
                         if ($key == 'purchasesTotalSum') {
                             printf('%s:%s<br />', esc_html(__('Сумма покупок', 'bonus-plus-wp')), esc_html($value));
-
                         }
                         if ($key == 'purchasesSumToNextCard') {
                             printf('%s:%s<br />', esc_html(__('Сумма покупок для смены карты', 'bonus-plus-wp')), esc_html($value));
-
                         }
                         if ($key == 'lastPurchaseDate') {
                             printf('%s:%s<br />', esc_html(__('Последняя покупка', 'bonus-plus-wp')), esc_html($value));
-
                         }
                     } else {
                         $person_data = $value;
@@ -124,7 +127,6 @@ class BPWPMyAccount
                             $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
                             if (!empty($owner)) {
                                 printf('%s:%s<br />', esc_html(__('Держатель', 'bonus-plus-wp')), esc_html($owner));
-
                             }
                         }
                     }
@@ -144,24 +146,25 @@ class BPWPMyAccount
                 }
             }
         }
-        ?>
-            
-        <?php
+?>
+
+    <?php
     }
 
     /**
-     * Подключение скриптов для генерации QR кода в блоке "Информация по карте лояльности" в профиле
-     *
+     * Подключение скриптов для генерации QR кода в блоке 
+     * "Информация по карте лояльности" в профиле
+     * 
      * @return void
      */
     public static function bpwp_qrcode_scripts()
     {
-        if( !is_user_logged_in() ){
+        if (!is_user_logged_in()) {
             return;
         }
         $customerData = bpwp_api_get_customer_data();
         $cardNumber = !empty($customerData['discountCardNumber']) ? $customerData['discountCardNumber'] : '';
-        
+
         wp_enqueue_script(
             'bpwp-qrcodejs',
             plugins_url('/assets/qrcodejs/qrcode.min.js', __DIR__),
@@ -171,7 +174,7 @@ class BPWPMyAccount
         );
         wp_enqueue_script(
             'bpwp-qrcodejs-action',
-            plugins_url('/assets/script.js', __DIR__),
+            plugins_url('/assets/qrcodejs/script.js', __DIR__),
             array('bpwp-qrcodejs'),
             BPWP_PLUGIN_VERSION,
             'in_footer'
@@ -186,5 +189,79 @@ class BPWPMyAccount
         );
     }
 
+    /**
+     *  Render customer data
+     */
+    public static function bpwp_api_render_customer_data()
+    {
+        if (!is_user_logged_in()) {
+            return;
+        }
+
+        $phone = get_user_meta(get_current_user_id(), 'billing_phone', true);
+
+        //$verifiedUser = get_user_meta(get_current_user_id(), 'bpwp_verified_user', true);
+
+        ob_start();
+
+        if (!$phone) {
+
+            printf('<h2>%s</h2>', __('Для регистрации в бонусной программе пожалуйста заполнить платежный адрес и телефон', 'bonus-plus-wp'));
+
+        } else { 
+
+            self::bpwp_api_print_customer_card_info();
+
+            //self::bpwp_render_verify_phone_form();
+        }
+
+        return ob_get_clean();
+    }
+
+    /**
+     *  Render verify phone form
+     */
+    public static function bpwp_render_verify_phone_form()
+    {
+        ?>
+        <div id="wrapper">
+            <div id="dialog">
+                <button class="close">×</button>
+                <h3><?= __('Пожалуйста, введите 6-значный код подтверждения, который мы отправили через SMS:', 'bonus-plus-wp') ?></h3>
+                <div id="form">
+                    <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" />
+                    <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" />
+                    <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" />
+                    <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" />
+                    <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" />
+                    <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" />
+                    <button class="btn btn-primary btn-embossed"><?= __('Verify', 'bonus-plus-wp') ?></button>
+                </div>
+
+                <div>
+                    Didn't receive the code?<br />
+                    <a href="#">Send code again</a><br />
+                    <a href="#">Change phone number</a>
+                </div>
+                
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Подключение скриптов для формы верификации телефона
+     */
+    public static function bpwp_verify_form_scripts()
+    {
+        wp_register_script(
+            'bpwp-verify-form',
+            plugins_url('/assets/verify-form/script.js', __DIR__),
+            array('jquery'),
+            BPWP_PLUGIN_VERSION,
+            'in_footer'
+        );
+    }
+     
 }
 BPWPMyAccount::init();

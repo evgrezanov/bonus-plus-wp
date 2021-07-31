@@ -16,55 +16,53 @@ function bpwp_api_request($endpoint, $params, $type)
 
     $url = 'https://bonusplus.pro/api/' . $endpoint;
 
-    if (!empty($params) & is_array($params)) {
-        foreach ($params as $key => $value) {
-            $url = add_query_arg(array($key => $value), $url);
+    $token = base64_encode($token);
+
+    if ($type == 'GET'){
+        if (!empty($params) & is_array($params)) {
+            foreach ($params as $key => $value) {
+                $url = add_query_arg(array($key => $value), $url);
+            }
         }
+        $args = array(
+            'method'      => $type,
+            'headers'     => array(
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'ApiKey ' . $token,
+            ),
+        );
     }
 
-    $token = base64_encode($token);
-    
-    $args = array(
-        'method'      => $type,
-        'headers'     => array(
-            'Authorization' => 'ApiKey ' . $token,
-        ),
-    );
-    
-    $request = wp_safe_remote_request($url, $args);
+    if ($type == 'POST') {
+        $args = array(
+            'method'      => $type,
+            'headers'     => array(
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'ApiKey ' . $token,
+            ),
+            'body'        => $params,
+        );
+    }
+
+    $request = wp_remote_request($url, $args);
 
     $response_code = wp_remote_retrieve_response_code($request);
     
     if (is_wp_error($request)) {
-        do_action(
-            'bpwp_logger_error',
-            $type = 'BPWP-Request',
-            $title = 'Ошибка REST API WP Error',
-            $desc = $request->get_error_message()
-        );
-        $msg = $request->get_error_message();
-        return false;
+        $response['code'] = $request->get_error_code();
+        $response['message'] = $request->get_error_message();
+        $response['request'] = $request;
     }
-
-    if (empty($request['body'])) {
-        do_action(
-            'bpwp_logger_error',
-            $type = 'BPWP-Request',
-            $title = 'REST API вернулся без требуемых данных'
-        );
-        return false;
-    }
-
-    $response = json_decode($request['body'], true);
-
-    if (!empty($response["errors"]) and is_array($response["errors"])) {
-        return false;
-    }
-
-    $response['code'] = $response_code;
-    if ($response_code != 200 && is_numeric($response_code)){
+    
+    if ($response_code !== 200){
+        $response['code'] = $response_code;
         $response['message'] = bpwp_api_get_error_msg($response_code);
+        $response['request'] = $request;
+    } else {
+        $response = json_decode($request['body'], true);
+        $response['code'] = $response_code;
     }
+
     return $response;
 }
 
@@ -86,6 +84,8 @@ function bpwp_api_get_customer_phone($customer_id = '')
 
 /**
  *  Return customer bonus data
+ * 
+ *  $customer_id int ID Клиента
  *
  */
 function bpwp_api_get_customer_data($customer_id = '')
@@ -97,13 +97,15 @@ function bpwp_api_get_customer_data($customer_id = '')
     $bonusData = get_user_meta($customer_id, 'bonus-plus', true);
     
     $data = [];
-    foreach ($bonusData as $key => $value){
-        if ($key != 'person'){
-            $data[$key] = $value;
-        } else {
-            $_person = $value;
-            foreach ($_person as $pkey=>$pvalue){
-                $data[$pkey] = $pvalue;
+    if (!empty($bonusData) && is_array($bonusData)){
+        foreach ($bonusData as $key => $value){
+            if ($key != 'person'){
+                $data[$key] = $value;
+            } else {
+                $_person = $value;
+                foreach ($_person as $pkey=>$pvalue){
+                    $data[$pkey] = $pvalue;
+                }
             }
         }
     }
@@ -114,13 +116,15 @@ function bpwp_api_get_customer_data($customer_id = '')
 function bpwp_api_get_error_msg($code)
 {
     $errors = [
-        '400' => __('Ошибка в структуре JSON передаваемого запроса', 'bonus-plus-wp'),
-        '401' => __('Не удалось аутентифицировать запрос. Возможные причины: схема аутентификации или токен указаны неверно; отсутствует заголовок Authorization в запросе;', 'bonus-plus-wp'),
-        '403' => __('Нет прав на просмотр данного объекта', 'bonus-plus-wp'),
-        '404' => __('Запрошенный ресурс не существует', 'bonus-plus-wp'),
-        '412' => __('В процессе обработки запроса произошла ошибка связанная с: некорректными данными в параметрах запроса; невозможностью выполнить данное действие; по каким-то другим причинам', 'bonus-plus-wp'),
-        '500' => __('При обработке запроса возникла непредвиденная ошибка', 'bonus-plus-wp'),
+        400 => __('Ошибка в структуре JSON передаваемого запроса', 'bonus-plus-wp'),
+        401 => __('Не удалось аутентифицировать запрос. Возможные причины: схема аутентификации или токен указаны неверно; отсутствует заголовок Authorization в запросе;', 'bonus-plus-wp'),
+        403 => __('Нет прав на просмотр данного объекта', 'bonus-plus-wp'),
+        404 => __('Запрошенный ресурс не существует', 'bonus-plus-wp'),
+        412 => __('В процессе обработки запроса произошла ошибка связанная с: некорректными данными в параметрах запроса; невозможностью выполнить данное действие; по каким-то другим причинам', 'bonus-plus-wp'),
+        500 => __('При обработке запроса возникла непредвиденная ошибка', 'bonus-plus-wp'),
+        204 => __('Товары и категории успешно импортированы', 'bonus-plus-wp'),
+        200 => __('ОК!', 'bonus-plus-wp'),
     ];
 
-    return $code && key_exists($code, $errors) ? $errors[$code] : $errors['500'];
+    return $code && key_exists($code, $errors) ? $errors[$code] : false;
 }

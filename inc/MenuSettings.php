@@ -32,6 +32,10 @@ class BPWPMenuSettings
      */
     public static $bpwp_owner_url;
 
+    /**
+     * URL action
+     */
+    public static $url;
 
     /**
      * The Init
@@ -44,18 +48,43 @@ class BPWPMenuSettings
 
         self::$bpwp_client_url = 'https://bonusplus.pro/lk';
 
+        self::$url = $_SERVER['REQUEST_URI'];
+
         add_action(
             'admin_menu',
             function () {
-                if (current_user_can('manage_options')) {
+                if (current_user_can('manage_woocommerce')) {
+                    //add_menu_page('Основное доп. меню', 'Мое основное меню', 'manage_options', 'my-top-level-slug');
                     add_menu_page(
-                        $page_title = __('БонусПлюс', 'bonus-plus-wp'),
-                        $menu_title = __('БонусПлюс', 'bonus-plus-wp'),
+                        $page_title = 'БонусПлюс',
+                        $menu_title = 'БонусПлюс',
                         $capability = 'manage_options',
-                        $menu_slug = 'bonus-plus',
-                        $function = array(__CLASS__, 'display_settings'),
+                        $menu_slug = 'bpwp-settings',
+                        $function = array(__CLASS__, 'display_control'),
                         $icon = 'dashicons-forms',
                         '57.5'
+                    );
+                }
+
+                if (current_user_can('manage_options')) {
+                    add_submenu_page(
+                        'bpwp-settings',
+                        'Настройки',
+                        'Настройки',
+                        'manage_options',
+                        'bonusplus',
+                        array(__CLASS__, 'display_settings')
+                    );
+                }
+
+                if (current_user_can('manage_woocommerce')) {
+                    add_submenu_page(
+                        'bpwp-control',
+                        'Управление',
+                        'Управление',
+                        'manage_woocommerce',
+                        'bonusplus',
+                        array(__CLASS__, 'display_control')
                     );
                 }
             }
@@ -216,7 +245,7 @@ class BPWPMenuSettings
     {
 
         $identification_by = get_option('bpwp_user_identification_by');
-        ?>
+?>
         <select class="check_prefix_postfix" name="bpwp_user_identification_by">
             <?php
             printf(
@@ -239,7 +268,7 @@ class BPWPMenuSettings
             );
             ?>
         </select>
-        <?php
+    <?php
         printf('<p><small>%s</small></p>', esc_html(__('Выберите как идентифицировать клиентов: по email, по номеру телефона или сначала по email, при неудаче по номеру телефона', 'bonus-plus-wp')));
     }
 
@@ -305,7 +334,7 @@ class BPWPMenuSettings
         </form>
 
 
-<?php
+    <?php
     }
 
     /**
@@ -328,27 +357,59 @@ class BPWPMenuSettings
             'smsPrice'  => __('Стоимость SMS', 'bonus-plus-wp'),
             'pushPrice' => __('Стоимость push-уведомлений', 'bonus-plus-wp'),
         ];
-
-        if (!empty($info)) {
-            $response_code = $info['code'];
-            if ($response_code == 200) {
-                $class = 'updated notice is-dismissible';
-                printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
-                foreach ($info as $key => $value) {
-                    if (!is_array($value) && key_exists($key, $fields)) {
-                        printf('<li>%s : %s</li>', esc_html($fields[$key]), esc_html($value));
+        
+        if (!empty($info)) { 
+            if (is_array($info) && isset($info['balance'])) {
+                $response_code = $info['code'];
+                if ($response_code == 200) {
+                    $class = 'updated notice is-dismissible';
+                    printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
+                    foreach ($info as $key => $value) {
+                        if (!is_array($value) && key_exists($key, $fields)) {
+                            printf('<li>%s : %s</li>', esc_html($fields[$key]), esc_html($value));
+                        }
                     }
-                }
-                print('</ul></div></div>');
-            } else {
-                $response_msg = $info['message'];
-                $class = 'notice notice-error';
-                printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
-                printf('<li>%s : %s</li>', esc_html($response_code), esc_html($response_msg));
-                print('</ul></div></div>');
-            } // todo дописать обработку для 412 ошибки, объект Error[msg, devMsg, code]
-
+                    print('</ul></div></div>');
+                } else {
+                    $response_msg = $info['message'];
+                    $class = 'notice notice-error';
+                    printf('<div class="wrap"><div id="message" class="%s"><ul>', esc_attr($class));
+                    printf('<li>%s : %s</li>', esc_html($response_code), esc_html($response_msg));
+                    print('</ul></div></div>');
+                } // todo дописать обработку для 412 ошибки, объект Error[msg, devMsg, code]
+            }
         }
+    }
+
+    /**
+     * Display Control page UI
+     * 
+     *  @return mixed
+     */
+    public static function display_control()
+    { 
+        ?>
+        <h1><?php esc_html_e('Управление Бонус+', 'bonus-plus-wp'); ?></h1>
+
+        <?php
+        
+        if (empty($_GET['a'])) {
+
+            do_action('bpwp_tool_actions_btns');
+
+            do_action('bpwp_tool_actions_message');
+
+        } else {
+
+            printf('<a href="%s">Вернуться...</a>', remove_query_arg('a', self::$url));
+            
+            do_action('bpwp_tool_actions_' . $_GET['a']);
+
+            do_action('bpwp_tool_actions_message');
+            
+        }
+
+        //do_action('bpwp_tools_sections');
     }
 }
 

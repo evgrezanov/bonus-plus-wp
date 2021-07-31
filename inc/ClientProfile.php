@@ -93,6 +93,8 @@ class BPWPProfile
             $data = bpwp_api_get_customer_data();
             // Описание опознанного пользователя
             $desc = get_option('bpwp_msg_know_customers');
+            $data['availableBonuses'] = isset($data['availableBonuses']) && !empty($data['availableBonuses']) ? $data['availableBonuses'] : 0;
+            $data['notActiveBonuses'] = isset($data['notActiveBonuses']) && !empty($data['notActiveBonuses']) ? $data['notActiveBonuses'] : 0;            
             $allBonuses = $data['availableBonuses'] + $data['notActiveBonuses'];
             
             $availablekeys = [

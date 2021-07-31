@@ -72,8 +72,10 @@ class BPWPBonusPlus_Core
         if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
             require_once __DIR__ . '/inc/WooAccount.php';
         }
-        require_once __DIR__ . '/inc/ClientProfile.php';
         require_once __DIR__ . '/inc/MenuSettings.php';
+        require_once __DIR__ . '/inc/Logger.php';
+        require_once __DIR__ . '/inc/ClientProfile.php';
+        require_once __DIR__ . '/inc/WooProductCatExport.php';
     }
 
     /**
@@ -85,9 +87,16 @@ class BPWPBonusPlus_Core
     {
         wp_register_style(
             'bpwp-bonus-card-style', 
-            plugins_url('/assets/style.css', __FILE__), 
+            plugins_url('/assets/qrcodejs/style.css', __FILE__), 
             array(),
             BPWP_PLUGIN_VERSION, 
+            'all'
+        );
+        wp_register_style(
+            'bpwp-verify-form-style',
+            plugins_url('/assets/verify-form/style.css', __FILE__),
+            array(),
+            BPWP_PLUGIN_VERSION,
             'all'
         );
     }

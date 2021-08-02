@@ -14,8 +14,8 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * PHP requires at least: 7.0
  * WP requires at least: 5.0
- * Tested up to: 5.7.2
- * Version: 1.3
+ * Tested up to: 5.8
+ * Version: 1.4
  */
 namespace BPWP;
 

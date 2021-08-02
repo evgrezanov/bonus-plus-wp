@@ -81,6 +81,7 @@ class BPWPProfile
             } else {
                 $url = site_url();
             }
+            $url = get_option('bpwp_uri_unknow_customers');
             $url = apply_filters('bpwp_filter_goto_register_url', $url);
 
             $data['title']  =   __('Войдите, на сайт', 'bonus-plus-wp');
@@ -124,6 +125,7 @@ class BPWPProfile
             } else {
                 $url = site_url();
             }
+            $url = get_option('bpwp_uri_know_customers');
             $url = apply_filters('bpwp_filter_goto_shop_url', $url);
 
             // Возвращаем массив для бонусной карты

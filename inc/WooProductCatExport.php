@@ -18,10 +18,56 @@ class BPWPWooProductCatExport
     public static function init()
     {
         self::$lastExportOption = 'bpwp_last_products_export_date';
-        
+        add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 10, $accepted_args = 1);
+
         add_action('bpwp_tool_actions_btns', [__CLASS__, 'bpwp_export_ui_btns']);
         add_action('bpwp_tool_actions_products_cats_export', [__CLASS__, 'bpwp_api_products_cats_export'], 10, 2);
         add_action('bpwp_tool_actions_message', [__CLASS__, 'bpwp_export_message_ui']);
+    }
+
+    /**
+     *  Add sections to settiongs page
+     * 
+     *  @return mixed
+     */
+    public static function settings_general()
+    {
+        register_setting('bpwp-settings', 'bpwp_wrong_products_action');
+        add_settings_field(
+            $id = 'bpwp_wrong_products_action',
+            $title = __('Действие при импорте с товаром у которого больше 1 категории:', 'bonus-plus-wp'),
+            $callback = array(__CLASS__, 'display_wrong_products_action'),
+            $page = 'bpwp-settings',
+            $section = 'bpwp_section_access'
+        );
+    }
+
+    /**
+     * display_wrong_products_action
+     * 
+     *  @return mixed
+     */
+    public static function display_wrong_products_action()
+    {
+
+        $wrong_products_action = get_option('bpwp_wrong_products_action'); ?>
+        <select class="check_prefix_postfix" name="bpwp_wrong_products_action">
+            <?php
+            printf(
+                '<option value="%s" %s>%s</option>',
+                'hide',
+                selected('hide', $wrong_products_action, false),
+                'Импортировать, не включая товар в файл импорта'
+            );
+            printf(
+                '<option value="%s" %s>%s</option>',
+                'stop',
+                selected('stop', $wrong_products_action, false),
+                'Не выполнять импорт'
+            );
+            ?>
+        </select>
+        <?php printf('<p><small>%s</small></p>', esc_html(__('1 товару в Бонус+ может соответствовать только одна категория товаров. Выберите действие, которое будет происходить с товарами, у которых больше 1 категории, при импорте товаров', 'bonus-plus-wp')));
     }
 
     /**
@@ -73,7 +119,7 @@ class BPWPWooProductCatExport
         self::$lastExport['cat_count'] = count($productCat) > 0 ? count($productCat) : 0;
         self::$lastExport['cat_export'] = count($product_cats) > 0 ? count($productCat) : 0;
         self::$lastExport['cat_hide'] = count($productCat) - count($product_cats) > 0 ? count($productCat) - count($product_cats) : 0;
-        
+
         return $product_cats;
     }
 
@@ -152,39 +198,49 @@ class BPWPWooProductCatExport
         }
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
-        
-        if (empty($store) || empty($product)){
+
+        if (empty($store) || empty($product)) {
             return [
                 'result'   => false,
                 'message'  => __('Экспорт невозможен, параметры переданы неверно', 'bonus-plus-wp'),
             ];
         }
 
-        /**
-         *  Описание передаваемых параметров https://bonusplus.pro/api/Help/ResourceModel?modelName=ProductImport
-         *  
-         *  object $product ProductTiny https://bonusplus.pro/api/Help/ResourceModel?modelName=ProductTiny
-         *  string $store
-         */
-        $params = [
-            'products' => $product,
-            'store'    => esc_html($store),
-        ];
+        $wrongProducts = self::$lastExport['phide'];
+        $wrongProductsAction = get_option('bpwp_wrong_products_action');
+        
+        // выполняем импорт
+        if (($wrongProductsAction == 'hide')) {
+            /**
+             *  Описание передаваемых параметров https://bonusplus.pro/api/Help/ResourceModel?modelName=ProductImport
+             *  
+             *  object $product ProductTiny https://bonusplus.pro/api/Help/ResourceModel?modelName=ProductTiny
+             *  string $store
+             */
+            $params = [
+                'products' => $product,
+                'store'    => esc_html($store),
+            ];
 
-        /**
-         *  Описание работы хука https://bonusplus.pro/api/Help/Api/POST-product-import
-         */
-        $import = bpwp_api_request(
-            'product/import',
-            json_encode($params),
-            'POST',
-        );
+            /**
+             *  Описание работы хука https://bonusplus.pro/api/Help/Api/POST-product-import
+             */
+            $export = bpwp_api_request(
+                'product/import',
+                json_encode($params),
+                'POST',
+            );
 
-        /**
-         *  TODO Здесь нужна доп проверка тк body может вернутся пустым
-         */
-        $result = self::bpwp_prepare_product_export_result($import);
+        }
+
+        // не выполняем импорт
+        if ($wrongProductsAction == 'stop' && $wrongProducts > 0) {
+            $export =  __('Импорт остановлен, тк есть товары принадлежащие больше чем 1 категории. Измените товары или настройки импорта.', 'bonus-plus-wp');
+        }
+
+        self::bpwp_prepare_product_export_result($export);
     }
+
 
     /**
      *  Разбираем результаты экспорта, записывем в опцию
@@ -193,13 +249,17 @@ class BPWPWooProductCatExport
      */
     public static function bpwp_prepare_product_export_result($result)
     {
-        if (empty($result)){
-            add_option('bpwp_last_products_export_date', date(DATE_ATOM, mktime(0, 0, 0, 7, 1, 2000)));
-            return null;
+        if (empty($result)) {
+            add_option(self::$lastExportOption, date(DATE_ATOM, mktime(0, 0, 0, 7, 1, 2000)));
         } else {
-            return $result;
+            self::$lastExport['pcount'] = 0;
+            self::$lastExport['pexport'] = 0;
+            self::$lastExport['cat_count'] = 0;
+            self::$lastExport['cat_export'] = 0;
+            self::$lastExport['cat_hide'] = 0;
+            self::$lastExport['message'] = $result;
+            delete_option(self::$lastExportOption);
         }
-            
     }
 
     /**
@@ -210,9 +270,8 @@ class BPWPWooProductCatExport
     public static function bpwp_export_ui_btns()
     {
         printf('<h2>%s</h2>', __('Экспорт товаров и категорий', 'bonus-plus-wp'));
-        
+
         printf('<a href="%s" class="button button-primary">Экспортировать</a>', add_query_arg('a', 'products_cats_export', admin_url('admin.php?page=bpwp-settings')));
-        
     }
 
     public static function bpwp_export_message_ui()
@@ -222,10 +281,14 @@ class BPWPWooProductCatExport
 
         if (!get_option(self::$lastExportOption)) {
             $strings[] = sprintf('<strong>Статус:</strong> %s', 'Загрузка не производилась');
+            if (isset(self::$lastExport['message']) && !empty(self::$lastExport['message'])){
+                $strings[] = sprintf('<strong>%s</strong>', self::$lastExport['message']);
+                $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Товаров с некорректными категориями', 'bonus-plus-wp')), self::$lastExport['phide']);
+            }
         } else {
             $strings[] = sprintf('<strong>Статус:</strong> %s %s', 'Последняя загрузка', esc_html(get_option(self::$lastExportOption)));
             // todo результат загрузки
-            if (!empty(self::$lastExport)){
+            if (!empty(self::$lastExport)) {
                 $strings[] = sprintf('<strong>%s:</strong>', esc_html(__('Результат загрузки', 'bonus-plus-wp')));
                 $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Найдено категорий', 'bonus-plus-wp')), self::$lastExport['cat_count']);
                 $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Экспортировано категорий', 'bonus-plus-wp')), self::$lastExport['cat_export']);
@@ -242,25 +305,25 @@ class BPWPWooProductCatExport
             $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
         }
 
-        ?>
+    ?>
         <div class="wrap">
             <div id="message" class="<?= esc_attr($class) ?>">
                 <?php
-                    foreach ($strings as $string) {
-                        if (!is_array($string)){
-                            printf('<p>%s</p>', $string);
-                        } else {
-                            foreach ($string as $s){
-                                if (!is_array($s) && !is_object($s)) {
-                                    printf('<p>%s</p>', $s);
-                                }
+                foreach ($strings as $string) {
+                    if (!is_array($string)) {
+                        printf('<p>%s</p>', $string);
+                    } else {
+                        foreach ($string as $s) {
+                            if (!is_array($s) && !is_object($s)) {
+                                printf('<p>%s</p>', $s);
                             }
                         }
                     }
+                }
                 ?>
             </div>
         </div>
-        <?php
+<?php
     }
 }
 

@@ -54,7 +54,6 @@ class BPWPMenuSettings
             'admin_menu',
             function () {
                 if (current_user_can('manage_woocommerce')) {
-                    //add_menu_page('Основное доп. меню', 'Мое основное меню', 'manage_options', 'my-top-level-slug');
                     add_menu_page(
                         $page_title = 'БонусПлюс',
                         $menu_title = 'БонусПлюс',
@@ -146,16 +145,7 @@ class BPWPMenuSettings
             $page = 'bpwp-settings',
             $section = 'bpwp_section_access'
         );
-
-        register_setting('bpwp-settings', 'bpwp_user_identification_by');
-        add_settings_field(
-            $id = 'bpwp_user_identification_by',
-            $title = __('Идентифицировать пользователей по', 'bonus-plus-wp'),
-            $callback = array(__CLASS__, 'display_user_identification_by'),
-            $page = 'bpwp-settings',
-            $section = 'bpwp_section_access'
-        );
-
+        
         register_setting('bpwp-settings', 'bpwp_shop_name');
         add_settings_field(
             $id = 'bpwp_shop_name',
@@ -165,7 +155,7 @@ class BPWPMenuSettings
             $section = 'bpwp_section_access'
         );
 
-        add_settings_section('bpwp_section_front_msgs', __('Текст виджета бонусной карты', 'bonus-plus-wp'), null, 'bpwp-settings');
+        add_settings_section('bpwp_section_front_msgs', __('Текст и ссылка виджета бонусной карты', 'bonus-plus-wp'), null, 'bpwp-settings');
 
         register_setting('bpwp-settings', 'bpwp_msg_know_customers');
         add_settings_field(
@@ -181,6 +171,24 @@ class BPWPMenuSettings
             $id = 'bpwp_msg_unknow_customers',
             $title = __('Неопознанные пользователи', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_msg_unknow_customers'),
+            $page = 'bpwp-settings',
+            $section = 'bpwp_section_front_msgs'
+        );
+
+        register_setting('bpwp-settings', 'bpwp_uri_know_customers');
+        add_settings_field(
+            $id = 'bpwp_uri_know_customers',
+            $title = __('Ссылка для идентифицированных пользователей', 'bonus-plus-wp'),
+            $callback = array(__CLASS__, 'display_uri_know_customers'),
+            $page = 'bpwp-settings',
+            $section = 'bpwp_section_front_msgs'
+        );
+
+        register_setting('bpwp-settings', 'bpwp_uri_unknow_customers');
+        add_settings_field(
+            $id = 'bpwp_uri_unknow_customers',
+            $title = __('Ссылка для неопознанных пользователей', 'bonus-plus-wp'),
+            $callback = array(__CLASS__, 'display_uri_unknow_customers'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_front_msgs'
         );
@@ -225,6 +233,42 @@ class BPWPMenuSettings
     }
 
     /**
+     * display_uri_know_customers
+     * 
+     *  @return mixed
+     */
+    public static function display_uri_know_customers()
+    {
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_uri_know_customers" value="%s"/>',
+            esc_attr(get_option('bpwp_uri_know_customers'))
+        );
+
+        printf(
+            '<p><small>%s</small></p>',
+            esc_html(__('Отобразится для пользователей авторизованных на сайте и зарегистрированных в Бонус+', 'bonus-plus-wp'))
+        );
+    }
+
+    /**
+     * display_uri_unknow_customers
+     * 
+     *  @return mixed
+     */
+    public static function display_uri_unknow_customers()
+    {
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_uri_unknow_customers" value="%s"/>',
+            esc_attr(get_option('bpwp_uri_unknow_customers'))
+        );
+
+        printf(
+            '<p><small>%s</small></p>',
+            esc_html(__('Отобразится для пользователей неавторизованных на сайте, либо не имеющих аккаунта в Бонус+', 'bonus-plus-wp')),
+        );
+    }
+
+    /**
      * display_lk_url
      * 
      *  @return mixed
@@ -234,42 +278,6 @@ class BPWPMenuSettings
         printf('<input class="regular-text" type="url" name="bpwp_lk_url" value="%s"/>', esc_url(get_option('bpwp_lk_url')));
 
         printf('<p><small>%s</small></p>', esc_html(__('Ссылка на личный кабинет Бонус+', 'bonus-plus-wp')));
-    }
-
-    /**
-     * display_user_identification_by
-     * 
-     *  @return mixed
-     */
-    public static function display_user_identification_by()
-    {
-
-        $identification_by = get_option('bpwp_user_identification_by');
-?>
-        <select class="check_prefix_postfix" name="bpwp_user_identification_by">
-            <?php
-            printf(
-                '<option value="%s" %s>%s</option>',
-                'email',
-                selected('email', $identification_by, false),
-                'Email'
-            );
-            printf(
-                '<option value="%s" %s>%s</option>',
-                'phone',
-                selected('phone', $identification_by, false),
-                'Телефон'
-            );
-            printf(
-                '<option value="%s" %s>%s</option>',
-                'both',
-                selected('both', $identification_by, false),
-                'Сначала email, затем телефон'
-            );
-            ?>
-        </select>
-    <?php
-        printf('<p><small>%s</small></p>', esc_html(__('Выберите как идентифицировать клиентов: по email, по номеру телефона или сначала по email, при неудаче по номеру телефона', 'bonus-plus-wp')));
     }
 
     /**

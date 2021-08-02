@@ -146,9 +146,6 @@ class BPWPMyAccount
                 }
             }
         }
-?>
-
-    <?php
     }
 
     /**

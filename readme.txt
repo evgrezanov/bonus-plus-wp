@@ -4,7 +4,7 @@ Donate link: https://github.com/evgrezanov
 Tags: bonus, woocommerce, sync, integration
 Requires at least: 4.0
 Tested up to: 5.8
-Stable tag: 1.5
+Stable tag: 1.6
 Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -88,8 +88,12 @@ PHP 7.1
 1. Страница настроек
 2. Страница личного кабинета WooCommerce
 3. Шорткод для отображения бонусной карты клиента
+4. Экспорт товаров и категорий в БонусПлюс
 
 == Changelog ==
+
+= 1.6 =
+-Исправлены ошибки при выводе сообщения о завершении экспорта товаров и категорий
 
 = 1.5 =
 - Удалена опция "Идентифицировать клиента по" https://github.com/evgrezanov/bonus-plus-wp/issues/11

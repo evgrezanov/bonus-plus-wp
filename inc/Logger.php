@@ -126,7 +126,7 @@ final class BPWPLogger
           $args['key'],
           checked(1, $args['value'], false)
         );
-        printf('<p>При включении, ошибки и ключевые изменения данных будут записываться в <a href="%s">журнал WooCommerce</a></p>', admin_url('admin.php?page=wc-status&tab=logs'));
+        printf('<p><small>При включении, ошибки и ключевые изменения данных будут записываться в <a href="%s">журнал WooCommerce</a></small></p>', admin_url('admin.php?page=wc-status&tab=logs'));
       },
       $page = 'bpwp-settings',
       $section = 'bpwp_section_access',

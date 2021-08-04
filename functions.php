@@ -52,15 +52,19 @@ function bpwp_api_request($endpoint, $params, $type)
         $response['code'] = $request->get_error_code();
         $response['message'] = $request->get_error_message();
         $response['request'] = $request;
+        $response['class'] = 'notice notice-error';
     }
-    
-    if ($response_code !== 200){
-        $response['code'] = $response_code;
-        $response['message'] = bpwp_api_get_error_msg($response_code);
+
+    $response['code'] = $response_code;
+    $response['message'] = bpwp_api_get_error_msg($response_code);
+
+
+    if ($response_code !== 200 || $response_code !== 204){
         $response['request'] = $request;
+        $response['class'] = 'notice notice-warning';
     } else {
-        $response = json_decode($request['body'], true);
-        $response['code'] = $response_code;
+        $response['request'] = json_decode($request['body'], true);
+        $response['class'] = 'notice notice-success';
     }
 
     return $response;

@@ -58,8 +58,7 @@ function bpwp_api_request($endpoint, $params, $type)
     $response['code'] = $response_code;
     $response['message'] = bpwp_api_get_error_msg($response_code);
 
-
-    if ($response_code !== 200 || $response_code !== 204){
+    if (!in_array($response_code, [200, 204])){
         $response['request'] = $request;
         $response['class'] = 'notice notice-warning';
     } else {

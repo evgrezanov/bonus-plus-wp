@@ -21,11 +21,6 @@ class BPWPWooProductCatExport
      */
     public static $productCatNoChild = [];
 
-    /**
-     *  Категории верхнего уровня, не имеющие родителей
-     */
-    public static $productTopCat = [];
-
     //public static $error = 0;
 
     public static $docUri;
@@ -70,20 +65,20 @@ class BPWPWooProductCatExport
     public static function display_wrong_products_action()
     {
 
-        $wrong_products_action = get_option('bpwp_wrong_products_action');
+        $wrongProductsAction = get_option('bpwp_wrong_products_action');
         ?>
         <select class="check_prefix_postfix" name="bpwp_wrong_products_action">
             <?php
                 printf(
                     '<option value="%s" %s>%s</option>',
                     'hide',
-                    selected('hide', $wrong_products_action, false),
+                    selected('hide', $wrongProductsAction, false),
                     __('Импортировать, не включая товар в файл импорта', 'bonus-plus-wp')
                 );
                 printf(
                     '<option value="%s" %s>%s</option>',
                     'empty',
-                    selected('empty', $wrong_products_action, false),
+                    selected('empty', $wrongProductsAction, false),
                     __( 'Импортировать товар, без категории', 'bonus-plus-wp')
                 );
             ?>
@@ -171,32 +166,30 @@ class BPWPWooProductCatExport
     {
         $productList = [];
         $wrongProducts = [];
-        // Получим категории верхнего уровня
-        self::$productTopCat = get_terms(
-            [
-                'taxonomy'   => 'product_cat',
-                'hide_empty' => false,
-                'parent'     => 0,
-                'fields'     => 'ids',
-            ]
-        );
+        $simpleProducts = [];
+        $variableProducts = [];
+        $wrongProductsAction = get_option('bpwp_wrong_products_action');
         
         $args = array(
             'status' => 'published',
             'limit'  => -1,
             'type'   => ['simple', 'variable'],
         );
-        $products = wc_get_products($args);
-        if ($products) {
+        if ($products = wc_get_products($args)) {
+            
             foreach ($products as $product) {
                 $productId = $product->get_id();
+                if ($productId = 120){
+                    //var_dump($product);
+                    //var_dump('</br>');
+                    var_dump($product->get_available_variations());
+                    die();
+                }
                 $productName = $product->get_name();
                 $productCategory = self::bpwp_get_product_child_category($productId);
                 
                 if (count($productCategory) !== 1) {
-                    // У товара больше 1 дочерней категории или нет, действуем по опции
-                    $wrong_products_action = get_option('bpwp_wrong_products_action');
-                    switch ($wrong_products_action) {
+                    switch ($wrongProductsAction) {
                         case 'hide':
                             do_action(
                                 'bpwp_logger_error',
@@ -204,30 +197,46 @@ class BPWPWooProductCatExport
                                 $title = __('Экспорт товаров в Бонус+, товар пропущен', 'bonus-plus-wp'),
                                 $desc = sprintf(__('У товара [%s] %s более 1 дочерней категории', 'bonus-plus-wp'), $productId, $productName),
                             );
+                            $productCat = -1;
                             break;
                         case 'empty':
-                            $exportProduct = [
-                                'id'  => $productId,
-                                'pid' => 0,
-                                'n'   => $productName,
-                                'g'   => false,
-                            ];
-                            $productList[] = $exportProduct;
+                            $productCat = 0;
                             break;
                     }
                     $wrongProducts[$productId] = $productName;
                 } else {
-                    foreach ($productCategory as $productCat){
-                        $CatId = $productCat->term_id;
+                    foreach ($productCategory as $productCat) {
+                        $productCat = $productCat->term_id;
                     }
-                    $productExport = [
+                }
+
+                // простые товары
+                if ($product->is_type('simple') && $productCat >= 0){
+                    $productList[] = [
                         'id'  => $productId,
-                        'pid' => $CatId,
+                        'pid' => $productCat,
                         'n'   => $productName,
                         'g'   => false,
                     ];
-                    $productList[] = $productExport;
+                    $simpleProducts[$productId] = $productName;
+                } 
+                
+                // вариативные товары
+                if ($product->is_type('variation') && $productCat >= 0){
+                    $variations = $product->get_available_variations();
+                    foreach ($variations as $variation){
+                        $variationId = $variation['variation_id'];
+                        $variationName = $variation->get_name();
+                        $productList[] = [
+                            'id'  => $variationId,
+                            'pid' => $productCat,
+                            'n'   => $variationName,
+                            'g'   => false,
+                        ];
+                        $variableProducts[$variationId] = $variationName;
+                    }
                 }
+
             }
         }
         wp_reset_postdata();
@@ -237,6 +246,7 @@ class BPWPWooProductCatExport
         self::$lastExport['pcount'] = count($products) > 0 ? count($products) : 0;
         self::$lastExport['pexport'] = count($productList) > 0 ? count($productList) : 0;
         self::$lastExport['phide'] = count($wrongProducts) > 0 ? count($wrongProducts) : 0;
+        self::$lastExport['vcount'] = count($variableProducts) > 0 ? count($variableProducts) : 0;
 
         return $productList;
     }
@@ -310,13 +320,13 @@ class BPWPWooProductCatExport
         $strings = [];
         $class = self::$lastExport['class'];
         $lastExportDate = !empty(get_option(self::$lastExportOption)) ? get_option(self::$lastExportOption) : '';
-        $wrong_products_action = get_option('bpwp_wrong_products_action');
-        switch ($wrong_products_action) {
+        $wrongProductsAction = get_option('bpwp_wrong_products_action');
+        switch ($wrongProductsAction) {
             case 'hide':
                 $action = __('Пропущено товаров', 'bonus-plus-wp');
                 break;
             case 'empty':
-                $action = __('Импортировано товаров, без категории', 'bonus-plus-wp');
+                $action = __('Экспортировано товаров, без категории', 'bonus-plus-wp');
                 break;
         }
 
@@ -327,6 +337,7 @@ class BPWPWooProductCatExport
         $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Найдено товаров', 'bonus-plus-wp')), self::$lastExport['pcount']);
         $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Экспортировано товаров', 'bonus-plus-wp')), self::$lastExport['pexport']);
         $strings[] = sprintf('<strong>%s: %d</strong>', esc_html($action), self::$lastExport['phide']);
+        $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Экспортировано вариаций', 'bonus-plus-wp')), self::$lastExport['vcount']);
 
 
         if (defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER) {

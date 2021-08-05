@@ -163,7 +163,7 @@ class BPWPProfile
                 ),
                 'GET'
             );
-            update_user_meta($user_id, 'bonus-plus', $res);
+            update_user_meta($user_id, 'bonus-plus', $res['request']);
         }
     }
 

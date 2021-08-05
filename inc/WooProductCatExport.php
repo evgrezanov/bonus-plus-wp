@@ -55,7 +55,7 @@ class BPWPWooProductCatExport
         register_setting('bpwp-settings', 'bpwp_wrong_products_action');
         add_settings_field(
             $id = 'bpwp_wrong_products_action',
-            $title = __('Действие при импорте с товаром у которого больше 1 категории:', 'bonus-plus-wp'),
+            $title = __('Действие при экспорте с товаром у которого больше 1 категории:', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_wrong_products_action'),
             $page = 'bpwp-settings',
             $section = 'bpwp_section_access'
@@ -83,7 +83,7 @@ class BPWPWooProductCatExport
                 printf(
                     '<option value="%s" %s>%s</option>',
                     'empty',
-                    selected('default', $wrong_products_action, false),
+                    selected('empty', $wrong_products_action, false),
                     __( 'Импортировать товар, без категории', 'bonus-plus-wp')
                 );
             ?>
@@ -190,46 +190,43 @@ class BPWPWooProductCatExport
         if ($products) {
             foreach ($products as $product) {
                 $productId = $product->get_id();
-                // получим все категории продукта
-                $pCatIds = $product->get_category_ids();
-                $categoriesCount = count($pCatIds);
-
-                if ($categoriesCount == 1) {
-                    $pCatId = $pCatIds[0];
-                    $product = [
+                $productName = $product->get_name();
+                $productCategory = self::bpwp_get_product_child_category($productId);
+                
+                if (count($productCategory) !== 1) {
+                    // У товара больше 1 дочерней категории или нет, действуем по опции
+                    $wrong_products_action = get_option('bpwp_wrong_products_action');
+                    switch ($wrong_products_action) {
+                        case 'hide':
+                            do_action(
+                                'bpwp_logger_error',
+                                $type = __CLASS__,
+                                $title = __('Экспорт товаров в Бонус+, товар пропущен', 'bonus-plus-wp'),
+                                $desc = sprintf(__('У товара [%s] %s более 1 дочерней категории', 'bonus-plus-wp'), $productId, $productName),
+                            );
+                            break;
+                        case 'empty':
+                            $exportProduct = [
+                                'id'  => $productId,
+                                'pid' => 0,
+                                'n'   => $productName,
+                                'g'   => false,
+                            ];
+                            $productList[] = $exportProduct;
+                            break;
+                    }
+                    $wrongProducts[$productId] = $productName;
+                } else {
+                    foreach ($productCategory as $productCat){
+                        $CatId = $productCat->term_id;
+                    }
+                    $productExport = [
                         'id'  => $productId,
-                        'pid' => $pCatId,
-                        'n'   => $product->get_name(),
+                        'pid' => $CatId,
+                        'n'   => $productName,
                         'g'   => false,
                     ];
-                    $productList[] = $product;
-                } else {
-                    // пробуем определить родительскую категорию товара
-                    $productParentCat = self::bpwp_export_get_parent_cat($productId, $pCatIds);
-                    if (!$productParentCat){
-                        // в зависимости от опции
-                        $wrong_products_action = get_option('bpwp_wrong_products_action');
-                        switch ($wrong_products_action) {
-                            case 'hide':
-                                do_action(
-                                    'bpwp_logger_error',
-                                    $type = __CLASS__,
-                                    $title = __('Экспорт товаров в Бонус+, товар пропущен', 'bonus-plus-wp'),
-                                    $desc = sprintf(__('У товара с ID %s %s более 1 категории', 'bonus-plus-wp'), $productId, $product->name),
-                                );
-                            break;
-                            case 'empty':
-                                $product = [
-                                    'id'  => $productId,
-                                    'pid' => 0,
-                                    'n'   => $product->get_name(),
-                                    'g'   => false,
-                                ];
-                                $productList[] = $product;
-                            break;
-                        }
-                        $wrongProducts[$productId] = $product->name;
-                    }
+                    $productList[] = $productExport;
                 }
             }
         }
@@ -313,15 +310,23 @@ class BPWPWooProductCatExport
         $strings = [];
         $class = self::$lastExport['class'];
         $lastExportDate = !empty(get_option(self::$lastExportOption)) ? get_option(self::$lastExportOption) : '';
+        $wrong_products_action = get_option('bpwp_wrong_products_action');
+        switch ($wrong_products_action) {
+            case 'hide':
+                $action = __('Пропущено товаров', 'bonus-plus-wp');
+                break;
+            case 'empty':
+                $action = __('Импортировано товаров, без категории', 'bonus-plus-wp');
+                break;
+        }
 
-        //$class = 'updated notice is-dismissible';
         $strings[] = sprintf('<strong>Результат последнего экспорта %s :</strong> %s', $lastExportDate, self::$lastExport['message']);
         $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Найдено категорий', 'bonus-plus-wp')), self::$lastExport['cat_count']);
         $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Экспортировано категорий', 'bonus-plus-wp')), self::$lastExport['cat_export']);
         $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Пропущено категорий', 'bonus-plus-wp')), self::$lastExport['cat_hide']);
         $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Найдено товаров', 'bonus-plus-wp')), self::$lastExport['pcount']);
         $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Экспортировано товаров', 'bonus-plus-wp')), self::$lastExport['pexport']);
-        $strings[] = sprintf('<strong>%s: %d</strong>', esc_html(__('Пропущено товаров', 'bonus-plus-wp')), self::$lastExport['phide']);
+        $strings[] = sprintf('<strong>%s: %d</strong>', esc_html($action), self::$lastExport['phide']);
 
 
         if (defined('WC_LOG_HANDLER') && 'WC_Log_Handler_DB' == WC_LOG_HANDLER) {
@@ -346,33 +351,29 @@ class BPWPWooProductCatExport
     }
 
     /**
-     *  Return parent cat by product id
-     * 
+     *  Return child category for product id https://wordpress.stackexchange.com/a/55921
+     *  
      *  @param $productId int ИД товара
-     *  @param $pCatIds array Массид ИД категорий товара
      * 
-     *  @return void
+     *  @return array Array of child product categories
      */
-    public static function bpwp_export_get_parent_cat($productId, $pCatIds){
-        if (empty($productId) || empty($pCatIds) || empty(self::$productTopCat))
-            return false;
+    public static function bpwp_get_product_child_category($productId){
+        //Get all terms associated with post in woocommerce's taxonomy 'product_cat'
+        $terms = get_the_terms($productId, 'product_cat');
 
-        $other_cats = array_diff($pCatIds, self::$productTopCat);
-        $parentCats = [];
-        foreach ($other_cats as $cat){
-            $termChildren = get_term_children($cat, 'product_cat');
-            if (empty($termChildren)){
-                $parentCats[] = $cat;
-            }
-        }
-        
-        if (count($parentCats) != 1){
-            return false;
-        } else {
-            return $parentCats[0];
-        }
+        //Get an array of their IDs
+        $term_ids = wp_list_pluck($terms, 'term_id');
 
+        //Get array of parents - 0 is not a parent
+        $parents = array_filter(wp_list_pluck($terms, 'parent'));
 
+        //Get array of IDs of terms which are not parents.
+        $term_ids_not_parents = array_diff($term_ids,  $parents);
+
+        //Get corresponding term objects.
+        $terms_not_parents = array_intersect_key($terms,  $term_ids_not_parents);
+
+        return $terms_not_parents;
     }
 }
 

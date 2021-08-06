@@ -179,12 +179,7 @@ class BPWPWooProductCatExport
             
             foreach ($products as $product) {
                 $productId = $product->get_id();
-                if ($productId = 120){
-                    //var_dump($product);
-                    //var_dump('</br>');
-                    var_dump($product->get_available_variations());
-                    die();
-                }
+                
                 $productName = $product->get_name();
                 $productCategory = self::bpwp_get_product_child_category($productId);
                 

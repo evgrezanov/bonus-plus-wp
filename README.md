@@ -5,7 +5,7 @@
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
 * Tested up to: 5.8
-* Stable tag: 1.7
+* Stable tag: 1.8
 * Requires PHP: 7.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,10 @@ PHP 7.1
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 1.8
+- Добавлен экспорт вариаций как продуктов
+- Добавлены хуки bpwp_filter_export_product_cat и bpwp_filter_export_products для фильтрации категорий и товаров перед экспортом
 
 ## 1.7
 - Исправлены функция определения родительской категории у товара, добавлена документация https://github.com/evgrezanov/bonus-plus-wp/wiki/Export-products-and-product-cat/

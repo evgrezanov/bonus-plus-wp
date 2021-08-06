@@ -175,6 +175,7 @@ class BPWPWooProductCatExport
             'limit'  => -1,
             'type'   => ['simple', 'variable'],
         );
+
         if ($products = wc_get_products($args)) {
             
             foreach ($products as $product) {
@@ -217,11 +218,13 @@ class BPWPWooProductCatExport
                 } 
                 
                 // вариативные товары
-                if ($product->is_type('variation') && $productCat >= 0){
-                    $variations = $product->get_available_variations();
-                    foreach ($variations as $variation){
+                if ($product->is_type('variable') && $productCat >= 0){
+                    foreach ($product->get_available_variations() as $variation) {
                         $variationId = $variation['variation_id'];
-                        $variationName = $variation->get_name();
+            
+                        $var = wc_get_product($variationId);
+                        $variationName = $var->get_formatted_name();
+                        
                         $productList[] = [
                             'id'  => $variationId,
                             'pid' => $productCat,
@@ -257,9 +260,14 @@ class BPWPWooProductCatExport
     {
 
         if (empty($product)) {
-            $product_cat = self::bpwp_api_product_cat_data_prepare();
-            $products = self::bpwp_api_products_data_prepare();
+            $product_cat = apply_filters('bpwp_filter_export_product_cat', self::bpwp_api_product_cat_data_prepare()); 
+            $products = apply_filters('bpwp_filter_export_products', self::bpwp_api_products_data_prepare());
             $product = array_merge($product_cat, $products);
+            /*
+            usort($product, function ($a, $b) { 
+                return $a['id'] - $b['id'];
+            });
+            */
         }
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
@@ -313,7 +321,7 @@ class BPWPWooProductCatExport
     public static function bpwp_export_message_ui()
     {
         $strings = [];
-        $class = self::$lastExport['class'];
+        $class = isset(self::$lastExport['class']) ? self::$lastExport['class'] : 'notice notice-warning';
         $lastExportDate = !empty(get_option(self::$lastExportOption)) ? get_option(self::$lastExportOption) : '';
         $wrongProductsAction = get_option('bpwp_wrong_products_action');
         switch ($wrongProductsAction) {

@@ -17,15 +17,16 @@
 	position: relative;
 	max-width: 450px;
 }
-
+/*
 #wrapper #dialog h3 {
 	margin: 0 0 10px;
 	padding: 0;
 	line-height: 1.25;
 }
-
+*/
 #wrapper #dialog span {
-	font-size: 90%;
+	font-size: 60%;
+	line-height: normal;
 }
 
 #wrapper #dialog #form {

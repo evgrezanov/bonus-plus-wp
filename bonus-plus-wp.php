@@ -91,13 +91,6 @@ class BPWPBonusPlus_Core
             BPWP_PLUGIN_VERSION, 
             'all'
         );
-        wp_register_style(
-            'bpwp-verify-form-style',
-            plugins_url('/assets/verify-form/style.css', __FILE__),
-            array(),
-            BPWP_PLUGIN_VERSION,
-            'all'
-        );
     }
 
     /**

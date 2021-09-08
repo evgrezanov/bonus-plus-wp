@@ -14,7 +14,7 @@
  * PHP requires at least: 7.0
  * WP requires at least: 5.0
  * Tested up to: 5.8
- * Version: 1.8
+ * Version: 1.9
  */
 namespace BPWP;
 
@@ -27,7 +27,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '1.7');
+        define('BPWP_PLUGIN_VERSION', '1.9');
 
         require_once __DIR__ . '/functions.php';
 
@@ -91,6 +91,13 @@ class BPWPBonusPlus_Core
             BPWP_PLUGIN_VERSION, 
             'all'
         );
+        /*wp_register_style(
+            'bpwp-bonus-loader-style',
+            plugins_url('/assets/loader.css', __FILE__),
+            array(),
+            BPWP_PLUGIN_VERSION,
+            'all'
+        );*/
     }
 
     /**

@@ -153,9 +153,8 @@ class BPWPProfile
     {
         $user_id = $user->ID;
         $phone = bpwp_api_get_customer_phone($user_id);
-
-        if (!empty($phone)) {
-
+        $isPhoneVerified = get_user_meta($user_id, 'bpwp_phone_verified', true);
+        if (!empty($phone) && $isPhoneVerified) {
             $res = bpwp_api_request(
                 'customer',
                 array(
@@ -164,6 +163,13 @@ class BPWPProfile
                 'GET'
             );
             update_user_meta($user_id, 'bonus-plus', $res['request']);
+        } else {
+            do_action(
+                'bpwp_logger',
+                $type = __CLASS__,
+                $title = __('Не верифицирован телефон', 'bonus-plus-wp'),
+                $desc = sprintf(__('У пользователя с ИД %s не верифицирован телефон, данные не получены!', 'bonus-plus-wp'), $user_id),
+            );
         }
     }
 

@@ -5,7 +5,7 @@
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
 * Tested up to: 5.8
-* Stable tag: 1.8
+* Stable tag: 1.9
 * Requires PHP: 7.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,9 @@ PHP 7.1
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 1.9
+- Добавлена возможность верификации номера телефона
 
 ## 1.8
 - Добавлен экспорт вариаций как продуктов

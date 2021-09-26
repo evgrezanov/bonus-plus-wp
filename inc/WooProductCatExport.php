@@ -42,7 +42,6 @@ class BPWPWooProductCatExport
         self::$lastExport['phide'] = empty(self::$lastExport['phide']) ? 0 : self::$lastExport['message'];
         self::$lastExport['vcount'] = empty(self::$lastExport['vcount']) ? 0 : self::$lastExport['message'];
 
-        
         add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 10, $accepted_args = 1);
 
         add_action('bpwp_tool_actions_btns', [__CLASS__, 'bpwp_export_ui_btns']);

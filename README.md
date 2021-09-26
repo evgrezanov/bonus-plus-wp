@@ -5,7 +5,7 @@
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
 * Tested up to: 5.8
-* Stable tag: 1.9
+* Stable tag: 1.10
 * Requires PHP: 7.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -76,11 +76,11 @@ Manual installation method requires downloading the wp-bonus-plus plugin and upl
 ## Какие минимальные требования?
 
 WordPress 5.0
-PHP 7.1
+PHP 7.1 (Рекомендуем 8.0 и выше)
 
 ## Будет работать без WooCommerce?
 
-Да, будет, используйте хук bpwp_api_filter_get_customer_phone для фильтрации номера телефона 
+Нет, текущая версия работает только с WooCommerce
 
 
 # Screenshots
@@ -91,6 +91,9 @@ PHP 7.1
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 1.10
+- fix warnings at export products page
 
 ## 1.9
 - Добавлена возможность верификации номера телефона

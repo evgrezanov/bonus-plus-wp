@@ -32,7 +32,17 @@ class BPWPWooProductCatExport
     {
         self::$lastExportOption = 'bpwp_last_products_export_date';
         self::$docUri = 'https://github.com/evgrezanov/bonus-plus-wp/wiki/Export-products-and-product-cat';
+        // set default values
+        self::$lastExport['message'] = empty(self::$lastExport['message']) ? __('Экспорт еще не производился','bonus-plus-wp') : self::$lastExport['message'];
+        self::$lastExport['cat_count'] = empty(self::$lastExport['cat_count']) ? 0 : self::$lastExport['message'];
+        self::$lastExport['cat_export'] = empty(self::$lastExport['cat_export']) ? 0 : self::$lastExport['message'];
+        self::$lastExport['cat_hide'] = empty(self::$lastExport['cat_hide']) ? 0 : self::$lastExport['message'];
+        self::$lastExport['pcount'] = empty(self::$lastExport['pcount']) ? 0 : self::$lastExport['message'];
+        self::$lastExport['pexport'] = empty(self::$lastExport['pexport']) ? 0 : self::$lastExport['message'];
+        self::$lastExport['phide'] = empty(self::$lastExport['phide']) ? 0 : self::$lastExport['message'];
+        self::$lastExport['vcount'] = empty(self::$lastExport['vcount']) ? 0 : self::$lastExport['message'];
 
+        
         add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 10, $accepted_args = 1);
 
         add_action('bpwp_tool_actions_btns', [__CLASS__, 'bpwp_export_ui_btns']);

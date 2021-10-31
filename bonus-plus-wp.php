@@ -27,7 +27,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '1.20');
+        define('BPWP_PLUGIN_VERSION', '1.202');
 
         require_once __DIR__ . '/functions.php';
 

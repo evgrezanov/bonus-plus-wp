@@ -1,8 +1,12 @@
 jQuery( 'document' ).ready( function( $ ) {
     window.onload = function() {
+
         params = bonusPlusWp.get_params();  
-        console.log(params);
+        //console.log(params);
         isElemetsExist = bonusPlusWp.is_elements_exist();
+
+        bonusPlusWp.bp_get_client(params['registration_uri'], params['authKey'], params['client_info'], params['ajax_url']);
+
         if (typeof params['card_number'] != 'undefined' && params['card_number'] != null /*&& isElemetsExist > 0*/){
             if (params['card_number']){ 
                 const cardNumber = params['card_number']; 
@@ -274,6 +278,26 @@ jQuery( 'document' ).ready( function( $ ) {
                 })
         },
         
-        bp_get_client: function (get_client_url, authKey, clientInfo, ajax_url){},
+        bp_get_client: function (url, authKey, clientInfo, ajax_url){
+            url = "https://bonusplus.pro/api/customer?phone=79119387283";
+            var csettings = {
+                "url": "https://bonusplus.pro/api/customer?phone=79119387283",
+                "method": "GET",
+                "timeout": 0,
+                "headers": {
+                    "Authorization": 'ApiKey '+authKey,
+                    "Content-Type": "application/json"                
+                },
+            };
+
+            $.ajax(csettings)
+            .done(function (response) {
+                console.log(response);
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR.responseText);
+                console.log(textStatus);
+            })
+        },
     }
 });

@@ -7,21 +7,33 @@ jQuery( 'document' ).ready( function( $ ) {
             if (params['card_number']){ 
                 const cardNumber = params['card_number']; 
                 console.log(cardNumber);
-                //console.log('have card number, not need add listener - render QRcode');
                 bonusPlusWp.qrcode_render(cardNumber);
+                
             } else {
-                // console.log('add event listener click send SmS');
-                document.getElementById("bpwpSendSms").addEventListener("click", function() {
-                    hide(document.getElementById("bpwp-verify-start"));
-                    document.getElementById("bpwpSendSms").disabled = true;
-                    //document.querySelector(".preload").style.display = "block";
-                    bonusPlusWp.bp_send_sms(params['send_sms_uri'], params['authKey']);
-                    show(document.getElementById("bpwp-verify-end"));
-                });
+                // no have cardnumber, so need register
+                if (isElemetsExist){
+                    // Регистрация
+                    document.getElementById("bpwpRegistration").addEventListener("click", function() {
+                        bonusPlusWp.bp_registration(params['registration_uri'], params['authKey'], params['client_info'], params['ajax_url']);
+                    });
+                    // Запрос СМС
+                    document.getElementById("bpwpSendSms").addEventListener("click", function() {
+                        bonusPlusWp.bp_send_sms(params['send_sms_uri'], params['authKey']);
+                    });
+                }
             }
+            
         }
+        hide(document.getElementById("loader"));
+        console.log('hide loader');
+        show(document.getElementById('bpwp-registration'));
     }
 
+    /**
+    *  hide dom element
+    * 
+    * @param {*} elements 
+    */
     function hide(elements){
         elements = elements.length ? elements : [elements];
         for (var index = 0; index < elements.length; index++) {
@@ -51,10 +63,12 @@ jQuery( 'document' ).ready( function( $ ) {
             arrayResult['authKey'] = accountBonusPlusData['auth'];
             arrayResult['send_sms_uri'] = accountBonusPlusData['sendSmsUri'];
             arrayResult['send_otp_uri'] = accountBonusPlusData['sendOtpUri'];
+            arrayResult['registration_uri'] = accountBonusPlusData['registrationUri'];
             arrayResult['redirect'] = accountBonusPlusData['redirect'];
             arrayResult['ajax_url'] = accountBonusPlusData['ajax_url'];
             arrayResult['card_number'] = accountBonusPlusData['cardNumber'];
             arrayResult['is_debug'] = accountBonusPlusData['debug'];
+            arrayResult['client_info'] = accountBonusPlusData['clientInfo'];
             return arrayResult;
         },
         
@@ -85,6 +99,10 @@ jQuery( 'document' ).ready( function( $ ) {
          * @param {string} authKey 
          */
         bp_send_sms: async function(uri, authKey){
+            hide(document.getElementById("bpwp-verify-start"));
+            show(document.getElementById("loader"));            
+            document.getElementById("bpwpSendSms").disabled = true;
+
             let myHeaders = new Headers();
             myHeaders.append('Authorization', 'ApiKey '+authKey);
 
@@ -119,6 +137,8 @@ jQuery( 'document' ).ready( function( $ ) {
                                 }
                             }
                         });
+                        hide(document.getElementById("loader"));
+                        show(document.getElementById("bpwp-verify-end"));
                     })
                     .catch(error => {
                         console.log('Error:');
@@ -131,8 +151,8 @@ jQuery( 'document' ).ready( function( $ ) {
          */
         bp_send_otp: async function(sendOtpUri, authKey, redirect, ajax_url){
             hide(document.getElementById("bpwp-verify-end"));
-            const spinner = document.getElementById("spinner");
-            spinner.removeAttribute('hidden');
+            //const spinner = document.getElementById("loader");
+            //spinner.removeAttribute('hidden');
 
             let myHeaders = new Headers();
             myHeaders.append('Authorization', 'ApiKey '+authKey);
@@ -166,43 +186,94 @@ jQuery( 'document' ).ready( function( $ ) {
                         })
                         .success( function( response ) {
                             userData = response.request;
-                            spinner.setAttribute('hidden', '');
                             document.getElementById('bpmsg').innerHTML = 'Подтверждено, сейчас вы будете перенаправлены!';
                             show(document.getElementById('bpmsg'));
                             window.location.href = redirect;
                         })
                         .fail( function( data ) {
-                            console.log( 'Customer data updated request FAILED: ' + data.statusText + responseText );
+                            console.log(data);
+                            console.log('Customer data updated request FAILED: ' + data.statusText);
                         })
                         .error( function(error){ 
                             console.log( 'Request error!');
                             console.log(error) 
                         });
-                    })
-                    .catch(error => {
+                    });
+                    /*.catch(error => {
                         console.log('Error:');
                         console.log(error);
-                    });
+                    });*/
         },
 
         /**
          *  Render QR code
          */
         qrcode_render: function (cardNumber){
-        if (cardNumber) { 
-            console.log('generate qr code');
-            var elem = document.getElementById("qrcode");
-            qrcode = new QRCode(elem, {
-                text: cardNumber,
-                width: 147,
-                height: 147,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-        
-    },
+            if (cardNumber) { 
+                console.log('generate qr code');
+                var elem = document.getElementById("qrcode");
+                qrcode = new QRCode(elem, {
+                    text: cardNumber,
+                    width: 147,
+                    height: 147,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        },
 
-    };
+        /**
+         *  Registration at BonusPlus
+         */
+        bp_registration: function (reg_url, authKey, clientInfo, ajax_url){
+            hide(document.getElementById("bpwp-registration"));
+            show(document.getElementById("loader"));            
+            document.getElementById("bpwpRegistration").disabled = true;
+
+            // Register user
+            var settings = {
+                "url": reg_url,
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Authorization": 'ApiKey '+authKey,
+                    "Content-Type": "application/json"
+                },
+                "data": clientInfo,
+            };
+
+            $.ajax(settings)
+                .done(function (response) {
+                    console.log(response);
+                    document.getElementById('bpmsg').innerHTML = 'Регистрация завершена!';
+                    // регистрация прошла успешно, запишем мету
+                    $.ajax({
+                        url : ajax_url,                 
+                        type: 'POST',                   
+                        data: {                         
+                            action  : 'bpwp_cv',
+                        }
+                    })
+                    .done( function( response ) {
+                        userData = response.request;
+                        console.log(userData);
+                            
+                    });
+                    hide(document.getElementById('loader'));
+                    show(document.getElementById('bpmsg'));
+                    show(document.getElementById("bpwp-verify-start"));
+                    
+                })
+                .fail(function(jqXHR, textStatus, errorThrown){
+                    console.log(jqXHR.responseText);
+                    console.log(textStatus);
+                    document.getElementById('bpmsg').innerHTML = 'При регистрации произошла ошибка <pre>' + jqXHR.responseText + '</pre>';
+                    hide(document.getElementById('loader'));
+                    show(document.getElementById('bpmsg'));
+                })
+        },
+        
+        bp_get_client: function (get_client_url, authKey, clientInfo, ajax_url){},
+    }
 });

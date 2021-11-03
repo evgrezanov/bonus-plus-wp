@@ -242,22 +242,20 @@ class BPWPMyAccount
         $msg = '';
 
         if (empty($phone)) {
+
             $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполнить платежный адрес и телефон', 'bonus-plus-wp'));
         } else if (empty($birthDate)) {
+
             $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполните дату рождения в платежном адресе', 'bonus-plus-wp'));
         } else if (empty($verifiedUser)) {
+
             self::bpwp_render_verify_phone_form($phone);
         } else {
+
             printf('<h3>%s</h3>', __('text', 'bonus-plus-wp'));
         }
 
         echo $msg;
-    }
-
-    public static function bpwp_render_verify_phone_form2($phone)
-    {
-
-        include plugins_url('bonus-plus-wp/templates/client-account.php');
     }
 
     /**
@@ -272,14 +270,14 @@ class BPWPMyAccount
                 <div class="loader-ball-8"></div>
             </div>
 
-            <div hidden id="bpmsg" class="msg"></div>
+            <div hidden id="bpmsg" class="msg" style="display:none;"></div>
 
-            <div id="qrcode"></div>
+            <div id="qrcode" style="display:none;"></div>
 
             <div id='bpwp-registration' style="display:none;">
                 <p><?= __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?>
                 </p>
-                <button id="bpwpRegistration"><?= __('Начать регистрацию', 'bonus-plus-wp') ?></button>
+                <button id="bpwpRegistration"><?= __('Создать учетную запись', 'bonus-plus-wp') ?></button>
             </div>
 
             <div id='bpwp-verify-start' style="display:none;">
@@ -294,7 +292,7 @@ class BPWPMyAccount
                     <strong><?= $phone ?></strong>
                 </p>
                 <input id="bpwpOtpInput" type="number" maxLength="1" size="6" min="0" max="999999" pattern="[0-9]{6}" />
-                <button id="bpwpSendOtp"><?= __('Подтвердить', 'bonus-plus-wp') ?></button>
+                <button id="bpwpSendOtp"><?= __('Подтвердить номер телефона', 'bonus-plus-wp') ?></button>
             </div>
         </div>
 <?php

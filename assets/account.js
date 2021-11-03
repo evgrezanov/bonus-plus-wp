@@ -1,8 +1,9 @@
 jQuery( 'document' ).ready( function( $ ) {
     window.onload = function() {
+        //show(document.getElementById("loader"));
 
         params = bonusPlusWp.get_params();  
-        //console.log(params);
+        
         isElemetsExist = bonusPlusWp.is_elements_exist();
 
         bonusPlusWp.bp_get_client(params['registration_uri'], params['authKey'], params['client_info'], params['ajax_url']);
@@ -29,7 +30,7 @@ jQuery( 'document' ).ready( function( $ ) {
             
         }
         hide(document.getElementById("loader"));
-        console.log('hide loader');
+        
         show(document.getElementById('bpwp-registration'));
     }
 
@@ -278,6 +279,14 @@ jQuery( 'document' ).ready( function( $ ) {
                 })
         },
         
+        /**
+         * Return client data from API
+         * 
+         * @param {*} url for request
+         * @param {*} authKey 
+         * @param {*} clientInfo 
+         * @param {*} ajax_url 
+         */
         bp_get_client: function (url, authKey, clientInfo, ajax_url){
             url = "https://bonusplus.pro/api/customer?phone=79119387283";
             var csettings = {
@@ -287,6 +296,13 @@ jQuery( 'document' ).ready( function( $ ) {
                 "headers": {
                     "Authorization": 'ApiKey '+authKey,
                     "Content-Type": "application/json"                
+                },
+                "statusCode":   {
+                    412: function (response) { // CUSTOMER_NOT_FOUND || CUSTOMER_ALREADY_EXIST
+                        console.log('pizdec');
+                        console.log(response);
+                        show(document.getElementById('bpwp-registration'));
+                    },
                 },
             };
 
@@ -298,6 +314,26 @@ jQuery( 'document' ).ready( function( $ ) {
                 console.log(jqXHR.responseText);
                 console.log(textStatus);
             })
+        },
+
+        bp_show_client_data: function(){
+
+        },
+
+        bp_show_registration_form: function(){
+
+        },
+
+        bp_show_send_sms_form: function(){
+
+        },
+
+        bp_show_send_otp_form: function(){
+
+        },
+
+        bp_show_myaccount_page: function(){
+
         },
     }
 });

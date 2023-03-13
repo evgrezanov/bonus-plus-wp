@@ -3,8 +3,8 @@ Contributors: redmonkey73
 Donate link: https://github.com/evgrezanov
 Tags: bonus, woocommerce, sync, integration
 Requires at least: 4.0
-Tested up to: 5.8
-Stable tag: 2.2
+Tested up to: 6.1
+Stable tag: 2.4
 Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,14 @@ PHP 7.1 (Рекомендуем 8.0 и выше)
 4. Экспорт товаров и категорий в БонусПлюс
 
 == Changelog ==
+
+= 2.4 =
+- add options for not filed phone and date of birthday field, or not verify phone number
+- discuss here https://github.com/evgrezanov/bonus-plus-wp/issues/22
+
+= 2.3 =
+- add options for not filed phone and date of birthday field, or not verify phone number
+- discuss here https://github.com/evgrezanov/bonus-plus-wp/issues/22
 
 = 2.1 =
 - clear client meta after login

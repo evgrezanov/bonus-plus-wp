@@ -175,6 +175,33 @@ class BPWPMenuSettings
             $section = 'bpwp_section_front_msgs'
         );
 
+        register_setting('bpwp-settings', 'bpwp_msg_customers_not_all_fields_fild');
+        add_settings_field(
+            $id = 'bpwp_msg_customers_not_all_fields_fild',
+            $title = __('Пользователи без телефона или даты рождения в профиле', 'bonus-plus-wp'),
+            $callback = array(__CLASS__, 'display_msg_customers_not_all_fields_fild'),
+            $page = 'bpwp-settings',
+            $section = 'bpwp_section_front_msgs'
+        );
+
+        register_setting('bpwp-settings', 'bpwp_msg_customers_not_verify_phone_number');
+        add_settings_field(
+            $id = 'bpwp_msg_customers_not_verify_phone_number',
+            $title = __('Пользователи не верифицировавшие номер телефона', 'bonus-plus-wp'),
+            $callback = array(__CLASS__, 'display_msg_customers_not_verify_phone_number'),
+            $page = 'bpwp-settings',
+            $section = 'bpwp_section_front_msgs'
+        );
+
+        register_setting('bpwp-settings', 'bpwp_uri_customers_lk_billing_address');
+        add_settings_field(
+            $id = 'bpwp_uri_customers_lk_billing_address',
+            $title = __('Ссылка для добавления телефона и даты рождения в ЛК', 'bonus-plus-wp'),
+            $callback = array(__CLASS__, 'display_uri_customers_lk_billing_address'),
+            $page = 'bpwp-settings',
+            $section = 'bpwp_section_front_msgs'
+        );        
+
         register_setting('bpwp-settings', 'bpwp_uri_know_customers');
         add_settings_field(
             $id = 'bpwp_uri_know_customers',
@@ -232,6 +259,60 @@ class BPWPMenuSettings
         );
     }
 
+    /**
+     * display_msg_customers_not_verify_phone_number
+     * 
+     *  @return mixed
+     */
+    public static function display_msg_customers_not_verify_phone_number()
+    {
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_msg_customers_not_verify_phone_number" value="%s"/>',
+            esc_attr(get_option('bpwp_msg_customers_not_verify_phone_number'))
+        );
+
+        printf(
+            '<p><small>%s</small></p>',
+            esc_html(__('Отобразится для пользователей не верифицировал номер телефона в профиле', 'bonus-plus-wp')),
+        );
+    }
+
+    /**
+     * display_msg_customers_not_all_fields_fild
+     * 
+     *  @return mixed
+     */
+    public static function display_msg_customers_not_all_fields_fild()
+    {
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_msg_customers_not_all_fields_fild" value="%s"/>',
+            esc_attr(get_option('bpwp_msg_customers_not_all_fields_fild'))
+        );
+
+        printf(
+            '<p><small>%s</small></p>',
+            esc_html(__('Отобразится для пользователей авторизованных на сайте, у которых не указан номер телефона или дата рождения в профиле', 'bonus-plus-wp')),
+        );
+    }
+
+    /**
+     * display_uri_customers_lk_billing_address
+     * 
+     * @return mixed
+     */
+    public static function display_uri_customers_lk_billing_address()
+    {
+        printf(
+            '<input class="regular-text" type="text" name="bpwp_uri_customers_lk_billing_address" value="%s"/>',
+            esc_attr(get_option('bpwp_uri_customers_lk_billing_address'))
+        );
+
+        printf(
+            '<p><small>%s</small></p>',
+            esc_html(__('Ссылка для заполнения биллинг адреса в ЛК пользователя', 'bonus-plus-wp')),
+        );
+    }
+    
     /**
      * display_uri_know_customers
      * 

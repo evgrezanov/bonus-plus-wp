@@ -66,7 +66,7 @@ class BPWPProfile
     /**
      *  Prepare customer data for display bonus card
      * 
-     *  @return array
+     *  @return array of properties of bonus cart
      */
     public static function bpwp_api_prepare_customer_bonuses_data($customer_id = '')
     {
@@ -90,6 +90,7 @@ class BPWPProfile
             $data['class']  =   'card4';
 
         } else {
+
             // Если пользователь авторизован 
             $data = bpwp_api_get_customer_data();
             // Описание опознанного пользователя
@@ -128,11 +129,36 @@ class BPWPProfile
             $url = get_option('bpwp_uri_know_customers');
             $url = apply_filters('bpwp_filter_goto_shop_url', $url);
 
-            // Возвращаем массив для бонусной карты
+            // Возвращаем массив данных для виджета бонусной карты
             $data['title']  =   sprintf('%s %s', $allBonuses, __('бонусных рублей', 'bonus-plus-wp'));
             $data['url']    =   $url;
             $data['desc']   =   $desc;
             $data['class']  =   'card3';
+
+            // Проверим заполнены ли у пользователя дата рождения и телефон
+            $user_id = get_current_user_id();
+            $billing_birth_date = get_user_meta( $user_id, 'billing_birth_date', true );
+            $billing_phone = get_user_meta(get_current_user_id(), 'billing_phone', true);
+            $bonus_plus = get_user_meta(get_current_user_id(), 'bonus-plus', true);
+            
+            if ( empty( $billing_birth_date ) || empty($billing_phone) ) {
+                $data['title']  =   __('ОШИБКА!', 'bonus-plus-wp');
+                $data['url']    =   get_option('bpwp_uri_customers_lk_billing_address');
+                $data['desc']   =   'Добавьте дату рождения и/или номер телефона в личном кабинете';
+                $data['class']  =   'card3';
+                // или данные из Бонус+ пустые
+            } elseif (empty($bonus_plus)){
+                $data['title']  =   __('ОШИБКА!', 'bonus-plus-wp');
+                $data['url']    =   get_option('bpwp_msg_customers_not_verify_phone_number');
+                $data['desc']   =   'Подтвердите номер телефона чтобы получать бонусы -->';
+                $data['class']  =   'card3';
+                // во всех остальных случаях
+            } else {
+                $data['title']  =   sprintf('%s %s', $allBonuses, __('бонусных рублей', 'bonus-plus-wp'));
+                $data['url']    =   $url;
+                $data['desc']   =   $desc;
+                $data['class']  =   'card3';
+            }
 
         }
 

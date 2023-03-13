@@ -13,8 +13,8 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * PHP requires at least: 7.0
  * WP requires at least: 5.0
- * Tested up to: 5.8
- * Version: 2.2
+ * Tested up to: 6.1
+ * Version: 2.4
  */
 namespace BPWP;
 
@@ -27,7 +27,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.2');
+        define('BPWP_PLUGIN_VERSION', '2.4');
 
         require_once __DIR__ . '/functions.php';
 

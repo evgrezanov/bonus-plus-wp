@@ -270,32 +270,32 @@ class BPWPMyAccount
                 <div class="loader-ball-8"></div>
             </div>
 
-            <div hidden id="bpmsg" class="msg" style="display:none;"></div>
+            <div hidden id="bpmsg" class="msg"></div>
 
-            <div id="qrcode" style="display:none;"></div>
+            <div hidden id="qrcode"></div>
 
-            <div id='bpwp-registration' style="display:none;">
-                <p><?= __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?>
-                </p>
+            <div hidden id='bpwp-registration'>
+                <p><?= __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?></p>
                 <button id="bpwpRegistration"><?= __('Создать учетную запись', 'bonus-plus-wp') ?></button>
             </div>
 
-            <div id='bpwp-verify-start' style="display:none;">
-                <p><?= __('Подтвердите номер телефона', 'bonus-plus-wp') ?>
-                    <strong><?= $phone ?></strong>
-                </p>
+            <div hidden id='bpwp-verify-start'>
+                <p><?= __('Подтвердите номер телефона', 'bonus-plus-wp') ?><strong><?= $phone ?></strong></p>
                 <button id="bpwpSendSms"><?= __('Отправить SMS c кодом подтверждения', 'bonus-plus-wp') ?></button>
             </div>
 
-            <div id='bpwp-verify-end' style="display:none;">
-                <p><?= __('Введите код высланый в SMS, на номер телефона:', 'bonus-plus-wp') ?>
-                    <strong><?= $phone ?></strong>
-                </p>
+            <div hidden id='bpwp-verify-end'>
+                <p><?= __('Введите код высланый в SMS, на номер телефона:', 'bonus-plus-wp') ?><strong><?= $phone ?></strong></p>
                 <input id="bpwpOtpInput" type="number" maxLength="1" size="6" min="0" max="999999" pattern="[0-9]{6}" />
                 <button id="bpwpSendOtp"><?= __('Подтвердить номер телефона', 'bonus-plus-wp') ?></button>
             </div>
+
+            <div hidden id="bpwpErrorMsg"></div>
+            <button hidden id="bpwpRetrySendSms"><?= __('Повторить отправку', 'bonus-plus-wp') ?></button>
+
         </div>
-<?php
+
+    <?php
     }
 
     /**

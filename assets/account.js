@@ -34,6 +34,14 @@ jQuery( 'document' ).ready( function( $ ) {
         show(document.getElementById('bpwp-registration'));
     }
 
+    function checkOtpSentStatus() {
+        return sessionStorage.getItem('otpSent');
+    }
+    
+    function setOtpSentStatus(status) {
+        sessionStorage.setItem('otpSent', status);
+    }
+    
     /**
     *  hide dom element
     * 
@@ -131,6 +139,7 @@ jQuery( 'document' ).ready( function( $ ) {
                     })
                     .then(function() {
                         console.log('SMS sended...');
+                        setOtpSentStatus(true);
                         document.getElementById("bpwpSendOtp").addEventListener("click", function() {
                             hide(document.getElementById("bpwp-verify-end"));
                             otpInput = document.getElementById('bpwpOtpInput');
@@ -155,59 +164,80 @@ jQuery( 'document' ).ready( function( $ ) {
          *  Отправка OTP в Б+
          */
         bp_send_otp: async function(sendOtpUri, authKey, redirect, ajax_url){
-            hide(document.getElementById("bpwp-verify-end"));
-            //const spinner = document.getElementById("loader");
-            //spinner.removeAttribute('hidden');
+            if (checkOtpSentStatus()) {
+                hide(document.getElementById("bpwp-verify-end"));
+                //const spinner = document.getElementById("loader");
+                //spinner.removeAttribute('hidden');
 
-            let myHeaders = new Headers();
-            myHeaders.append('Authorization', 'ApiKey '+authKey);
+                let myHeaders = new Headers();
+                myHeaders.append('Authorization', 'ApiKey '+authKey);
 
-            const myOTPInit = {
-                method: 'PUT',
-                headers: myHeaders
-            };
+                const myOTPInit = {
+                    method: 'PUT',
+                    headers: myHeaders
+                };
 
-            let otpRequest = new Request(sendOtpUri);
-            let response = await 
-                fetch(otpRequest, myOTPInit)
-                    .then(function(response) {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                            console.log(`HTTP error! status: ${response.status}`);
-                        }
-                        if (response.status == 204){
-                            console.log('Phone OTP compleate, get customer data from Bonus plus...');
-                            return response.blob();
-                        }
-                    })
-                    .then(function() {
-                        // Update user meta
-                        $.ajax({
-                            url : ajax_url,                 
-                            type: 'POST',                   
-                            data: {                         
-                                action  : 'bpwp_cv',
+                let otpRequest = new Request(sendOtpUri);
+                let response = await 
+                    fetch(otpRequest, myOTPInit)
+                        .then(function(response) {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                                console.log(`HTTP error! status: ${response.status}`);
+                            }
+                            if (response.status == 204){
+                                console.log('Phone OTP compleate, get customer data from Bonus plus...');
+                                setOtpSentStatus(false); // Сброс статуса отправки OTP после успешного подтверждения
+                                return response.blob();
                             }
                         })
-                        .success( function( response ) {
-                            userData = response.request;
-                            document.getElementById('bpmsg').innerHTML = 'Подтверждено, сейчас вы будете перенаправлены!';
-                            show(document.getElementById('bpmsg'));
-                            window.location.href = redirect;
-                        })
-                        .fail( function( data ) {
-                            console.log(data);
-                            console.log('Customer data updated request FAILED: ' + data.statusText);
-                        })
-                        .error( function(error){ 
-                            console.log( 'Request error!');
-                            console.log(error) 
+                        .then(function() {
+                            // Update user meta
+                            $.ajax({
+                                url : ajax_url,                 
+                                type: 'POST',                   
+                                data: {                         
+                                    action  : 'bpwp_cv',
+                                }
+                            })
+                            .success( function( response ) {
+                                userData = response.request;
+                                document.getElementById('bpmsg').innerHTML = 'Подтверждено, сейчас вы будете перенаправлены!';
+                                show(document.getElementById('bpmsg'));
+                                window.location.href = redirect;
+                            })
+                            .fail( function( data ) {
+                                console.log(data);
+                                console.log('Customer data updated request FAILED: ' + data.statusText);
+                            })
+                            .error( function(error){ 
+                                console.log( 'Request error!');
+                                console.log(error) 
+                            });
                         });
-                    });
-                    /*.catch(error => {
+                        /*.catch(error => {
                         console.log('Error:');
                         console.log(error);
                     });*/
+            } else {
+                // Показать сообщение пользователю, что OTP не был отправлен или запросить отправку OTP снова
+                error: function(xhr, status, error) {
+                    console.error('Ошибка при отправке SMS: ', error);
+                    // Показать сообщение пользователю, что OTP не был отправлен
+                    const errorMsg = document.getElementById('bpwpErrorMsg');
+                    errorMsg.innerHTML = 'Ошибка при отправке SMS с OTP-кодом. Пожалуйста, попробуйте еще раз.';
+                    show(errorMsg);
+                
+                    // Добавляем обработчик событий для кнопки повторного запроса OTP
+                    const retryBtn = document.getElementById('bpwpRetrySendSms');
+                    show(retryBtn);
+                    retryBtn.addEventListener('click', function() {
+                        hide(errorMsg);
+                        hide(retryBtn);
+                        bonusPlusWp.bp_send_sms(params['send_sms_uri'], params['authKey']);
+                    }, false);
+                }
+            }
         },
 
         /**

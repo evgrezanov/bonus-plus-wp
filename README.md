@@ -4,8 +4,8 @@
 * Donate link: https://github.com/evgrezanov
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
-* Tested up to: 5.8
-* Stable tag: 2.2
+* Tested up to: 6.1.1
+* Stable tag: 2.4
 * Requires PHP: 7.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,9 @@ PHP 7.1 (Рекомендуем 8.0 и выше)
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 2.4
+- добавлены настройки для вывода различного текста и ссылок для различных типов пользователей
 
 ## 2.1
 - clear client meta after login

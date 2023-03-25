@@ -221,22 +221,7 @@ jQuery( 'document' ).ready( function( $ ) {
                     });*/
             } else {
                 // Показать сообщение пользователю, что OTP не был отправлен или запросить отправку OTP снова
-                error: function(xhr, status, error) {
-                    console.error('Ошибка при отправке SMS: ', error);
-                    // Показать сообщение пользователю, что OTP не был отправлен
-                    const errorMsg = document.getElementById('bpwpErrorMsg');
-                    errorMsg.innerHTML = 'Ошибка при отправке SMS с OTP-кодом. Пожалуйста, попробуйте еще раз.';
-                    show(errorMsg);
-                
-                    // Добавляем обработчик событий для кнопки повторного запроса OTP
-                    const retryBtn = document.getElementById('bpwpRetrySendSms');
-                    show(retryBtn);
-                    retryBtn.addEventListener('click', function() {
-                        hide(errorMsg);
-                        hide(retryBtn);
-                        bonusPlusWp.bp_send_sms(params['send_sms_uri'], params['authKey']);
-                    }, false);
-                }
+                console.log('OTP not sended, need display msg about request new OTP');
             }
         },
 

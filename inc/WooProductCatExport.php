@@ -93,10 +93,16 @@ class BPWPWooProductCatExport
             ?>
         </select>
         <?php 
+            //TODO: Написать инструкцию, убрать коммент, когда будет готова иснтрукция
+            /*
             printf('<p><small>%s <a href="%s" target="_blank">%s</a></small></p>', 
                 esc_html(__('В Бонус+ 1 товару, может соответствовать только одна категория товаров, подробнее', 'bonus-plus-wp')),
                 esc_attr(self::$docUri),
                 esc_html(__('здесь', 'bonus-plus-wp'))
+            );
+            */
+            printf('<p><small>%s</small></p>', 
+                esc_html(__('В Бонус+ 1 товару, может соответствовать только одна категория товаров', 'bonus-plus-wp')),
             );
     }
 
@@ -118,12 +124,22 @@ class BPWPWooProductCatExport
             foreach ($productCat as $term) {
                 $parent = $term->parent == 0 ? 0 : $term->parent;
                 $catId = $term->term_id;
+
+                if ($parent == 0) {
                 $product_cat = [
-                    'id'  => $catId,
-                    'pid' => $parent,
+                    'id'  => (string)$catId,
                     'n'   => $term->name,
                     'g'   => true,
                 ];
+                } else {
+                    $product_cat = [
+                        'id'  => (string)$catId,
+                        'pid' => (string)$parent,
+                        'n'   => $term->name,
+                        'g'   => true,
+                    ];
+                }
+
                 $product_cats[] = $product_cat;
                 // проверим есть ли у категории потомки
                 $childCats = get_terms(
@@ -218,8 +234,8 @@ class BPWPWooProductCatExport
                 // простые товары
                 if ($product->is_type('simple') && $productCat >= 0){
                     $productList[] = [
-                        'id'  => $productId,
-                        'pid' => $productCat,
+                        'id'  => (string)$productId,
+                        'pid' => (string)$productCat,
                         'n'   => $productName,
                         'g'   => false,
                     ];
@@ -232,11 +248,14 @@ class BPWPWooProductCatExport
                         $variationId = $variation['variation_id'];
             
                         $var = wc_get_product($variationId);
-                        $variationName = $var->get_formatted_name();
+
+                        // TODO: убрать из названия <span class="description"></span>
+                        //$variationName = $var->get_formatted_name();
+                        $variationName = $var->get_name();
                         
                         $productList[] = [
-                            'id'  => $variationId,
-                            'pid' => $productCat,
+                            'id'  => (string)$variationId,
+                            'pid' => (string)$productCat,
                             'n'   => $variationName,
                             'g'   => false,
                         ];
@@ -267,7 +286,7 @@ class BPWPWooProductCatExport
      */
     public static function bpwp_api_products_cats_export($product = [])
     {
-
+        
         if (empty($product)) {
             $product_cat = apply_filters('bpwp_filter_export_product_cat', self::bpwp_api_product_cat_data_prepare()); 
             $products = apply_filters('bpwp_filter_export_products', self::bpwp_api_products_data_prepare());
@@ -278,7 +297,7 @@ class BPWPWooProductCatExport
             });
             */
         }
-
+        
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
 
         if (empty($store) || empty($product)) {
@@ -297,7 +316,9 @@ class BPWPWooProductCatExport
             'store'    => esc_html($store),
         ];
 
-        if (empty(self::$lastExport['message'])){
+        // TODO: Испрвить проверку. По другуому признаку.
+        //if (empty(self::$lastExport['message'])){
+        if (self::$lastExport['message'] == 'Экспорт еще не производился'){
             $export = bpwp_api_request(
                 'product/import',
                 json_encode($params),
@@ -305,9 +326,17 @@ class BPWPWooProductCatExport
             );
 
             if ($export){
-                add_option(self::$lastExportOption, date(DATE_ATOM, mktime(0, 0, 0, 7, 1, 2000)));
+                //add_option(self::$lastExportOption, date(DATE_ATOM, mktime(0, 0, 0, 7, 1, 2000)));
+                update_option(self::$lastExportOption, current_time( 'd.m.Y H:i:s' ));
                 self::$lastExport['message'] = $export['message'];
                 self::$lastExport['class'] = $export['class'];
+            } else {
+                do_action(
+                    'bpwp_logger_error',
+                    $type = __CLASS__,
+                    $title = __('Ошибка при экспорте категорий и товаров', 'bonus-plus-wp'),
+                    $desc = $export,
+                );
             }
         }
     }
@@ -358,7 +387,8 @@ class BPWPWooProductCatExport
             $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
         }
         
-        $strings[] = sprintf('Документация по процедуре экспорта: <a href="%s" target="_blank">открыть</a>', esc_attr(self::$docUri));
+        // TODO: Убрать коммент, когда будет готова иснтрукция
+        //$strings[] = sprintf('Документация по процедуре экспорта: <a href="%s" target="_blank">открыть</a>', esc_attr(self::$docUri));
 
         ?>
         <div class="wrap">

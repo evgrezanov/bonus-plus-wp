@@ -93,7 +93,7 @@ class BPWPWooProductCatExport
             ?>
         </select>
         <?php 
-            //TODO: Написать инструкцию, убрать коммент, когда будет готова иснтрукция
+            //TODO: Написать инструкцию. Убрать коммент, когда будет готова инструкция
             /*
             printf('<p><small>%s <a href="%s" target="_blank">%s</a></small></p>', 
                 esc_html(__('В Бонус+ 1 товару, может соответствовать только одна категория товаров, подробнее', 'bonus-plus-wp')),
@@ -316,8 +316,7 @@ class BPWPWooProductCatExport
             'store'    => esc_html($store),
         ];
 
-        // TODO: Испрвить проверку. По другуому признаку.
-        //if (empty(self::$lastExport['message'])){
+        // TODO: Исправить проверку. По другому признаку.
         if (self::$lastExport['message'] == 'Экспорт еще не производился'){
             $export = bpwp_api_request(
                 'product/import',
@@ -326,7 +325,6 @@ class BPWPWooProductCatExport
             );
 
             if ($export){
-                //add_option(self::$lastExportOption, date(DATE_ATOM, mktime(0, 0, 0, 7, 1, 2000)));
                 update_option(self::$lastExportOption, current_time( 'd.m.Y H:i:s' ));
                 self::$lastExport['message'] = $export['message'];
                 self::$lastExport['class'] = $export['class'];

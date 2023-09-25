@@ -267,7 +267,7 @@ class BPWPWooProductCatExport
         self::$lastExport['pexport'] = count($productList) > 0 ? count($productList) : 0;
         self::$lastExport['phide'] = count($wrongProducts) > 0 ? count($wrongProducts) : 0;
         self::$lastExport['vcount'] = count($variableProducts) > 0 ? count($variableProducts) : 0;
-        
+
         return $productList;
     }
 
@@ -280,7 +280,6 @@ class BPWPWooProductCatExport
      */
     public static function bpwp_api_products_cats_export($product = [])
     {
-        
         if (empty($product)) {
             $product_cat = apply_filters('bpwp_filter_export_product_cat', self::bpwp_api_product_cat_data_prepare()); 
             $products = apply_filters('bpwp_filter_export_products', self::bpwp_api_products_data_prepare());
@@ -291,13 +290,13 @@ class BPWPWooProductCatExport
             });
             */
         }
-        
+
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
 
         if (empty($store) || empty($product)) {
             self::$lastExport['message'] =  __('Экспорт невозможен, параметры переданы неверно', 'bonus-plus-wp');
         }
-    
+
         /**
          *  Описание передаваемых параметров https://bonusplus.pro/api/Help/ResourceModel?modelName=ProductImport
          *  

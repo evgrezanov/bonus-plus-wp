@@ -31,7 +31,7 @@ class BPWPWooProductCatExport
     public static function init()
     {
         self::$lastExportOption = 'bpwp_last_products_export_date';
-        self::$docUri = 'https://github.com/evgrezanov/bonus-plus-wp/wiki/Export-products-and-product-cat';
+        self::$docUri = 'https://github.com/evgrezanov/bonus-plus-wp/wiki/%D0%AD%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82-%D0%BA%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D0%B9-%D0%B8-%D1%82%D0%BE%D0%B2%D0%B0%D1%80%D0%BE%D0%B2';
         // set default values
         self::$lastExport['message'] = empty(self::$lastExport['message']) ? __('Экспорт еще не производился','bonus-plus-wp') : self::$lastExport['message'];
         self::$lastExport['cat_count'] = empty(self::$lastExport['cat_count']) ? 0 : self::$lastExport['message'];
@@ -93,16 +93,10 @@ class BPWPWooProductCatExport
             ?>
         </select>
         <?php 
-            //TODO: Написать инструкцию. Убрать коммент, когда будет готова инструкция
-            /*
             printf('<p><small>%s <a href="%s" target="_blank">%s</a></small></p>', 
                 esc_html(__('В Бонус+ 1 товару, может соответствовать только одна категория товаров, подробнее', 'bonus-plus-wp')),
                 esc_attr(self::$docUri),
                 esc_html(__('здесь', 'bonus-plus-wp'))
-            );
-            */
-            printf('<p><small>%s</small></p>', 
-                esc_html(__('В Бонус+ 1 товару, может соответствовать только одна категория товаров', 'bonus-plus-wp')),
             );
     }
 
@@ -273,7 +267,7 @@ class BPWPWooProductCatExport
         self::$lastExport['pexport'] = count($productList) > 0 ? count($productList) : 0;
         self::$lastExport['phide'] = count($wrongProducts) > 0 ? count($wrongProducts) : 0;
         self::$lastExport['vcount'] = count($variableProducts) > 0 ? count($variableProducts) : 0;
-
+        
         return $productList;
     }
 
@@ -303,7 +297,6 @@ class BPWPWooProductCatExport
         if (empty($store) || empty($product)) {
             self::$lastExport['message'] =  __('Экспорт невозможен, параметры переданы неверно', 'bonus-plus-wp');
         }
-
     
         /**
          *  Описание передаваемых параметров https://bonusplus.pro/api/Help/ResourceModel?modelName=ProductImport
@@ -385,8 +378,7 @@ class BPWPWooProductCatExport
             $strings[] = sprintf('Журнал обработки: <a href="%s">открыть</a>', admin_url('admin.php?page=wc-status&tab=logs'));
         }
         
-        // TODO: Убрать коммент, когда будет готова иснтрукция
-        //$strings[] = sprintf('Документация по процедуре экспорта: <a href="%s" target="_blank">открыть</a>', esc_attr(self::$docUri));
+        $strings[] = sprintf('Документация по процедуре экспорта: <a href="%s" target="_blank">открыть</a>', esc_attr(self::$docUri));
 
         ?>
         <div class="wrap">

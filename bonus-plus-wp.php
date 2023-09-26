@@ -75,6 +75,7 @@ class BPWPBonusPlus_Core
         require_once __DIR__ . '/inc/Logger.php';
         require_once __DIR__ . '/inc/ClientProfile.php';
         require_once __DIR__ . '/inc/WooProductCatExport.php';
+        require_once __DIR__ . '/inc/ApiHelper.php';
     }
 
     /**

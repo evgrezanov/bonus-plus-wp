@@ -244,7 +244,6 @@ class BPWPWooProductCatExport
                         $var = wc_get_product($variationId);
 
                         // TODO: убрать из названия <span class="description"></span>
-                        //$variationName = $var->get_formatted_name();
                         $variationName = $var->get_name();
                         
                         $productList[] = [

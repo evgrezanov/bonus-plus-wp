@@ -175,6 +175,14 @@ class BPWPApiHelper
         return $output;
     }
 
+    /**
+     *  Выводим количество начисленных бонусов за покупку
+     *  на странице товара, в корзине и чекауте $discount['cb']
+     * 
+     *  @param object $data данные о бонусах
+     * 
+     *  @return string HTML данные о скидках по чеку
+     */
     public static function bpwp_render_retailitems_calc($data)
     {
         if (is_array($data) && isset($data['request']) && is_array($data['request']['discount'])) {

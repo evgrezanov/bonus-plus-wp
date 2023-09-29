@@ -14,12 +14,6 @@ class BPWPCustomerBalance
     {
         // Заказ выполнен, запрос с начислением бонусов. Комментарий в заказ - "бонусы начисены"
         add_action('woocommerce_order_status_completed', [__CLASS__, 'bpwp_customer_balance_bonusplus']);
-
-
-        // add_action('woocommerce_before_add_to_cart_quantity', [__CLASS__, 'bpwp_single__bonusplus_price']);
-        // add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_single__bonusplus_price']);
-        // add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_single__bonusplus_price']);
-        // add_action('woocommerce_after_shop_loop_item', [__CLASS__, 'bpwp_single__bonusplus_price']);
     }
 
 
@@ -31,19 +25,24 @@ class BPWPCustomerBalance
      */
     public static function bpwp_customer_balance_bonusplus($order_id)
     {
+        do_action('logger', $order_id);
+        
         // Получим бонусы для этого клиента. Из мета заказа(?)
-        $amount = BPWPApiHelper::bpwp_get_calc_bonusplus_price();
+    
+        //$amount = BPWPApiHelper::bpwp_get_calc_bonusplus_price();
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
 
+        // TODO: Получить телефон юзера из заказа
+        // Сделать проверку есть ли чел в системе бунус+
         $billingPhone = bpwp_api_get_customer_phone();
-        do_action('logger', $amount);
+        do_action('logger', $billingPhone);
         
         $params = [
-            'amount' => 22,
+            'amount' => 22, // для теста
         ];
 
-        if (!empty($billingPhone) && !empty($amount)){
+        if (!empty($billingPhone)){
             $retailcalc = bpwp_api_request(
                 'customer/'. $billingPhone .'/balance',
                 json_encode($params),

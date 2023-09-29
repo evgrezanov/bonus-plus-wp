@@ -33,7 +33,18 @@ function bpwp_api_request($endpoint, $params, $type)
         );
     }
 
-    if ($type == 'POST') {
+    if ($type == 'POST' || $type == 'PUT') {
+        $args = array(
+            'method'      => $type,
+            'headers'     => array(
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'ApiKey ' . $token,
+            ),
+            'body'        => $params,
+        );
+    }
+
+    if ($type == 'PUT') {
         $args = array(
             'method'      => $type,
             'headers'     => array(

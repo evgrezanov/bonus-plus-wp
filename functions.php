@@ -55,6 +55,17 @@ function bpwp_api_request($endpoint, $params, $type)
         );
     }
 
+    if ($type == 'PATCH') {
+        $args = array(
+            'method'      => $type,
+            'headers'     => array(
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'ApiKey ' . $token,
+            ),
+            'body'        => $params,
+        );
+    }
+
     $request = wp_remote_request($url, $args);
 
     $response_code = wp_remote_retrieve_response_code($request);

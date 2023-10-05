@@ -21,7 +21,6 @@ class BPWPCustomerBalance
     public static function bpwp_customer_balance_bonusplus($order_id)
     {
         $order = wc_get_order($order_id);
-
         $user_id = $order->get_user_id();
 
         //Проведение продажи в БонусПлюс
@@ -42,7 +41,6 @@ class BPWPCustomerBalance
     public static function bpwp_get_order_bonuses($order_id)
     {
         $order = wc_get_order($order_id);
-
         $user_id = $order->get_user_id();
 
         $items = self::bpwp_products_to_retail($order_id);
@@ -50,9 +48,6 @@ class BPWPCustomerBalance
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
         
         $billingPhone = bpwp_api_get_customer_phone($user_id);
-
-        do_action('logger', $billingPhone);
-        
 
         $params = [
             'phone'         => $billingPhone,

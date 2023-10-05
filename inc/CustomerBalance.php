@@ -40,12 +40,14 @@ class BPWPCustomerBalance
      */
     public static function bpwp_get_order_bonuses($order_id)
     {
+        $order = wc_get_order($order_id);
+        $user_id = $order->get_user_id();
 
         $items = self::bpwp_products_to_retail($order_id);
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
         
-        $billingPhone = bpwp_api_get_customer_phone();
+        $billingPhone = bpwp_api_get_customer_phone($user_id);
 
         $params = [
             'phone'         => $billingPhone,
@@ -91,11 +93,29 @@ class BPWPCustomerBalance
             $quantity = $item->get_quantity();
             $total = $item->get_total();
 
+            $categories = wp_get_post_terms($product_id, 'product_cat');
+            $category_id = null;
+
+            if (!empty($categories)) {
+                // Если у товара есть категории, выбираем категорию нижнего уровня
+                foreach ($categories as $category) {
+                    if ($category->parent == 0) {
+                        $category_id = $category->term_id;
+                        break;
+                    }
+                }
+
+                if (!$category_id) {
+                    $category_id = $categories[0]->term_id;
+                }
+            }
+
             $product_data = [
                 "sum"       => (float)$total,
                 "qnt"       => (float)$quantity,
                 "product"   => $product_id,
                 "ds"        => 0.0,
+                "cat"       => $category_id,
                 "ext"       => $order_id.'-'.$ext, //ext - уникальный идентификатор позиции, его нужно делать либо уникальным, либо не заполнять вовсе
                 "price"     => (float) $product_price,
             ];

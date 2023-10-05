@@ -60,7 +60,7 @@ class BPWPApiHelper
                     "qnt"       => 1.0,
                     "product"   => $product_id,
                     "ds"        => 0.0,
-                    /*"cat"       => $category_id,*/
+                    "cat"       => $category_id,
                     "ext"       => $ext,
                     "price"     => (float) $product_price,
                     /*"sellMode" => "sample string 7",*/

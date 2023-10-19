@@ -110,10 +110,10 @@ class BPWPProfile
             ];
 
             $tavailablekeys = [
-                $data['discountCardName'],
-                $data['purchasesTotalSum'],
-                $data['purchasesSumToNextCard'],
-                $data['nextCardName'],
+                isset($data['discountCardName']) ? $data['discountCardName'] : null,
+                isset($data['purchasesTotalSum']) ? $data['purchasesTotalSum'] : null,
+                isset($data['purchasesSumToNextCard']) ? $data['purchasesSumToNextCard'] : null,
+                isset($data['nextCardName']) ? $data['nextCardName'] : null,
                 $data['availableBonuses'],
                 $data['notActiveBonuses'],
                 $allBonuses

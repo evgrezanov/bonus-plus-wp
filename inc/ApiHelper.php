@@ -12,10 +12,9 @@ class BPWPApiHelper
      */
     public static function init()
     {
-        add_action('woocommerce_before_add_to_cart_quantity', [__CLASS__, 'bpwp_single__bonusplus_price']);
-        add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_single__bonusplus_price']);
-        add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_single__bonusplus_price']);
-        add_action('woocommerce_after_shop_loop_item', [__CLASS__, 'bpwp_single__bonusplus_price']);
+        add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
+        add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
+        add_action('woocommerce_short_description', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10, 1);
     }
 
     /**
@@ -141,7 +140,7 @@ class BPWPApiHelper
     public static function bpwp_render_calc_bonusplus_price($data) {
         $output = '<ul>';
 
-        if (is_array($data) && isset($data['request']) && is_array($data['request']['discount'])) {
+        if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
             foreach ($data['request']['discount'] as $discount) {
                 $output .= '<li>';
                 $output .= '<strong>ext:</strong> ' . $discount['ext'] . '<br>';
@@ -169,8 +168,12 @@ class BPWPApiHelper
         }
     
         $output .= '</ul>';
-        $output .= '<strong>maxDebitBonuses:</strong> ' . $data['request']['maxDebitBonuses'] . '<br>';
-        $output .= '<strong>multiplicityDebitBonus:</strong> ' . $data['request']['multiplicityDebitBonus'] . '<br>';
+        $maxDebitBonuses = $data['request']['maxDebitBonuses'];
+        $multiplicityDebitBonus = $data['request']['multiplicityDebitBonus'];
+        $output .= '<strong>maxDebitBonuses:</strong> ';
+        $output .= $maxDebitBonuses . '<br>';
+        $output .= '<strong>multiplicityDebitBonus:</strong> ';
+        $output .= $multiplicityDebitBonus . '<br>';
     
         return $output;
     }
@@ -178,11 +181,21 @@ class BPWPApiHelper
     public static function bpwp_render_retailitems_calc($data)
     {
         if (is_array($data) && isset($data['request']) && is_array($data['request']['discount'])) {
+            $output = '<div class="bonus-plus-price">';
             foreach ($data['request']['discount'] as $discount) {
+                $output .= '<ul>';
                 if (isset($discount['cb']) && !empty($discount['cb'])){
-                    return '+' . $discount['cb'] . ' бонусов';
+                    $output .= '<li> +' . $discount['cb'] . ' бонусов</li>';
                 }
+
+                if (isset($discount['db']) && !empty($discount['db'])){
+                    $output .= '<li> -' . $discount['db'] . ' бонусов</li>';
+                }
+                $output .= '</ul>';
             }
+            $output .= '</div>';
+
+            echo $output;
         }
     }
 
@@ -192,6 +205,30 @@ class BPWPApiHelper
     public static function bpwp_single__bonusplus_price(){
         $price_data = self::bpwp_get_calc_bonusplus_price();
         echo self::bpwp_render_retailitems_calc($price_data);
+    }
+
+    /**
+     * 
+     */
+    public static function bpwp_single_product_bonusplus_price($post_excerpt){
+        if (is_product()) {
+            $price_data = self::bpwp_get_calc_bonusplus_price();
+            $content = $post_excerpt . self::bpwp_render_retailitems_calc($price_data);
+        }
+
+        return $content;
+    }
+
+    /**
+     * 
+     */
+    public static function bpwp_cart_checkout_bonusplus_price(){
+        if (is_cart() || is_checkout()) {
+            $price_data = self::bpwp_get_calc_bonusplus_price();
+            $content = self::bpwp_render_retailitems_calc($price_data);
+        }
+
+        return $content;
     }
 }
 

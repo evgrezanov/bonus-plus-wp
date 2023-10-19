@@ -38,6 +38,11 @@ class BPWPMenuSettings
     public static $url;
 
     /**
+     *  page id of Category export wiki URL
+     */
+    public static $product_cat_export_wiki_page_url;
+
+    /**
      * The Init
      */
     public static function init()
@@ -50,16 +55,18 @@ class BPWPMenuSettings
 
         self::$url = $_SERVER['REQUEST_URI'];
 
+        self::$product_cat_export_wiki_page_url = 'https://bonuspluswp.site/wiki/products-export/';
+
         add_action(
             'admin_menu',
             function () {
                 if (current_user_can('manage_woocommerce')) {
                     add_menu_page(
-                        $page_title = 'БонусПлюс',
-                        $menu_title = 'БонусПлюс',
+                        $page_title = 'Настройки подключения БонусПлюс',
+                        $menu_title = 'Настройки',
                         $capability = 'manage_options',
                         $menu_slug = 'bpwp-settings',
-                        $function = array(__CLASS__, 'display_control'),
+                        $function = array(__CLASS__, 'display_settings'),
                         $icon = 'dashicons-forms',
                         '57.5'
                     );
@@ -68,22 +75,19 @@ class BPWPMenuSettings
                 if (current_user_can('manage_options')) {
                     add_submenu_page(
                         'bpwp-settings',
-                        'Настройки',
-                        'Настройки',
+                        'Экспорт',
+                        'Экспорт каталога',
                         'manage_options',
-                        'bonusplus',
-                        array(__CLASS__, 'display_settings')
-                    );
-                }
-
-                if (current_user_can('manage_woocommerce')) {
-                    add_submenu_page(
-                        'bpwp-control',
-                        'Управление',
-                        'Управление',
-                        'manage_woocommerce',
-                        'bonusplus',
+                        'bpwp-connection',
                         array(__CLASS__, 'display_control')
+                    );
+                    add_submenu_page(
+                        'bpwp-settings',
+                        'Настройка виджета',
+                        'Виджет',
+                        'manage_options',
+                        'bpwp-widget',
+                        array(__CLASS__, 'display_widget_settings')
                     );
                 }
             }
@@ -94,6 +98,8 @@ class BPWPMenuSettings
         add_action('bpwp_settings_after_header', [__CLASS__, 'render_nav_menu'], 10);
 
         add_action('bpwp_settings_after_header', [__CLASS__, 'display_status'], 20);
+
+        add_action('bpwp_widget_settings_after_header', [__CLASS__, 'render_widget_nav_menu'], 10);
     }
 
     /**
@@ -118,6 +124,16 @@ class BPWPMenuSettings
         );
     }
 
+    public static function render_widget_nav_menu()
+    {
+        printf(
+            '<a href="%s" target="_blank">%s</a> | ',
+            esc_url(self::$product_cat_export_wiki_page_url),
+            esc_html(
+                __('Экспорт товаров и категорий', 'bonus-plus-wp')
+            )
+        );
+    }
     /**
      *  Add sections to settiongs page
      * 
@@ -155,59 +171,59 @@ class BPWPMenuSettings
             $section = 'bpwp_section_access'
         );
 
-        add_settings_section('bpwp_section_front_msgs', __('Текст и ссылка виджета бонусной карты', 'bonus-plus-wp'), null, 'bpwp-settings');
+        add_settings_section('bpwp_section_front_msgs', __('Текст и ссылка виджета бонусной карты', 'bonus-plus-wp'), null, 'bpwp-widget');
 
-        register_setting('bpwp-settings', 'bpwp_msg_know_customers');
+        register_setting('bpwp-widget', 'bpwp_msg_know_customers');
         add_settings_field(
             $id = 'bpwp_msg_know_customers',
             $title = __('Текст для Идентифицированных пользователей', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_msg_know_customers'),
-            $page = 'bpwp-settings',
+            $page = 'bpwp-widget',
             $section = 'bpwp_section_front_msgs'
         );
 
-        register_setting('bpwp-settings', 'bpwp_msg_unknow_customers');
+        register_setting('bpwp-widget', 'bpwp_msg_unknow_customers');
         add_settings_field(
             $id = 'bpwp_msg_unknow_customers',
             $title = __('Текст для неопознанных пользователей', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_msg_unknow_customers'),
-            $page = 'bpwp-settings',
+            $page = 'bpwp-widget',
             $section = 'bpwp_section_front_msgs'
         );
 
-        register_setting('bpwp-settings', 'bpwp_msg_customers_not_verify_phone_number');
+        register_setting('bpwp-widget', 'bpwp_msg_customers_not_verify_phone_number');
         add_settings_field(
             $id = 'bpwp_msg_customers_not_verify_phone_number',
             $title = __('Ссылка для пользователей не верифицировавших номер телефона', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_msg_customers_not_verify_phone_number'),
-            $page = 'bpwp-settings',
+            $page = 'bpwp-widget',
             $section = 'bpwp_section_front_msgs'
         );
 
-        register_setting('bpwp-settings', 'bpwp_uri_customers_lk_billing_address');
+        register_setting('bpwp-widget', 'bpwp_uri_customers_lk_billing_address');
         add_settings_field(
             $id = 'bpwp_uri_customers_lk_billing_address',
             $title = __('Ссылка для добавления телефона и даты рождения в ЛК', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_uri_customers_lk_billing_address'),
-            $page = 'bpwp-settings',
+            $page = 'bpwp-widget',
             $section = 'bpwp_section_front_msgs'
         );        
 
-        register_setting('bpwp-settings', 'bpwp_uri_know_customers');
+        register_setting('bpwp-widget', 'bpwp_uri_know_customers');
         add_settings_field(
             $id = 'bpwp_uri_know_customers',
             $title = __('Ссылка для идентифицированных пользователей', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_uri_know_customers'),
-            $page = 'bpwp-settings',
+            $page = 'bpwp-widget',
             $section = 'bpwp_section_front_msgs'
         );
 
-        register_setting('bpwp-settings', 'bpwp_uri_unknow_customers');
+        register_setting('bpwp-widget', 'bpwp_uri_unknow_customers');
         add_settings_field(
             $id = 'bpwp_uri_unknow_customers',
             $title = __('Ссылка для неопознанных пользователей', 'bonus-plus-wp'),
             $callback = array(__CLASS__, 'display_uri_unknow_customers'),
-            $page = 'bpwp-settings',
+            $page = 'bpwp-widget',
             $section = 'bpwp_section_front_msgs'
         );
     }
@@ -380,7 +396,7 @@ class BPWPMenuSettings
     public static function display_settings()
     {
 
-    ?>
+        ?>
         <form method="POST" action="options.php">
 
             <h1><?php esc_html_e('Настройки интеграции Бонус+', 'bonus-plus-wp'); ?></h1>
@@ -396,7 +412,7 @@ class BPWPMenuSettings
         </form>
 
 
-    <?php
+        <?php
     }
 
     /**
@@ -451,9 +467,11 @@ class BPWPMenuSettings
     public static function display_control()
     { 
         ?>
-        <h1><?php esc_html_e('Управление Бонус+', 'bonus-plus-wp'); ?></h1>
+        <h1><?php esc_html_e('Экспорт товаров в Бонус+', 'bonus-plus-wp'); ?></h1>
 
         <?php
+
+        do_action('bpwp_widget_settings_after_header');
         
         if (empty($_GET['a'])) {
 
@@ -472,6 +490,27 @@ class BPWPMenuSettings
         }
 
         //do_action('bpwp_tools_sections');
+    }
+
+    /**
+     * Display Settings Widget page UI
+     * 
+     *  @return mixed
+     */
+    public static function display_widget_settings()
+    {
+        ?>
+            <form method="POST" action="options.php">
+                <h1><?php esc_html_e('Настройка виджета карты Бонус+', 'bonus-plus-wp'); ?></h1>
+
+                <?php
+                    settings_fields('bpwp-widget');
+                    do_settings_sections('bpwp-widget', 'bpwp_section_front_msgs');
+                    submit_button();
+                ?>
+        
+            </form>
+        <?php
     }
 }
 

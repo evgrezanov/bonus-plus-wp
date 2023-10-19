@@ -60,10 +60,10 @@ class BPWPMenuSettings
         add_action(
             'admin_menu',
             function () {
-                if (current_user_can('manage_woocommerce')) {
+                if (current_user_can('manage_options')) {
                     add_menu_page(
                         $page_title = 'Настройки подключения БонусПлюс',
-                        $menu_title = 'Настройки',
+                        $menu_title = 'Бонус+',
                         $capability = 'manage_options',
                         $menu_slug = 'bpwp-settings',
                         $function = array(__CLASS__, 'display_settings'),

@@ -138,9 +138,13 @@ class BPWPApiHelper
      *  @return string HTML данные о скидках по чеку
      */
     public static function bpwp_render_calc_bonusplus_price($data) {
+        
         $output = '<ul>';
 
+        
         if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
+            
+            do_action('logger', $data);
             foreach ($data['request']['discount'] as $discount) {
                 $output .= '<li>';
                 $output .= '<strong>ext:</strong> ' . $discount['ext'] . '<br>';
@@ -174,14 +178,16 @@ class BPWPApiHelper
         $output .= $maxDebitBonuses . '<br>';
         $output .= '<strong>multiplicityDebitBonus:</strong> ';
         $output .= $multiplicityDebitBonus . '<br>';
-    
-        return $output;
+        
+        echo $output;
     }
 
     public static function bpwp_render_retailitems_calc($data)
     {
         if (is_array($data) && isset($data['request']) && is_array($data['request']['discount'])) {
-            $output = '<div class="bonus-plus-price">';
+            do_action('logger', $data['request']);
+            
+            $output = '<div class="bonus-plus-price MIKE">';
             foreach ($data['request']['discount'] as $discount) {
                 $output .= '<ul>';
                 if (isset($discount['cb']) && !empty($discount['cb'])){
@@ -223,13 +229,44 @@ class BPWPApiHelper
      * 
      */
     public static function bpwp_cart_checkout_bonusplus_price(){
-        if (is_cart() || is_checkout()) {
+        // if (is_cart() || is_checkout()) {
+        if (is_cart()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
             $content = self::bpwp_render_retailitems_calc($price_data);
         }
 
+        // Выводим бонусы, доступные для списания.
+        // TODO разобраться с акциями. Получить правильное количество бонусов для списания.
+        // ! Сейчас ["maxDebitBonuses"]=> float(1)
+        if (is_checkout()) {
+        $price_data = self::bpwp_get_calc_bonusplus_price();
+        $content = self::bpwp_render_calc_bonusplus_price($price_data);
+        }
+    
         return $content;
     }
+
+
+    /**
+     * TODO: 
+     * - Вывести в чекаут Бонусы для списания: пока хардкодом
+     * - Поставить галочку списывать или нет
+     * - На хук оплаты сделать запрос на удержание бонусов
+     * - На хук Выполнен сделать запрос списание бонусов. 'retail/calc', с параметром списания бунусов всегда 14. 'bonusDebit'    => 14.0 -
+     * 
+     */
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 BPWPApiHelper::init();

@@ -11,18 +11,94 @@ class BPWPCustomerBalance
      */
     public static function init()
     {
+        // Создание заказа - Резервирование бонусов на счету клиента
+        do_action( 'woocommerce_checkout_order_created', [__CLASS__, 'bpwp_balance_reserve_bonusplus']);
+        
         // Заказ выполнен, запрос с начислением бонусов. Комментарий в заказ - "бонусы начисены"
         add_action('woocommerce_order_status_completed', [__CLASS__, 'bpwp_customer_balance_bonusplus']);
     }
 
+
     /**
-     *  Начисляем бонусы клиенту
+     *  Резервируем бонусы
      */
+    public static function bpwp_balance_reserve_bonusplus($order)
+    {
+        $order_id = $order->get_id();
+        $user_id = $order->get_user_id();
+
+        do_action('logger', $order);
+        
+        // TODO Получить бонусы для списания и добавить в мета заказа
+        
+        $bonus_debit = 14;
+        
+        do_action('logger', $bonus_debit);
+
+        // Уменьшить суммы заказа на количество списываемых бонусов
+        
+        // Запрос Резервируем бонусы
+        /*
+        https://bonusplus.pro/api/Help/Api/PATCH-customer-phoneNumber-balance-reserve
+        */
+
+        $order_data = array(
+            'billing_phone' => bpwp_api_get_customer_phone($user_id),
+            'order_id' => $order_id,
+            'bonus_debit' => $bonus_debit,
+        );
+        
+        do_action('logger', $order_data);
+
+
+        $balance_reserve = self::bpwp_balance_reserve($order_data);
+        
+        do_action('logger', $balance_reserve,'error');
+
+        // Обновление данных заказа
+        // if ($balance_reserve['code'] == 200){
+        //     update_order_meta($order_id, 'bonus_debit', $bonus_debit);
+            
+        //     //update_user_meta($order_id, 'bonus_debit', $balance_reserve['request']['customer']);
+        // }
+
+        $order->update_meta_data( '_bonus_debit', $bonus_debit );
+    }
+
+    /**
+    *  Запрос Резервируем бонусы
+    */
+    public static function bpwp_balance_reserve($order_data)
+    {
+        if (!empty($order_data)) {
+
+            $params = array(
+                'id'=> $order_data['order_id'],
+                'amount'=> $order_data['bonus_debit'],
+            );
+
+            $retail = bpwp_api_request(
+                '/customer/'. $order_data['billingPhone'] .'/balance/reserve',
+                json_encode($params),
+                'PATCH',
+            );
+            
+            do_action('logger', $retail);
+            
+            return $retail;
+        }
+
+    }
+    
+
+    /**
+    *  Начисляем бонусы клиенту
+    */
     public static function bpwp_customer_balance_bonusplus($order_id)
     {
         $order = wc_get_order($order_id);
         $user_id = $order->get_user_id();
-
+        
         //Проведение продажи в БонусПлюс
         $retail = self::bpwp_get_order_bonuses($order_id);
 
@@ -43,6 +119,15 @@ class BPWPCustomerBalance
         $order = wc_get_order($order_id);
         $user_id = $order->get_user_id();
 
+        $bonus_debit = get_user_meta($order_id, 'bonus_debit', true);
+
+        do_action('logger', $bonus_debit);
+        
+        if (empty($bonus_debit)) {
+            $bonus_debit = 0.0;
+        }
+
+
         $items = self::bpwp_products_to_retail($order_id);
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
@@ -51,7 +136,7 @@ class BPWPCustomerBalance
 
         $params = [
             'phone'         => $billingPhone,
-            'bonusDebit'    => 0.0,
+            'bonusDebit'    => $bonus_debit, // вставить переменную со значением бонусов для списания
             'store'         => $store,
             'externalId'    => $order_id, // должно быть уникальным, это идентификатор продажи из внешней системы
             'certificate'   => true
@@ -66,6 +151,8 @@ class BPWPCustomerBalance
                 json_encode($params),
                 'POST',
             );
+            
+            do_action('logger', $retail);
             
             return $retail;
         }

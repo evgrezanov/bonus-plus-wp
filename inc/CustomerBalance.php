@@ -12,8 +12,9 @@ class BPWPCustomerBalance
     public static function init()
     {
         // Создание заказа - Резервирование бонусов на счету клиента
-        do_action( 'woocommerce_checkout_order_created', [__CLASS__, 'bpwp_balance_reserve_bonusplus']);
-        
+        //do_action( 'woocommerce_checkout_order_created', [__CLASS__, 'bpwp_balance_reserve_bonusplus']);
+        add_action( 'woocommerce_new_order', [__CLASS__, 'bpwp_balance_reserve_bonusplus'], 10, 2);
+
         // Заказ выполнен, запрос с начислением бонусов. Комментарий в заказ - "бонусы начисены"
         add_action('woocommerce_order_status_completed', [__CLASS__, 'bpwp_customer_balance_bonusplus']);
     }
@@ -22,25 +23,19 @@ class BPWPCustomerBalance
     /**
      *  Резервируем бонусы
      */
-    public static function bpwp_balance_reserve_bonusplus($order)
+    public static function bpwp_balance_reserve_bonusplus($order_id, $order)
     {
-        $order_id = $order->get_id();
         $user_id = $order->get_user_id();
-
-        do_action('logger', $order);
-        
+                
         // TODO Получить бонусы для списания и добавить в мета заказа
-        
         $bonus_debit = 14;
-        
-        do_action('logger', $bonus_debit);
 
         // Уменьшить суммы заказа на количество списываемых бонусов
-        
-        // Запрос Резервируем бонусы
-        /*
-        https://bonusplus.pro/api/Help/Api/PATCH-customer-phoneNumber-balance-reserve
-        */
+        // Если юзер выбрал Да( списать), то уменьшаем сумму заказа
+        // // Запрос Резервируем бонусы
+        // /*
+        // https://bonusplus.pro/api/Help/Api/PATCH-customer-phoneNumber-balance-reserve
+        // */
 
         $order_data = array(
             'billing_phone' => bpwp_api_get_customer_phone($user_id),
@@ -52,8 +47,6 @@ class BPWPCustomerBalance
 
 
         $balance_reserve = self::bpwp_balance_reserve($order_data);
-        
-        do_action('logger', $balance_reserve,'error');
 
         // Обновление данных заказа
         // if ($balance_reserve['code'] == 200){
@@ -62,7 +55,11 @@ class BPWPCustomerBalance
         //     //update_user_meta($order_id, 'bonus_debit', $balance_reserve['request']['customer']);
         // }
 
-        $order->update_meta_data( '_bonus_debit', $bonus_debit );
+        add_post_meta( $order_id, '_bonus_debit', $bonus_debit );
+        
+        // $order->update_meta_data( '_bonus_debit', $bonus_debit );
+        // $order->save();
+        
     }
 
     /**
@@ -77,15 +74,14 @@ class BPWPCustomerBalance
                 'amount'=> $order_data['bonus_debit'],
             );
 
-            $retail = bpwp_api_request(
-                '/customer/'. $order_data['billingPhone'] .'/balance/reserve',
+            $balance_reserve = bpwp_api_request(
+                '/customer/'. $order_data['billing_phone'] .'/balance/reserve',
                 json_encode($params),
                 'PATCH',
             );
             
-            do_action('logger', $retail);
-            
-            return $retail;
+            do_action('logger', $balance_reserve,'error');
+            return $balance_reserve;
         }
 
     }
@@ -119,14 +115,13 @@ class BPWPCustomerBalance
         $order = wc_get_order($order_id);
         $user_id = $order->get_user_id();
 
-        $bonus_debit = get_user_meta($order_id, 'bonus_debit', true);
-
-        do_action('logger', $bonus_debit);
+        $bonus_debit = $order->get_meta( 'bonus_debit' );
         
         if (empty($bonus_debit)) {
             $bonus_debit = 0.0;
         }
-
+        
+        do_action('logger', $bonus_debit);
 
         $items = self::bpwp_products_to_retail($order_id);
 
@@ -151,8 +146,6 @@ class BPWPCustomerBalance
                 json_encode($params),
                 'POST',
             );
-            
-            do_action('logger', $retail);
             
             return $retail;
         }
@@ -211,6 +204,7 @@ class BPWPCustomerBalance
         }
         return $products_data;        
     }
+
 }
 
 BPWPCustomerBalance::init();

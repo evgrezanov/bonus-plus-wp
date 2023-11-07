@@ -144,7 +144,7 @@ class BPWPApiHelper
         
         if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
             
-            do_action('logger', $data);
+            //do_action('logger', $data);
             foreach ($data['request']['discount'] as $discount) {
                 $output .= '<li>';
                 $output .= '<strong>ext:</strong> ' . $discount['ext'] . '<br>';
@@ -179,15 +179,22 @@ class BPWPApiHelper
         $output .= '<strong>multiplicityDebitBonus:</strong> ';
         $output .= $multiplicityDebitBonus . '<br>';
         
+/*
+        $bpwp_balance = 123;
+        $bpwp_bonus_debit = 14;
+
+        $output .= '<div class="bonus-plus-price">';
+        $output .= '<p>Ваш бонусный баланс '. $bpwp_balance.'. На эту покупку будет списано '. $bpwp_bonus_debit .' бон.</p>';
+        $output .= '</div>';
+*/
         echo $output;
     }
 
     public static function bpwp_render_retailitems_calc($data)
     {
         if (is_array($data) && isset($data['request']) && is_array($data['request']['discount'])) {
-            do_action('logger', $data['request']);
             
-            $output = '<div class="bonus-plus-price MIKE">';
+            $output = '<div class="bonus-plus-price">';
             foreach ($data['request']['discount'] as $discount) {
                 $output .= '<ul>';
                 if (isset($discount['cb']) && !empty($discount['cb'])){
@@ -234,13 +241,14 @@ class BPWPApiHelper
             $price_data = self::bpwp_get_calc_bonusplus_price();
             $content = self::bpwp_render_retailitems_calc($price_data);
         }
-
+        
         // Выводим бонусы, доступные для списания.
         // TODO разобраться с акциями. Получить правильное количество бонусов для списания.
         // ! Сейчас ["maxDebitBonuses"]=> float(1)
         if (is_checkout()) {
-        $price_data = self::bpwp_get_calc_bonusplus_price();
-        $content = self::bpwp_render_calc_bonusplus_price($price_data);
+            $price_data = self::bpwp_get_calc_bonusplus_price();
+            //$content = self::bpwp_render_retailitems_calc($price_data);
+            //$content = self::bpwp_render_calc_bonusplus_price($price_data);
         }
     
         return $content;

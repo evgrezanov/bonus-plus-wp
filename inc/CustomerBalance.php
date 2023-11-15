@@ -28,7 +28,11 @@ class BPWPCustomerBalance
         $user_id = $order->get_user_id();
                 
         // TODO Получить бонусы для списания и добавить в мета заказа
-        $bonus_debit = 14;
+        $data = BPWPApiHelper::bpwp_get_calc_bonusplus_price();
+
+        if (is_array($data) && isset($data['request'])) {
+        $bonus_debit = $data['request']['maxDebitBonuses'];
+        }
 
         // Уменьшить суммы заказа на количество списываемых бонусов
         // Если юзер выбрал Да( списать), то уменьшаем сумму заказа
@@ -43,9 +47,6 @@ class BPWPCustomerBalance
             'bonus_debit' => $bonus_debit,
         );
         
-        do_action('logger', $order_data);
-
-
         $balance_reserve = self::bpwp_balance_reserve($order_data);
 
         // Обновление данных заказа
@@ -80,7 +81,6 @@ class BPWPCustomerBalance
                 'PATCH',
             );
             
-            do_action('logger', $balance_reserve,'error');
             return $balance_reserve;
         }
 
@@ -115,14 +115,12 @@ class BPWPCustomerBalance
         $order = wc_get_order($order_id);
         $user_id = $order->get_user_id();
 
-        $bonus_debit = $order->get_meta( 'bonus_debit' );
+        $bonus_debit = $order->get_meta( '_bonus_debit' );
         
-        if (empty($bonus_debit)) {
+        if (!isset($bonus_debit) || empty($bonus_debit)) {
             $bonus_debit = 0.0;
         }
         
-        do_action('logger', $bonus_debit);
-
         $items = self::bpwp_products_to_retail($order_id);
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
@@ -134,7 +132,6 @@ class BPWPCustomerBalance
             'bonusDebit'    => $bonus_debit, // вставить переменную со значением бонусов для списания
             'store'         => $store,
             'externalId'    => $order_id, // должно быть уникальным, это идентификатор продажи из внешней системы
-            'certificate'   => true
         ];
 
         $params['items'] = $items;
@@ -195,7 +192,7 @@ class BPWPCustomerBalance
                 "qnt"       => (float)$quantity,
                 "product"   => $product_id,
                 "ds"        => 0.0,
-                "cat"       => $category_id,
+                //"cat"       => $category_id,
                 "ext"       => $order_id.'-'.$ext, //ext - уникальный идентификатор позиции, его нужно делать либо уникальным, либо не заполнять вовсе
                 "price"     => (float) $product_price,
             ];

@@ -53,13 +53,14 @@ class BPWPApiHelper
                         $category_id = $categories[0]->term_id;
                     }
                 }
+                
 
                 $product_data = [
-                    "sum"       => 1.0,
+                    "sum"       => (float) $product_price,
                     "qnt"       => 1.0,
                     "product"   => $product_id,
                     "ds"        => 0.0,
-                    "cat"       => $category_id,
+                    //"cat"       => $category_id,
                     "ext"       => $ext,
                     "price"     => (float) $product_price,
                     /*"sellMode" => "sample string 7",*/
@@ -111,11 +112,11 @@ class BPWPApiHelper
             'bonusDebit'    => 0.0,
             'level'         => 0,
             'store'         => $store,
-            'certificate'   => true
+            //'certificate'   => true
         ];
-
+        
         $params['items'] = $items;
-
+        
         if (!empty($billingPhone) && !empty($store) && count($items) >= 1){
             $retailcalc = bpwp_api_request(
                 'retail/calc',
@@ -144,7 +145,6 @@ class BPWPApiHelper
         
         if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
             
-            //do_action('logger', $data);
             foreach ($data['request']['discount'] as $discount) {
                 $output .= '<li>';
                 $output .= '<strong>ext:</strong> ' . $discount['ext'] . '<br>';
@@ -248,7 +248,8 @@ class BPWPApiHelper
         if (is_checkout()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
             //$content = self::bpwp_render_retailitems_calc($price_data);
-            //$content = self::bpwp_render_calc_bonusplus_price($price_data);
+
+            $content = self::bpwp_render_calc_bonusplus_price($price_data);
         }
     
         return $content;

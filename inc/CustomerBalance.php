@@ -52,9 +52,20 @@ class BPWPCustomerBalance
         $balance_reserve = self::bpwp_balance_reserve($order_data);
 
         do_action('logger', $balance_reserve, 'warning');
+        
         //TODO Обновить мета пользователя. Количество бонусов
 
-        
+        $info = bpwp_api_get_customer_data();
+
+        if ($info && is_array($info)) {
+            $info['availableBonuses'] = $info['availableBonuses'] - $bonus_debit;
+            do_action('logger', $info);
+            
+            update_user_meta($user_id, 'bonus-plus', $info);
+        }
+
+
+
         /*
         bonus-plus [
             'availableBonuses' => 404.0

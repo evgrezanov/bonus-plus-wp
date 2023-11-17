@@ -88,6 +88,7 @@ class BPWPApiHelper
         if (is_product() && $product) {
             $items[] = $product->get_id();
             $quantity = 1;
+            // todo создать обект  id и количеством
         }
 
         // Если находимся в корзине
@@ -97,11 +98,12 @@ class BPWPApiHelper
             foreach ($cart_items as $cart_item_key => $cart_item) {
                 $items[] = $cart_item['product_id'];
                 $quantity = $cart_item['quantity'];
+                // todo создать обект  id и количеством
             }
 
         }
 
-        $items = self::bpwp_product_to_retailitems($items);
+        $items = self::bpwp_product_to_retailitems($items); // передать объкт и обработать с id и количеством
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
 

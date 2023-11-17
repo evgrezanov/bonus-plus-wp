@@ -41,6 +41,8 @@ class BPWPCustomerBalance
         // https://bonusplus.pro/api/Help/Api/PATCH-customer-phoneNumber-balance-reserve
         // */
 
+        // Резервируем бонусы, передаем положительное число
+
         $order_data = array(
             'billing_phone' => bpwp_api_get_customer_phone($user_id),
             'order_id' => $order_id,
@@ -49,6 +51,15 @@ class BPWPCustomerBalance
         
         $balance_reserve = self::bpwp_balance_reserve($order_data);
 
+        do_action('logger', $balance_reserve, 'warning');
+        //TODO Обновить мета пользователя. Количество бонусов
+
+        
+        /*
+        bonus-plus [
+            'availableBonuses' => 404.0
+        ]
+        */
         // Обновление данных заказа
         // if ($balance_reserve['code'] == 200){
         //     update_order_meta($order_id, 'bonus_debit', $bonus_debit);
@@ -57,10 +68,22 @@ class BPWPCustomerBalance
         // }
 
         add_post_meta( $order_id, '_bonus_debit', $bonus_debit );
-        
-        // $order->update_meta_data( '_bonus_debit', $bonus_debit );
-        // $order->save();
-        
+
+        //if ($deduction == 'true') { // TODO Если пользователь подтвердил списание бонусов
+            
+            // Добавим Скидку
+			$item_id = wc_add_order_item( $order_id, array(
+				'order_item_name' => 'Списание бонусов',
+				'order_item_type' => 'fee'
+				) );
+				
+				wc_add_order_item_meta( $item_id, '_line_total', wc_format_decimal( -$bonus_debit) );
+			
+            $order->calculate_totals();
+            $order_id = $order->save();
+
+        //} End if
+
     }
 
     /**
@@ -74,6 +97,7 @@ class BPWPCustomerBalance
                 'id'=> $order_data['order_id'],
                 'amount'=> $order_data['bonus_debit'],
             );
+            do_action('logger', $order_data);
 
             $balance_reserve = bpwp_api_request(
                 '/customer/'. $order_data['billing_phone'] .'/balance/reserve',
@@ -94,12 +118,26 @@ class BPWPCustomerBalance
     {
         $order = wc_get_order($order_id);
         $user_id = $order->get_user_id();
+        $bonus_debit = $order->get_meta( '_bonus_debit' );
+        
+        if (isset($bonus_debit) || !empty($bonus_debit)) {
+            
+            $order_data = array(
+                'billing_phone' => bpwp_api_get_customer_phone($user_id),
+                'order_id' => $order_id,
+                'bonus_debit' => $bonus_debit * -1,
+            );
+            
+            // Освобождаем из резерва, передаем отрицательное число
+            $balance_reserve = self::bpwp_balance_reserve($order_data);
+        }
         
         //Проведение продажи в БонусПлюс
         $retail = self::bpwp_get_order_bonuses($order_id);
 
         // Обновление данных пользователя
         if ($retail['code'] == 200){
+
             update_user_meta($user_id, 'bonus-plus', $retail['request']['customer']);
         }
     }

@@ -53,7 +53,6 @@ class BPWPApiHelper
                         $category_id = $categories[0]->term_id;
                     }
                 }
-                
 
                 $product_data = [
                     "sum"       => (float) $product_price,
@@ -140,53 +139,68 @@ class BPWPApiHelper
      */
     public static function bpwp_render_calc_bonusplus_price($data) {
         
-        $output = '<ul>';
-
+        $output = '';
         
-        if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
+        if (isset($_GET['testrequest'])) {
             
-            foreach ($data['request']['discount'] as $discount) {
-                $output .= '<li>';
-                $output .= '<strong>ext:</strong> ' . $discount['ext'] . '<br>';
-                
-                if (is_array($discount['messages']) && !empty($discount['messages'])) {
-                    $output .= '<strong>messages:</strong> <ul>';
-                    foreach ($discount['messages'] as $message) {
-                        $output .= '<li>' . $message . '</li>';
-                    }
-                    $output .= '</ul>';
-                }
-    
-                $output .= '<strong>cb:</strong> ' . $discount['cb'] . ' - Сумма бонусов, которые будут начислены на данную позицию<br>';
-                $output .= '<strong>db:</strong> ' . $discount['db'] . ' - Сумма бонусов, которые будут списаны для данной позиции<br>';
-                $output .= '<strong>ds:</strong> ' . $discount['ds'] . ' - Общая сумма скидки для позиции (без учета бонусов)<br>';
-                $output .= '<strong>dp:</strong> ' . $discount['dp'] . ' - Процент скидки для позиции (без учета бонусов)<br>';
-                $output .= '<strong>ids:</strong> ' . $discount['ids'] . ' - Сумма скидки, примененная на стороне БонусПлюс для данной позиции (внутренняя скидка)<br>';
-                $output .= '<strong>idp:</strong> ' . $discount['idp'] . ' - Процент скидки, примененный на стороне БонусПлюс для данной позиции (внутренняя скидка)<br>';
-                $output .= '<strong>dbp:</strong> ' . $discount['dbp'] . ' - Процент списания бонусов<br>';
-                $output .= '<strong>cbp:</strong> ' . $discount['cbp'] . ' - Процент начисления бонусов<br>';
-                $output .= '</li>';
-            }
-        } else {
-            $output .= '<li>Invalid data format</li>';
-        }
-    
-        $output .= '</ul>';
-        $maxDebitBonuses = $data['request']['maxDebitBonuses'];
-        $multiplicityDebitBonus = $data['request']['multiplicityDebitBonus'];
-        $output .= '<strong>maxDebitBonuses:</strong> ';
-        $output .= $maxDebitBonuses . '<br>';
-        $output .= '<strong>multiplicityDebitBonus:</strong> ';
-        $output .= $multiplicityDebitBonus . '<br>';
+            $output .= '<ul>';
         
-/*
-        $bpwp_balance = 123;
-        $bpwp_bonus_debit = 14;
+            if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
 
-        $output .= '<div class="bonus-plus-price">';
-        $output .= '<p>Ваш бонусный баланс '. $bpwp_balance.'. На эту покупку будет списано '. $bpwp_bonus_debit .' бон.</p>';
-        $output .= '</div>';
-*/
+                foreach ($data['request']['discount'] as $discount) {
+                    $output .= '<li>';
+                    $output .= '<strong>ext:</strong> ' . $discount['ext'] . '<br>';
+
+                    if (is_array($discount['messages']) && !empty($discount['messages'])) {
+                        $output .= '<strong>messages:</strong> <ul>';
+                        foreach ($discount['messages'] as $message) {
+                            $output .= '<li>' . $message . '</li>';
+                        }
+                        $output .= '</ul>';
+                    }
+                
+                    $output .= '<strong>cb:</strong> ' . $discount['cb'] . ' - Сумма бонусов, которые будут начислены на данную позицию<br>';
+                    $output .= '<strong>db:</strong> ' . $discount['db'] . ' - Сумма бонусов, которые будут списаны для данной позиции<br>';
+                    $output .= '<strong>ds:</strong> ' . $discount['ds'] . ' - Общая сумма скидки для позиции (без учета бонусов)<br>';
+                    $output .= '<strong>dp:</strong> ' . $discount['dp'] . ' - Процент скидки для позиции (без учета бонусов)<br>';
+                    $output .= '<strong>ids:</strong> ' . $discount['ids'] . ' - Сумма скидки, примененная на стороне БонусПлюс для данной позиции (внутренняя скидка)<br>';
+                    $output .= '<strong>idp:</strong> ' . $discount['idp'] . ' - Процент скидки, примененный на стороне БонусПлюс для данной позиции (внутренняя скидка)<br>';
+                    $output .= '<strong>dbp:</strong> ' . $discount['dbp'] . ' - Процент списания бонусов<br>';
+                    $output .= '<strong>cbp:</strong> ' . $discount['cbp'] . ' - Процент начисления бонусов<br>';
+                    $output .= '</li>';
+                }
+            } else {
+                $output .= '<li>Invalid data format</li>';
+            }
+        
+            $output .= '</ul>';
+            $maxDebitBonuses = $data['request']['maxDebitBonuses'];
+            $multiplicityDebitBonus = $data['request']['multiplicityDebitBonus'];
+            $output .= '<strong>maxDebitBonuses:</strong> ';
+            $output .= $maxDebitBonuses . '<br>';
+            $output .= '<strong>multiplicityDebitBonus:</strong> ';
+            $output .= $multiplicityDebitBonus . '<br>';
+        
+        }
+
+        
+        $info = bpwp_api_get_customer_data();
+        if ($info && is_array($info)) {
+
+            $available_bonuses = $info['availableBonuses'];
+            
+            $maxDebitBonuses = 0;
+
+            if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
+                $maxDebitBonuses = $data['request']['maxDebitBonuses'];
+            }
+
+            $output .= '<div class="bonus-plus-price">';
+            $output .= '<p>Ваш бонусный баланс '. $available_bonuses .'. На эту покупку будет списано '. $maxDebitBonuses .' бон.</p>';
+            $output .= '</div>';
+            
+        }
+
         echo $output;
     }
 
@@ -224,6 +238,8 @@ class BPWPApiHelper
      * 
      */
     public static function bpwp_single_product_bonusplus_price($post_excerpt){
+        $content = '';
+        
         if (is_product()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
             $content = $post_excerpt . self::bpwp_render_retailitems_calc($price_data);
@@ -236,19 +252,15 @@ class BPWPApiHelper
      * 
      */
     public static function bpwp_cart_checkout_bonusplus_price(){
-        // if (is_cart() || is_checkout()) {
+        $content = '';
         if (is_cart()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
             $content = self::bpwp_render_retailitems_calc($price_data);
         }
         
         // Выводим бонусы, доступные для списания.
-        // TODO разобраться с акциями. Получить правильное количество бонусов для списания.
-        // ! Сейчас ["maxDebitBonuses"]=> float(1)
         if (is_checkout()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
-            //$content = self::bpwp_render_retailitems_calc($price_data);
-
             $content = self::bpwp_render_calc_bonusplus_price($price_data);
         }
     
@@ -258,10 +270,10 @@ class BPWPApiHelper
 
     /**
      * TODO: 
-     * - Вывести в чекаут Бонусы для списания: пока хардкодом
+     [x]- Вывести в чекаут Бонусы для списания: пока хардкодом
      * - Поставить галочку списывать или нет
-     * - На хук оплаты сделать запрос на удержание бонусов
-     * - На хук Выполнен сделать запрос списание бонусов. 'retail/calc', с параметром списания бунусов всегда 14. 'bonusDebit'    => 14.0 -
+     [x] - На хук оплаты сделать запрос на удержание бонусов
+     [x] - На хук Выполнен: отозвать удержание бонусов, провести подажу со списание бонусов 'retail'
      * 
      */
 

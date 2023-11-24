@@ -6,28 +6,38 @@ defined('ABSPATH') || exit; // Exit if accessed directly
 
 class BPWPApiHelper
 {
+    private static $maxDebitBonuses;
 
     /**
      *  Init
      */
     public static function init()
     {
+        self::$maxDebitBonuses = 0;
+
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_short_description', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10, 1);
-        //add_action('woocommerce_checkout_order_processed', [__CLASS__, 'bpwp_woocommerce_checkout_order_processed_action'], 10, 3);
-        //add_filter('woocommerce_update_cart_action_cart_updated', [__CLASS__, 'on_action_cart_updated']);
+        add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
+        
     }
 
-    public static function on_action_cart_updated( $cart_updated ) {
+    public static function add_custom_fee_on_checkout()
+    {
+        // TODO: Если юзер выбрал Да( списать), то уменьшаем сумму заказа
 
-        do_action('logger', $cart_updated);
-        
-        $new_value = 222;
+        // Получить maxDebitBonus
+        $data = self::bpwp_get_calc_bonusplus_price();
 
-        WC()->cart->set_total( $new_value );
+        if (is_array($data) && isset($data['request'])) {
+            $fee_amount = -(int)$data['request']['maxDebitBonuses'];
+            $fee_name = 'Списание бонусов';
+            $taxable = true;
+            $tax_class = 'bpwp-bonuses-reserved';
         
-        return $cart_updated;
+            WC()->cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
+
+        }
     }
 
     /**
@@ -77,7 +87,7 @@ class BPWPApiHelper
                     "product"   => $product_item['id'],
                     "ds"        => 0.0,
                     "ext"       => $ext,
-                    "price"     => (float) $product_price,
+                    "price"     => (float) $product_price
                 ];
 
                 
@@ -209,8 +219,6 @@ class BPWPApiHelper
         if ($info && is_array($info)) {
 
             $available_bonuses = $info['availableBonuses'];
-            
-            $maxDebitBonuses = 0;
 
             if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
                 
@@ -280,60 +288,24 @@ class BPWPApiHelper
     }
 
     /**
-     * 
+     * Выводим бонусы, доступные для начисления и списания
      */
     public static function bpwp_cart_checkout_bonusplus_price(){
         $content = '';
-        if (is_cart()) {
-            $price_data = self::bpwp_get_calc_bonusplus_price();
-            $content = self::bpwp_render_retailitems_calc($price_data);
-        }
-        
-        // Выводим бонусы, доступные для списания.
-        if (is_checkout()) {
-            $price_data = self::bpwp_get_calc_bonusplus_price();
 
-            //$order = wc_get_checkout()->get_order();
-            //$order_id = $order->get_id();
-            //$total = $order->get_total();
-            //do_action('logger', $cart);
-            
-            
+        if (is_cart() || is_checkout() ) {
+            $price_data = self::bpwp_get_calc_bonusplus_price();
+            //$content = self::bpwp_render_retailitems_calc($price_data);
             $content = self::bpwp_render_calc_bonusplus_price($price_data);
-            
-            WC()->cart->add_fee( 'sale', 34, false);
         }
-        
         return $content;
     }
 
-    public static function bpwp_woocommerce_checkout_order_processed_action($order_id, $posted_data, $order){
-        do_action('logger', $order);
-        do_action('logger', $order_id);
-        do_action('logger', $posted_data);
-        
+    public function bpwp_get_max_debit_bonuses($data) {
+        if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
+            $this->maxDebitBonuses = $data['request']['maxDebitBonuses'];
+        }
     }
-
-
-    /**
-     * TODO: 
-     [x]- Вывести в чекаут Бонусы для списания: пока хардкодом
-     * - Поставить галочку списывать или нет
-     [x] - На хук оплаты сделать запрос на удержание бонусов
-     [x] - На хук Выполнен: отозвать удержание бонусов, провести подажу со списание бонусов 'retail'
-     * 
-     */
-
-
-
-
-
-
-
-
-
-
-
 
 }
 

@@ -12,13 +12,12 @@ class BPWPCustomerBalance
     public static function init()
     {
         // Создание заказа - Резервирование бонусов на счету клиента
-        //do_action( 'woocommerce_checkout_order_created', [__CLASS__, 'bpwp_balance_reserve_bonusplus']);
         add_action( 'woocommerce_new_order', [__CLASS__, 'bpwp_balance_reserve_bonusplus'], 10, 2);
 
         // Заказ выполнен, запрос с начислением бонусов. Комментарий в заказ - "бонусы начисены"
         add_action('woocommerce_order_status_completed', [__CLASS__, 'bpwp_customer_balance_bonusplus']);
+       
     }
-
 
     /**
      *  Резервируем бонусы
@@ -34,12 +33,10 @@ class BPWPCustomerBalance
         $bonus_debit = $data['request']['maxDebitBonuses'];
         }
 
-        // Уменьшить суммы заказа на количество списываемых бонусов
-        // Если юзер выбрал Да( списать), то уменьшаем сумму заказа
-        // // Запрос Резервируем бонусы
-        // /*
-        // https://bonusplus.pro/api/Help/Api/PATCH-customer-phoneNumber-balance-reserve
-        // */
+        // Запрос Резервируем бонусы
+        /*
+        https://bonusplus.pro/api/Help/Api/PATCH-customer-phoneNumber-balance-reserve
+        */
 
         // Резервируем бонусы, передаем положительное число
 
@@ -56,7 +53,6 @@ class BPWPCustomerBalance
         
         if ($info && is_array($info)) {
             $info['availableBonuses'] = $info['availableBonuses'] - $bonus_debit;
-            do_action('logger', $info);
             
             update_user_meta($user_id, 'bonus-plus', $info);
         }
@@ -106,7 +102,6 @@ class BPWPCustomerBalance
                 'id'=> $order_data['order_id'],
                 'amount'=> $order_data['bonus_debit'],
             );
-            do_action('logger', $order_data);
 
             $balance_reserve = bpwp_api_request(
                 '/customer/'. $order_data['billing_phone'] .'/balance/reserve',
@@ -239,13 +234,13 @@ class BPWPCustomerBalance
                 "qnt"       => (float)$quantity,
                 "product"   => $product_id,
                 "ds"        => 0.0,
-                //"cat"       => $category_id,
                 "ext"       => $order_id.'-'.$ext, //ext - уникальный идентификатор позиции, его нужно делать либо уникальным, либо не заполнять вовсе
-                "price"     => (float) $product_price,
+                "price"     => (float) $product_price
             ];
 
             $products_data[] = $product_data;
         }
+        
         return $products_data;        
     }
 

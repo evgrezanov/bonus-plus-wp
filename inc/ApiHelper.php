@@ -49,7 +49,6 @@ class BPWPApiHelper
      */
     public static function bpwp_product_to_retailitems ($product_ids) 
     {
-
         $products_data = [];
         $ext = 0;
 

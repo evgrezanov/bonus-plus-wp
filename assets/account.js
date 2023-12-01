@@ -19,7 +19,13 @@ jQuery( 'document' ).ready( function( $ ) {
                 if (isElemetsExist){
                     // Регистрация
                     document.getElementById("bpwpRegistration").addEventListener("click", function() {
-                        bonusPlusWp.bp_registration(params['registration_uri'], params['authKey'], params['client_info'], params['ajax_url']);
+
+                        jQuery.get('/wp-json/wp/v1/getcustomer', function(response) {
+                            // Обработка полученных данных
+                            console.log(response);
+                        });
+                        
+                        //bonusPlusWp.bp_registration(params['registration_uri'], params['authKey'], params['client_info'], params['ajax_url']);
                     });
                     // Запрос СМС
                     document.getElementById("bpwpSendSms").addEventListener("click", function() {

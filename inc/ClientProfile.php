@@ -137,14 +137,15 @@ class BPWPProfile
 
             // Проверим заполнены ли у порльзователя дата рождения и телефон
             $user_id = get_current_user_id();
-            $billing_birth_date = get_user_meta( $user_id, 'billing_birth_date', true );
+            //$billing_birth_date = get_user_meta( $user_id, 'billing_birth_date', true );
             $billing_phone = get_user_meta(get_current_user_id(), 'billing_phone', true);
             $bonus_plus = get_user_meta(get_current_user_id(), 'bonus-plus', true);
             
-            if ( empty( $billing_birth_date ) || empty($billing_phone) ) {
+            //if ( empty( $billing_birth_date ) || empty($billing_phone) ) {
+            if (empty($billing_phone) ) {
                 $data['title']  =   __('ОШИБКА!', 'bonus-plus-wp');
                 $data['url']    =   get_option('bpwp_uri_customers_lk_billing_address');
-                $data['desc']   =   'Добавьте дату рождения и/или номер телефона в личном кабинете';
+                $data['desc']   =   'Добавьте номер телефона в личном кабинете';
                 $data['class']  =   'card3';
                 // или данные из Бонус+ пустые
             } elseif (empty($bonus_plus)){

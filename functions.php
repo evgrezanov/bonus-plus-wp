@@ -262,11 +262,7 @@ function bpwp_endpoint_get_customer() {
     if (is_user_logged_in()) {
         $user_id = get_current_user_id();
     }
-    
-    do_action('logger', $user_id);
-    
     //    delete_user_meta($user_id, 'bonus-plus');
-    
     // Check billing_phone 
     $phone = bpwp_api_get_customer_phone($user_id);
 
@@ -279,7 +275,6 @@ function bpwp_endpoint_get_customer() {
     );
 
     if ($res['code'] == 200){
-        do_action('logger', $res,'warning');
         update_user_meta($user_id, 'bonus-plus', $res['request']);
     } else {
         do_action(

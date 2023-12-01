@@ -286,7 +286,7 @@ class BPWPMyAccount
 
             <div hidden id="bpmsg" class="msg" style="display:none;"></div>
 
-            <div id="qrcode" style="display:none;"></div>
+            <!-- <div id="qrcode" style="display:none;"></div> -->
 
             <div id='bpwp-registration' style="display:none;">
                 <p><?= __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?>

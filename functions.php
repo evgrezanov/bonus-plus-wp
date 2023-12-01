@@ -250,6 +250,7 @@ function bpwp_register_get_customer_endpoint() {
         'callback' => 'bpwp_endpoint_get_customer',
         //'permission_callback' => '__return_true', // разрешить все
         'permission_callback' => function($request) { // Функция проверки nonce
+            //$params= $request->get_params();
             $nonce = $request->get_header('X-WP-Nonce');
             return wp_verify_nonce($nonce, 'wp_rest');
         }
@@ -275,7 +276,11 @@ function bpwp_endpoint_get_customer() {
     );
 
     if ($res['code'] == 200){
+        // Обновляем мета пользователя
         update_user_meta($user_id, 'bonus-plus', $res['request']);
+        $user_info = account_info();
+        do_action('logger', $user_info);
+        
     } else {
         do_action(
             'bpwp_logger',
@@ -289,11 +294,68 @@ function bpwp_endpoint_get_customer() {
 	// Если не сущ в б+ - делаем проверку по смс. Если пройдено - создаем нового и получаем GET /customer (на основании его генерим QR код), Добавляем в мета
 	// Если сущ, то делаем проверку по смс. Если пройдено - получаем GET /customer (на основании его генерим QR код), обновляем мета 
 	
-
+    
     // Возвращаем данные в формате JSON
-    return wp_json_encode($res);
+    //return wp_json_encode($res);
+    return ($user_info); // возвращаяем HTML
 }
 
+function account_info()
+{
+    $info = bpwp_api_get_customer_data();
+    if ($info && is_array($info)) {
+        
+        $output = sprintf('<h2>%s</h2>', 'Информация по карте лояльности');
+        
+        
+        foreach ($info as $key => $value) {
+            if ($key != 'person') {
+                if ($key == 'discountCardNumber') {
+                    $output .= sprintf('<br /><div id="qrcode" data-card="%s"></div><br/>', esc_html($value));
+                    $output .= sprintf('%s:%s<br />', esc_html(__('Номер карты', 'bonus-plus-wp')), esc_html($value));
+                }
+                if ($key == 'discountCardName') {
+                    $output .= sprintf('%s:%s<br />', esc_html(__('Тип карты', 'bonus-plus-wp')), esc_html($value));
+                }
+                if ($key == 'availableBonuses') {
+                    $output .= sprintf('%s:%s<br />', esc_html(__('Доступных бонусов', 'bonus-plus-wp')), esc_html($value));
+                }
+                if ($key == 'notActiveBonuses') {
+                    $output .= sprintf('%s:%s<br />', esc_html(__('Неактивных бонусов', 'bonus-plus-wp')), esc_html($value));
+                }
+                if ($key == 'purchasesTotalSum') {
+                    $output .= sprintf('%s:%s<br />', esc_html(__('Сумма покупок', 'bonus-plus-wp')), esc_html($value));
+                }
+                if ($key == 'purchasesSumToNextCard') {
+                    $output .= sprintf('%s:%s<br />', esc_html(__('Сумма покупок для смены карты', 'bonus-plus-wp')), esc_html($value));
+                }
+                if ($key == 'lastPurchaseDate') {
+                    $output .= sprintf('%s:%s<br />', esc_html(__('Последняя покупка', 'bonus-plus-wp')), esc_html($value));
+                }
+            } else {
+                $person_data = $value;
+                $person = array();
+                foreach ($person_data as $pkey => $pvalue) {
+                    if ($pkey == 'ln' || $pkey == 'fn' || $pkey == 'mn') {
+                        $person[$pkey] = $pvalue;
+                    }
+                }
+                if (!empty($person)) {
+                    $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
+                    if (!empty($owner)) {
+                        $output .= sprintf('%s:%s<br />', esc_html(__('Держатель', 'bonus-plus-wp')), esc_html($owner));
+                    }
+                }
+            }
+        }
+
+    } else { // нет данных в бонус+ 
+        do_action('logger', 'Нет данных!');
+        //do_action('bpwp_veryfy_client_data');
+    }
+
+    return $output;
+}
 /*
 Пример вызова
 JS

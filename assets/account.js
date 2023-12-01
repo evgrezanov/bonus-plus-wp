@@ -18,15 +18,15 @@ jQuery( 'document' ).ready( function( $ ) {
                 // no have cardnumber, so need register
                 if (isElemetsExist){
                     // Регистрация
-                    document.getElementById("bpwpRegistration").addEventListener("click", function() {
+                    // document.getElementById("bpwpRegistration").addEventListener("click", function() {
 
-                        jQuery.get('/wp-json/wp/v1/getcustomer', function(response) {
-                            // Обработка полученных данных
-                            console.log(response);
-                        });
+                    //     jQuery.get('/wp-json/wp/v1/getcustomer', function(response) {
+                    //         // Обработка полученных данных
+                    //         console.log(response);
+                    //     });
                         
                         //bonusPlusWp.bp_registration(params['registration_uri'], params['authKey'], params['client_info'], params['ajax_url']);
-                    });
+                    //});
                     // Запрос СМС
                     document.getElementById("bpwpSendSms").addEventListener("click", function() {
                         bonusPlusWp.bp_send_sms(params['send_sms_uri'], params['authKey']);

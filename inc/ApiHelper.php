@@ -20,9 +20,6 @@ class BPWPApiHelper
         add_action('woocommerce_short_description', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10, 1);
         add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
 
-        // add_action('rest_api_init', [__CLASS__, 'bpwp_register_get_customer_endpoint']);
-        // add_action('rest_api_init', [__CLASS__, 'bpwp_register_post_customer_endpoint']);
-        
     }
 
     public static function add_custom_fee_on_checkout()
@@ -309,85 +306,6 @@ class BPWPApiHelper
             $this->maxDebitBonuses = $data['request']['maxDebitBonuses'];
         }
     }
-
-    
-    /*
-Пример вызова
-JS
-jQuery.get('/wp-json/wp/v1/example', function(response) {
-    // Обработка полученных данных
-    console.log(response);
-});
-
-PHP
-$response = wp_remote_get('https://example.com/wp-json/wp/v1/example');
-if (is_wp_error($response)) {
-    // Обработка ошибки
-    $error_message = $response->get_error_message();
-    echo "Ошибка: $error_message";
-} else {
-    $data = wp_remote_retrieve_body($response);
-    $decoded_data = json_decode($data, true);
-    if ($decoded_data) {
-        // Обработка полученных данных
-        echo "Сообщение: " . $decoded_data['message'];
-        echo "Временная метка: " . $decoded_data['timestamp'];
-    } else {
-        // Обработка ошибки декодирования JSON
-        echo "Ошибка декодирования JSON";
-    }
-}
-*/
-
-// Регистрация эндпоинта для GET /customer
-public function bpwp_register_get_customer_endpoint() {
-    register_rest_route('wp/v1', '/getcustomer', array(
-        'methods' => 'GET',
-        'callback' => 'bpwp_endpoint_get_customer',
-        'permission_callback' => '__return_true',
-        //'permission_callback' => array( $this, 'get_items_permissions_check' ), // функция
-        // описание передаваемых параметров
-		// 'args' => array(
-            // 	'default'   => 
-		// 	'required'  => 
-		// 	'a'         => 
-		// 	'b'         => 
-        // ),
-    ));
-}
-
-// Регистрация эндпоинта для POST /customer
-public function bpwp_register_post_customer_endpoint() {
-    register_rest_route('wp/v1', '/postcustomer', array(
-        'methods' => 'GET',
-        'callback' => 'bpwp_endpoint_post_customer',
-        'permission_callback' => '__return_true',
-    ));
-}
-
-// Функция обработки запроса GET customer
-public function bpwp_endpoint_get_customer() {
-    // Ваш код обработки запроса и получения данных
-    $data = array(
-        'message' => 'Привет, мир!',
-        'timestamp' => current_time('timestamp')
-    );
-    
-    // Возвращаем данные в формате JSON
-    return wp_json_encode($data);
-}
-
-// Функция обработки запроса POST customer
-public function bpwp_endpoint_post_customer() {
-    // Ваш код обработки запроса и получения данных
-    $data = array(
-        'message' => 'Привет, мир!',
-        'timestamp' => current_time('timestamp')
-    );
-    
-    // Возвращаем данные в формате JSON
-    return wp_json_encode($data);
-}
 
 }
 

@@ -214,6 +214,16 @@ class BPWPMyAccount
             'in_footer'
         );
 
+        wp_enqueue_script(
+            'customerjs',
+            plugins_url('/assets/customer.js', __DIR__),
+            ['qrcodejs', 'jquery'],
+            BPWP_PLUGIN_VERSION,
+            'in_footer'
+        );
+
+        wp_enqueue_script( 'wp-api' );
+
         wp_localize_script(
             'accountjs',
             'accountBonusPlusData',
@@ -312,7 +322,7 @@ class BPWPMyAccount
             'label'       => __('Дата рождения', 'bonus-plus-wp'),
             'class'       => array('form-row-wide'),
             'priority'    => 25,
-            'required'    => true,
+            'required'    => false,
             'clear'       => true,
         );
 

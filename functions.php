@@ -258,17 +258,45 @@ function bpwp_register_get_customer_endpoint() {
 
 // Функция обработки запроса GET customer
 function bpwp_endpoint_get_customer() {
-    $data = array(
-        'message' => 'Success!',
-        'timestamp' => current_time('timestamp')
+
+    if (is_user_logged_in()) {
+        $user_id = get_current_user_id();
+    }
+    
+    do_action('logger', $user_id);
+    
+    //    delete_user_meta($user_id, 'bonus-plus');
+    
+    // Check billing_phone 
+    $phone = bpwp_api_get_customer_phone($user_id);
+
+    $res = bpwp_api_request(
+        'customer',
+        array(
+            'phone' => $phone
+        ),
+        'GET'
     );
+
+    if ($res['code'] == 200){
+        do_action('logger', $res,'warning');
+        update_user_meta($user_id, 'bonus-plus', $res['request']);
+    } else {
+        do_action(
+            'bpwp_logger',
+            $type = __CLASS__,
+            $title = __('Ошибка при получении данных клиента', 'bonus-plus-wp'),
+            $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
+        ); 
+    }
+    
 
 	// Если не сущ в б+ - делаем проверку по смс. Если пройдено - создаем нового и получаем GET /customer (на основании его генерим QR код), Добавляем в мета
 	// Если сущ, то делаем проверку по смс. Если пройдено - получаем GET /customer (на основании его генерим QR код), обновляем мета 
 	
 
     // Возвращаем данные в формате JSON
-    return wp_json_encode($data);
+    return wp_json_encode($res);
 }
 
 /*

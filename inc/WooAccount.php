@@ -185,6 +185,10 @@ class BPWPMyAccount
         $customerData = bpwp_api_get_customer_data();
         $cardNumber = !empty($customerData['discountCardNumber']) ? $customerData['discountCardNumber'] : '';
         //$clientInfo = [];
+        $apiKey = '';
+        $sendSmsUri = '';
+        $sendOtpUri = '';
+        $registrationUri = '';
 
         if (!empty($phone = get_user_meta(get_current_user_id(), 'billing_phone', true))) {
             $apiKey = base64_encode(esc_attr(get_option('bpwp_api_key')));
@@ -375,9 +379,12 @@ class BPWPMyAccount
         $billingEmail = !empty($customer['billing_email']) ? $customer['billing_email'] : '-';
         $billingPhone = !empty($customer['billing_phone']) ? $customer['billing_phone'] : '-';
         // ДД.ММ.ГГГГ 
-        $originalBDate = $customer['billing_birth_date'][0];
-        $newBDate = date("d.m.Y", strtotime($originalBDate));
-
+        if (isset($customer['billing_birth_date'])) {
+            $originalBDate = $customer['billing_birth_date'][0];
+            $newBDate = date("d.m.Y", strtotime($originalBDate));
+        } else {
+            $newBDate = '';
+        }
 
         $registrationData = array();
 

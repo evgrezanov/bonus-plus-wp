@@ -256,6 +256,7 @@ class BPWPWooProductCatExport
                     }
                 }
 
+                // TODO добавить обработку остальных типов товаров
             }
         }
         wp_reset_postdata();
@@ -283,17 +284,18 @@ class BPWPWooProductCatExport
             $product_cat = apply_filters('bpwp_filter_export_product_cat', self::bpwp_api_product_cat_data_prepare()); 
             $products = apply_filters('bpwp_filter_export_products', self::bpwp_api_products_data_prepare());
             $product = array_merge($product_cat, $products);
-            /*
-            usort($product, function ($a, $b) { 
-                return $a['id'] - $b['id'];
-            });
-            */
         }
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
 
         if (empty($store) || empty($product)) {
             self::$lastExport['message'] =  __('Экспорт невозможен, параметры переданы неверно', 'bonus-plus-wp');
+            do_action(
+                'bpwp_logger_error',
+                $type = __CLASS__,
+                $title = __('Экспорт товаров в Бонус+, невозможен', 'bonus-plus-wp'),
+                $desc = __('Параметры название магазина или список продуктовпереданы неверно', 'bonus-plus-wp'),
+            );
         }
 
         /**
@@ -339,7 +341,7 @@ class BPWPWooProductCatExport
     {
         printf('<h2>%s</h2>', __('Экспорт товаров и категорий', 'bonus-plus-wp'));
 
-        printf('<a href="%s" class="button button-primary">Экспортировать</a>', add_query_arg('a', 'products_cats_export', admin_url('admin.php?page=bpwp-settings')));
+        printf('<a href="%s" class="button button-primary">Экспортировать</a>', add_query_arg('a', 'products_cats_export', admin_url('admin.php?page=bpwp-connection')));
     }
 
     /**

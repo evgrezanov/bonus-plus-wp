@@ -4,9 +4,9 @@
 * Donate link: https://github.com/evgrezanov
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
-* Tested up to: 6.1.1
-* Stable tag: 2.6
-* Requires PHP: 7.1
+* Tested up to: 6.4.2
+* Stable tag: 2.7
+* Requires PHP: 8.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,8 +75,8 @@ Manual installation method requires downloading the wp-bonus-plus plugin and upl
 
 ## Какие минимальные требования?
 
-WordPress 5.0
-PHP 7.1 (Рекомендуем 8.0 и выше)
+WordPress 6.0
+PHP Рекомендуем 8.0 и выше
 
 ## Будет работать без WooCommerce?
 
@@ -91,6 +91,9 @@ PHP 7.1 (Рекомендуем 8.0 и выше)
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 2.7
+- устранение бага с экспортом товаров и категорий https://github.com/evgrezanov/bonus-plus-wp/issues/50
 
 ## 2.6
 - настройки виджета перенесены на отдельную вкладку в админке https://github.com/evgrezanov/bonus-plus-wp/issues/32

@@ -7,7 +7,7 @@
  * Author URI: https://github.com/evgrezanov/
  * Developer: redmonkey73
  * Developer URI: https://github.com/evgrezanov/
- * Text Domain: wp-bonus-plus
+ * Text Domain: bonus-plus-wp
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html

@@ -313,7 +313,7 @@ class BPWPWooProductCatExport
         if (self::$lastExport['message'] == 'Экспорт еще не производился'){
             $export = bpwp_api_request(
                 'product/import',
-                json_encode($params),
+                wp_json_encode($params),
                 'POST',
             );
 
@@ -382,7 +382,7 @@ class BPWPWooProductCatExport
 
         ?>
         <div class="wrap">
-            <div id="message" class="<?= esc_attr($class) ?>">
+            <div id="message" class="<?php echo esc_attr($class) ?>">
                 <?php
                     foreach ($strings as $string) {
                         printf('<p>%s</p>', $string);

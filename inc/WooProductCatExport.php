@@ -403,20 +403,27 @@ class BPWPWooProductCatExport
     public static function bpwp_get_product_child_category($productId){
         //Get all terms associated with post in woocommerce's taxonomy 'product_cat'
         $terms = get_the_terms($productId, 'product_cat');
+        
+        // Check if terms exist and is not a WP_Error
+        if (is_array($terms) && !is_wp_error($terms)) {
 
-        //Get an array of their IDs
-        $term_ids = wp_list_pluck($terms, 'term_id');
+            //Get an array of their IDs
+            $term_ids = wp_list_pluck($terms, 'term_id');
 
-        //Get array of parents - 0 is not a parent
-        $parents = array_filter(wp_list_pluck($terms, 'parent'));
+            //Get array of parents - 0 is not a parent
+            $parents = array_filter(wp_list_pluck($terms, 'parent'));
 
-        //Get array of IDs of terms which are not parents.
-        $term_ids_not_parents = array_diff($term_ids,  $parents);
+            //Get array of IDs of terms which are not parents.
+            $term_ids_not_parents = array_diff($term_ids,  $parents);
 
-        //Get corresponding term objects.
-        $terms_not_parents = array_intersect_key($terms,  $term_ids_not_parents);
+            //Get corresponding term objects.
+            $terms_not_parents = array_intersect_key($terms,  $term_ids_not_parents);
 
-        return $terms_not_parents;
+            return $terms_not_parents;
+        }
+
+        // Return an empty array if there are no terms or an error occurred
+        return array();
     }
 }
 

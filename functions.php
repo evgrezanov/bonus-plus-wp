@@ -162,7 +162,7 @@ function bpwp_api_get_error_msg($code)
 ** Меняем порядок вывода
 ** Редактируем текст внутри полей
 */
-add_filter('woocommerce_checkout_fields', 'custom_override_checkout_fields', 9999);
+//add_filter('woocommerce_checkout_fields', 'custom_override_checkout_fields', 9999);
 function custom_override_checkout_fields($fields)
 {
 
@@ -179,6 +179,7 @@ function custom_override_checkout_fields($fields)
 
 	$fields['billing']['billing_first_name']['placeholder'] = 'Имя';
 	$fields['billing']['billing_email']['placeholder'] = 'Email';
+    $fields['billing']['billing_phone']['placeholder'] = '+7 (999) 999-99-99'; //Телефон
 	
 	// Вставляем телефон пользователя в поле
     if ( is_user_logged_in() ) {
@@ -282,6 +283,10 @@ function bpwp_endpoint_get_customer() {
         do_action('logger', $user_info);
         
     } else {
+
+        // TODO: Отправка SMS
+        // Пишеем Ендпоинт для СМС, а функуию испльзуем сразу
+        // $user_info =
         do_action(
             'bpwp_logger',
             $type = __CLASS__,

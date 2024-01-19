@@ -5,6 +5,10 @@ jQuery( 'document' ).ready( function( $ ) {
             const accountContent = $('.woocommerce-MyAccount-content');
             const bpwpRegistration = $('#bpwp-registration');
 
+            // TODO: 
+
+
+
             $.ajax( {
                 url: wpApiSettings.root + 'wp/v1/getcustomer',
                 method: 'GET',
@@ -25,6 +29,9 @@ jQuery( 'document' ).ready( function( $ ) {
                 
                 const bonusPlusInfo = $(response); // Если получаем HTML
                 accountContent.append(bonusPlusInfo);
+
+                // Эндпоинт для отправки смс вместо account.js строка 107
+                // $.ajax() - сделатьт отдельной функцией
 
                 // Показать QR код
                 const qrcodeElement = document.getElementById('qrcode');

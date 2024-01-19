@@ -105,7 +105,7 @@ class BPWPCustomerBalance
 
             $balance_reserve = bpwp_api_request(
                 '/customer/'. $order_data['billing_phone'] .'/balance/reserve',
-                json_encode($params),
+                wp_json_encode($params),
                 'PATCH',
             );
             
@@ -182,7 +182,7 @@ class BPWPCustomerBalance
         if (!empty($billingPhone) && !empty($store) && count($items) >= 1){
             $retail = bpwp_api_request(
                 'retail',
-                json_encode($params),
+                wp_json_encode($params),
                 'POST',
             );
             

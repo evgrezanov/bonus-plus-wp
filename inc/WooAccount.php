@@ -236,7 +236,7 @@ class BPWPMyAccount
                 'ajax_url'          => admin_url('admin-ajax.php'),
                 'cardNumber'        => esc_attr($cardNumber),
                 'debug'             => apply_filters('bpwp_debug_phone_verify', false),
-                'clientInfo'        => json_encode(self::bpwp_get_client_registration_data(get_current_user_id())),
+                'clientInfo'        => wp_json_encode(self::bpwp_get_client_registration_data(get_current_user_id())),
             )
         );
         wp_enqueue_style('bpwp-bonus-loader-style');
@@ -289,24 +289,24 @@ class BPWPMyAccount
             <!-- <div id="qrcode" style="display:none;"></div> -->
 
             <div id='bpwp-registration' style="display:none;">
-                <p><?= __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?>
+                <p><?php echo __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?>
                 </p>
-                <button id="bpwpRegistration"><?= __('Создать учетную запись', 'bonus-plus-wp') ?></button>
+                <button id="bpwpRegistration"><?php echo __('Создать учетную запись', 'bonus-plus-wp') ?></button>
             </div>
 
             <div id='bpwp-verify-start' style="display:none;">
-                <p><?= __('Подтвердите номер телефона', 'bonus-plus-wp') ?>
-                    <strong><?= $phone ?></strong>
+                <p><?php echo __('Подтвердите номер телефона', 'bonus-plus-wp') ?>
+                    <strong><?php echo $phone ?></strong>
                 </p>
-                <button id="bpwpSendSms"><?= __('Отправить SMS c кодом подтверждения', 'bonus-plus-wp') ?></button>
+                <button id="bpwpSendSms"><?php echo __('Отправить SMS c кодом подтверждения', 'bonus-plus-wp') ?></button>
             </div>
 
             <div id='bpwp-verify-end' style="display:none;">
-                <p><?= __('Введите код высланый в SMS, на номер телефона:', 'bonus-plus-wp') ?>
-                    <strong><?= $phone ?></strong>
+                <p><?php echo __('Введите код высланый в SMS, на номер телефона:', 'bonus-plus-wp') ?>
+                    <strong><?php echo $phone ?></strong>
                 </p>
                 <input id="bpwpOtpInput" type="number" maxLength="1" size="6" min="0" max="999999" pattern="[0-9]{6}" />
-                <button id="bpwpSendOtp"><?= __('Подтвердить номер телефона', 'bonus-plus-wp') ?></button>
+                <button id="bpwpSendOtp"><?php echo __('Подтвердить номер телефона', 'bonus-plus-wp') ?></button>
             </div>
         </div>
 <?php

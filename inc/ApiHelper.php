@@ -49,7 +49,6 @@ class BPWPApiHelper
      */
     public static function bpwp_product_to_retailitems ($product_ids) 
     {
-
         $products_data = [];
         $ext = 0;
 
@@ -150,7 +149,7 @@ class BPWPApiHelper
         if (!empty($billingPhone) && !empty($store) && count($items) >= 1){
             $retailcalc = bpwp_api_request(
                 'retail/calc',
-                json_encode($params),
+                wp_json_encode($params),
                 'PUT',
             );
             
@@ -171,7 +170,7 @@ class BPWPApiHelper
     public static function bpwp_render_calc_bonusplus_price($data) {
         
         $output = '';
-        
+        // TODO добавить проверку на nonce if (isset($_GET['testrequest']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'nonce_action_name')) {}
         if (isset($_GET['testrequest'])) {
             
             $output .= '<ul>';

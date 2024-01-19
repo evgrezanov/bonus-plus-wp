@@ -256,6 +256,7 @@ class BPWPWooProductCatExport
                     }
                 }
 
+                // TODO добавить обработку остальных типов товаров
             }
         }
         wp_reset_postdata();
@@ -283,17 +284,18 @@ class BPWPWooProductCatExport
             $product_cat = apply_filters('bpwp_filter_export_product_cat', self::bpwp_api_product_cat_data_prepare()); 
             $products = apply_filters('bpwp_filter_export_products', self::bpwp_api_products_data_prepare());
             $product = array_merge($product_cat, $products);
-            /*
-            usort($product, function ($a, $b) { 
-                return $a['id'] - $b['id'];
-            });
-            */
         }
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
 
         if (empty($store) || empty($product)) {
             self::$lastExport['message'] =  __('Экспорт невозможен, параметры переданы неверно', 'bonus-plus-wp');
+            do_action(
+                'bpwp_logger_error',
+                $type = __CLASS__,
+                $title = __('Экспорт товаров в Бонус+, невозможен', 'bonus-plus-wp'),
+                $desc = __('Параметры название магазина или список продуктовпереданы неверно', 'bonus-plus-wp'),
+            );
         }
 
         /**
@@ -311,7 +313,7 @@ class BPWPWooProductCatExport
         if (self::$lastExport['message'] == 'Экспорт еще не производился'){
             $export = bpwp_api_request(
                 'product/import',
-                json_encode($params),
+                wp_json_encode($params),
                 'POST',
             );
 
@@ -339,7 +341,7 @@ class BPWPWooProductCatExport
     {
         printf('<h2>%s</h2>', __('Экспорт товаров и категорий', 'bonus-plus-wp'));
 
-        printf('<a href="%s" class="button button-primary">Экспортировать</a>', add_query_arg('a', 'products_cats_export', admin_url('admin.php?page=bpwp-settings')));
+        printf('<a href="%s" class="button button-primary">Экспортировать</a>', add_query_arg('a', 'products_cats_export', admin_url('admin.php?page=bpwp-connection')));
     }
 
     /**
@@ -380,7 +382,7 @@ class BPWPWooProductCatExport
 
         ?>
         <div class="wrap">
-            <div id="message" class="<?= esc_attr($class) ?>">
+            <div id="message" class="<?php echo esc_attr($class) ?>">
                 <?php
                     foreach ($strings as $string) {
                         printf('<p>%s</p>', $string);
@@ -401,20 +403,27 @@ class BPWPWooProductCatExport
     public static function bpwp_get_product_child_category($productId){
         //Get all terms associated with post in woocommerce's taxonomy 'product_cat'
         $terms = get_the_terms($productId, 'product_cat');
+        
+        // Check if terms exist and is not a WP_Error
+        if (is_array($terms) && !is_wp_error($terms)) {
 
-        //Get an array of their IDs
-        $term_ids = wp_list_pluck($terms, 'term_id');
+            //Get an array of their IDs
+            $term_ids = wp_list_pluck($terms, 'term_id');
 
-        //Get array of parents - 0 is not a parent
-        $parents = array_filter(wp_list_pluck($terms, 'parent'));
+            //Get array of parents - 0 is not a parent
+            $parents = array_filter(wp_list_pluck($terms, 'parent'));
 
-        //Get array of IDs of terms which are not parents.
-        $term_ids_not_parents = array_diff($term_ids,  $parents);
+            //Get array of IDs of terms which are not parents.
+            $term_ids_not_parents = array_diff($term_ids,  $parents);
 
-        //Get corresponding term objects.
-        $terms_not_parents = array_intersect_key($terms,  $term_ids_not_parents);
+            //Get corresponding term objects.
+            $terms_not_parents = array_intersect_key($terms,  $term_ids_not_parents);
 
-        return $terms_not_parents;
+            return $terms_not_parents;
+        }
+
+        // Return an empty array if there are no terms or an error occurred
+        return array();
     }
 }
 

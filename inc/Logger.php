@@ -59,7 +59,7 @@ final class BPWPLogger
     if (!empty($description)) {
 
       if (is_array($description)) {
-        $description = json_encode($description, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $description = wp_json_encode($description, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
       } else {
         $description = wc_print_r($description, true);
       }
@@ -91,7 +91,7 @@ final class BPWPLogger
 
     if (!empty($description)) {
       if (is_array($description)) {
-        $description = json_encode($description, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $description = wp_json_encode($description, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
       } else {
         $description = wc_print_r($description, true);
       }

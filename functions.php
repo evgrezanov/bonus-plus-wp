@@ -45,6 +45,7 @@ function bpwp_api_request($endpoint, $params, $type)
     }
 
     if ($type == 'PUT') {
+        
         $args = array(
             'method'      => $type,
             'headers'     => array(
@@ -54,7 +55,7 @@ function bpwp_api_request($endpoint, $params, $type)
             'body'        => $params,
         );
     }
-
+    
     if ($type == 'PATCH') {
         $args = array(
             'method'      => $type,
@@ -65,6 +66,10 @@ function bpwp_api_request($endpoint, $params, $type)
             'body'        => $params,
         );
     }
+    
+    $args['headers']['Content-Length'] = strlen( $args['body'] ?: '' ); // Добавим Content-Length. Важно, если body пустой
+    // do_action('logger', $url);
+    // do_action('logger', $args);
 
     $request = wp_remote_request($url, $args);
 
@@ -240,12 +245,147 @@ function custom_override_checkout_fields($fields)
 	return $fields;
 }
 
-add_action('rest_api_init', 'bpwp_register_get_customer_endpoint');
-//add_action('rest_api_init', 'bpwp_register_post_customer_endpoint');
+//add_action('rest_api_init', 'bpwp_register_get_customer_endpoint', 10);
+add_action('rest_api_init', 'bpwp_customer_endpoints', 20);
 
+// Регистрация эндпоинтов для отправки SMS и проверки полученного кода
+
+function bpwp_customer_endpoints() {
+
+    register_rest_route('wp/v1', '/sendcode', array(
+        'methods' => 'POST',
+        'callback' => 'bpwp_customer_sendcode',
+        //'permission_callback' => '__return_true', // разрешить все
+        'permission_callback' => 'verify_wp_nonce', // разрешить все
+        //'permission_callback' => function($request) { // Функция проверки nonce
+            // $nonce = $request->get_header('x_wp_nonce');
+            // return wp_verify_nonce($nonce, 'wp_rest');
+        //}
+    ));
+
+    register_rest_route('wp/v1', '/checkcode', array(
+        'methods' => 'POST',
+        'callback' => 'bpwp_customer_checkcode',
+        'args' => array(
+            'phone' => array(
+                'type' => 'string',
+                'required' => true,
+                'sanitize_callback' => 'sanitize_text_field'
+            ),
+            'code' => array(
+                'type' => 'integer',
+                'required' => true,
+                'sanitize_callback' => 'sanitize_text_field'
+                //'sanitize_callback' => 'absint'
+            )
+        ),
+        'permission_callback' => 'verify_wp_nonce',
+    ));
+    
+}
+
+function verify_wp_nonce($request) {
+		$nonce = $request->get_header('X-WP-Nonce');
+        return wp_verify_nonce($nonce, 'wp_rest');
+	}
+
+// Отправляет проверочный код на номер телефона клиента посредством смс-сообщения
+function bpwp_customer_sendcode(WP_REST_Request $request) {
+
+    if (is_user_logged_in()) {
+        $user_id = get_current_user_id();
+    }
+
+    $phone = bpwp_api_get_customer_phone($user_id); // Получаем тот же телефон из у пользователя.
+    
+    //$phone = '79278921123';
+
+    // Написать правильный запрос
+    /*
+    $res = bpwp_api_request(
+        'customer/'.$phone.'/sendCode',
+        array(),
+        // array(
+        //     'phone' => $phone
+        // ),
+        'PUT'
+    );
+
+    do_action('logger', $res, 'error');
+
+    */
+
+    // if ($res['code'] == 200){
+    //     $message = 'Код отправлен!';
+    // } else {
+    //     wp_send_json(
+    //         array(
+    //             'success' => false,
+    //             'message' => 'Код не отправлен!',
+    //         )
+    //     );
+    //     wp_die();
+    // }
+
+    wp_send_json(
+        array(
+            'success' => true,
+            'message' => 'Код отправлен',
+        )
+    );
+    wp_die();
+}
+
+
+// Проверяет код, отправленный на номер телефона клиента
+function bpwp_customer_checkcode(WP_REST_Request $request) {
+    
+    if (is_user_logged_in()) {
+        $user_id = get_current_user_id();
+    }
+
+    // ? Проверить, если нет телефона и кода, то возвращаем ошибку
+    $args = array(
+        'phone' => $request->get_param( 'phone' ),
+        'code' => $request->get_param( 'code' )
+    );
+    
+    $phone = bpwp_api_get_customer_phone($user_id); // Получаем тот же телефон из у пользователя.
+    
+    //Написать правильный запрос
+    //customer/$phone/checkCode/$code
+    $res = bpwp_api_request(
+        'customer/'. $phone .'/checkCode/'. $args['code'],
+        array(),
+        'PUT'
+    );
+
+    do_action('logger', $res, 'error');
+
+    // if ($res['code'] == 200){
+    //     $message = 'Код отправлен!';
+    // } else {
+    //     wp_send_json(
+    //         array(
+    //             'success' => false,
+    //             'message' => 'Код не отправлен!',
+    //         )
+    //     );
+    //     wp_die();
+    // }
+
+    wp_send_json(
+        array(
+            'success' => true,
+            'message' => 'Код верен',
+        )
+    );
+    wp_die();
+}
 
 // Регистрация эндпоинта для GET /customer
 function bpwp_register_get_customer_endpoint() {
+    
     register_rest_route('wp/v1', '/getcustomer', array(
         'methods' => 'GET',
         'callback' => 'bpwp_endpoint_get_customer',
@@ -264,7 +404,7 @@ function bpwp_endpoint_get_customer() {
     if (is_user_logged_in()) {
         $user_id = get_current_user_id();
     }
-    //    delete_user_meta($user_id, 'bonus-plus');
+    // delete_user_meta($user_id, 'bonus-plus');
     // Check billing_phone 
     $phone = bpwp_api_get_customer_phone($user_id);
 
@@ -280,10 +420,11 @@ function bpwp_endpoint_get_customer() {
         // Обновляем мета пользователя
         update_user_meta($user_id, 'bonus-plus', $res['request']);
         $user_info = account_info();
-        do_action('logger', $user_info);
+        // do_action('logger', $user_info);
         
     } else {
 
+        echo 'Регистрация в системе';
         // TODO: Отправка SMS
         // Пишеем Ендпоинт для СМС, а функуию испльзуем сразу
         // $user_info =
@@ -304,6 +445,18 @@ function bpwp_endpoint_get_customer() {
     //return wp_json_encode($res);
     return ($user_info); // возвращаяем HTML
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 function account_info()
 {

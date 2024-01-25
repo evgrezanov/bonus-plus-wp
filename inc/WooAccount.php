@@ -34,10 +34,10 @@ class BPWPMyAccount
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_qrcode_scripts']);
         add_filter('bpwp_debug_phone_verify', '__return_true');
         add_filter('woocommerce_billing_fields', [__CLASS__, 'bpwp_add_birth_date_billing_field'], 20, 1);
-        if (wp_doing_ajax()) {
-            add_action('wp_ajax_nopriv_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
-            add_action('wp_ajax_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
-        }
+        // if (wp_doing_ajax()) {
+        //     add_action('wp_ajax_nopriv_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
+        //     add_action('wp_ajax_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
+        // }
     }
 
     /**
@@ -112,7 +112,7 @@ class BPWPMyAccount
 
                 //do_action('bpwp_after_bonus_card_info_title');
 
-                echo '<br><div id="qrcode"></div><br>';
+                echo '<br><div id="qrcode" data-cardnumber="'.$info['discountCardNumber'].'"></div><br>';
 
                 foreach ($info as $key => $value) {
                     if ($key != 'person') {
@@ -167,7 +167,9 @@ class BPWPMyAccount
                     }
                 }
             }
-        } else { // нет данных в бонус+ 
+        } else {
+            // нет данных в бонус+ 
+            // Если нет get_user_meta($customer_id, 'bonus-plus', true), то отправим запрос по ноеру телефона, чтобы обновить данные юзера
             do_action('bpwp_veryfy_client_data');
         }
     }
@@ -206,13 +208,13 @@ class BPWPMyAccount
             'in_footer'
         );
 
-        wp_enqueue_script(
-            'accountjs',
-            plugins_url('/assets/account.js', __DIR__),
-            ['qrcodejs', 'jquery'],
-            BPWP_PLUGIN_VERSION,
-            'in_footer'
-        );
+        // wp_enqueue_script(
+        //     'accountjs',
+        //     plugins_url('/assets/account.js', __DIR__),
+        //     ['qrcodejs', 'jquery'],
+        //     BPWP_PLUGIN_VERSION,
+        //     'in_footer'
+        // );
 
         wp_enqueue_script(
             'customerjs',
@@ -224,21 +226,21 @@ class BPWPMyAccount
 
         wp_enqueue_script( 'wp-api' );
 
-        wp_localize_script(
-            'accountjs',
-            'accountBonusPlusData',
-            array(
-                'auth'              => esc_attr($apiKey),
-                'sendSmsUri'        => $sendSmsUri,
-                'sendOtpUri'        => $sendOtpUri,
-                'registrationUri'   => esc_attr($registrationUri),
-                'redirect'          => site_url() . '/my-account/',
-                'ajax_url'          => admin_url('admin-ajax.php'),
-                'cardNumber'        => esc_attr($cardNumber),
-                'debug'             => apply_filters('bpwp_debug_phone_verify', false),
-                'clientInfo'        => wp_json_encode(self::bpwp_get_client_registration_data(get_current_user_id())),
-            )
-        );
+        // wp_localize_script(
+        //     'accountjs',
+        //     'accountBonusPlusData',
+        //     array(
+        //         'auth'              => esc_attr($apiKey),
+        //         'sendSmsUri'        => $sendSmsUri,
+        //         'sendOtpUri'        => $sendOtpUri,
+        //         'registrationUri'   => esc_attr($registrationUri),
+        //         'redirect'          => site_url() . '/my-account/',
+        //         'ajax_url'          => admin_url('admin-ajax.php'),
+        //         'cardNumber'        => esc_attr($cardNumber),
+        //         'debug'             => apply_filters('bpwp_debug_phone_verify', false),
+        //         'clientInfo'        => wp_json_encode(self::bpwp_get_client_registration_data(get_current_user_id())),
+        //     )
+        // );
         wp_enqueue_style('bpwp-bonus-loader-style');
     }
 
@@ -247,23 +249,26 @@ class BPWPMyAccount
      */
     public static function bpwp_api_render_customer_data()
     {
-        $phone = !empty(get_user_meta(get_current_user_id(), 'billing_phone', true)) ? get_user_meta(get_current_user_id(), 'billing_phone', true) : '';
+        $user_id = get_current_user_id();
 
-        $birthDate = !empty(get_user_meta(get_current_user_id(), 'billing_birth_date', true)) ? get_user_meta(get_current_user_id(), 'billing_birth_date', true) : '';
-
-        $verifiedUser = !empty(get_user_meta(get_current_user_id(), 'bpwp_verified_user', true)) ? get_user_meta(get_current_user_id(), 'bpwp_verified_user', true) : '';
+        $phone = !empty(get_user_meta($user_id, 'billing_phone', true)) ? get_user_meta($user_id, 'billing_phone', true) : '';
+        
+        $birthDate = !empty(get_user_meta($user_id, 'billing_birth_date', true)) ? get_user_meta($user_id, 'billing_birth_date', true) : '';
+        
+        $verifiedUser = !empty(get_user_meta($user_id, 'bpwp_verified_user', true)) ? get_user_meta($user_id, 'bpwp_verified_user', true) : '';
 
         $msg = '';
-
+        
         if (empty($phone)) {
-
-            $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполнить платежный адрес и телефон', 'bonus-plus-wp'));
+            
+            $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполните платежный адрес и телефон', 'bonus-plus-wp'));
+            $msg .= sprintf('<a href="%s">%s</a>', '/my-account/edit-address/billing/', __('Перейти к заполнению данных', 'bonus-plus-wp'));
         } else if (empty($birthDate)) {
-
+            
             $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполните дату рождения в платежном адресе', 'bonus-plus-wp'));
         } else if (empty($verifiedUser)) {
-
-            self::bpwp_render_verify_phone_form($phone);
+            // Делаем запрос в б+ по номеру телефона
+            self::bpwp_render_verify_phone_form($phone, $user_id);
         } else {
 
             printf('<h3>%s</h3>', __('text', 'bonus-plus-wp'));
@@ -275,30 +280,49 @@ class BPWPMyAccount
     /**
      *  Render verify phone form
      */
-    public static function bpwp_render_verify_phone_form($phone)
+    public static function bpwp_render_verify_phone_form($phone, $user_id)
     {
-?>
-        <div id="verify-phone-dialog">
+        $res = bpwp_api_request(
+            'customer',
+            array(
+                'phone' => $phone
+            ),
+            'GET'
+        );
+    
+        if ($res['code'] == 200){
+            // Обновляем мета пользователя
+            update_user_meta($user_id, 'bonus-plus', $res['request']);
+            $user_info = account_info();
+            
+            echo 'Выводим данные карты клиента';
+
+            self::bpwp_api_print_customer_card_info();
+
+        } else {
+        ?>
+
+            <div id="verify-phone-dialog">
+
+                <div hidden id="bpmsg" class="msg" style="display:none;"></div>
+
+            <!-- <div id="qrcode" style="display:none;"></div> -->
+
+            <div id='bpwp-registration'>
+                <p><?php echo __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?>
+                </p>
+                <!-- <button id="bpwpRegistration"><?php echo __('Создать учетную запись', 'bonus-plus-wp') ?></button> -->
+            </div>
 
             <div id="loader" class="center-body">
                 <div class="loader-ball-8"></div>
             </div>
 
-            <div hidden id="bpmsg" class="msg" style="display:none;"></div>
-
-            <!-- <div id="qrcode" style="display:none;"></div> -->
-
-            <div id='bpwp-registration' style="display:none;">
-                <p><?php echo __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?>
-                </p>
-                <button id="bpwpRegistration"><?php echo __('Создать учетную запись', 'bonus-plus-wp') ?></button>
-            </div>
-
-            <div id='bpwp-verify-start' style="display:none;">
+            <div id='bpwp-verify-start'>
                 <p><?php echo __('Подтвердите номер телефона', 'bonus-plus-wp') ?>
                     <strong><?php echo $phone ?></strong>
                 </p>
-                <button id="bpwpSendSms"><?php echo __('Отправить SMS c кодом подтверждения', 'bonus-plus-wp') ?></button>
+                <button id="bpwpSendSms" data-phone='<?php echo $phone ?>'><?php echo __('Отправить SMS c кодом подтверждения', 'bonus-plus-wp') ?></button>
             </div>
 
             <div id='bpwp-verify-end' style="display:none;">
@@ -309,8 +333,94 @@ class BPWPMyAccount
                 <button id="bpwpSendOtp"><?php echo __('Подтвердить номер телефона', 'bonus-plus-wp') ?></button>
             </div>
         </div>
+<?php }
+        
+        ?>
+
+        
 <?php
     }
+
+
+    /** Копипаста из BonusPlus */
+
+    /**
+	 * Register customer in BonusPlus by phone number and code
+	 */
+	public function register_by_phone_and_code() {
+		//self::verify_nonce( __FUNCTION__ );
+
+		$phone_number = isset( $_POST['phone_number'] ) ? wc_clean( wp_unslash( $_POST['phone_number'] ) ) : '';
+		$code         = isset( $_POST['code'] ) ? wc_clean( wp_unslash( $_POST['code'] ) ) : '';
+
+		try {
+			if ( empty( $phone_number ) || empty( $code ) ) {
+				throw new Exception( __( 'Phone number or code not provided', 'bonus-plus' ) );
+			}
+
+			bonus_plus()->api( 'code' )->check( $phone_number, $code );
+			bonus_plus()->api( 'customer' )->register_by_phone( $phone_number );
+
+			( new BPCustomer() )->set_registered_in_bp( $phone_number );
+
+			unset( $_SESSION[ $this->code_counter_session_key ] );
+			unset( $_SESSION[ $this->last_code_request_session_key ] );
+		} catch ( Exception $e ) {
+			bonus_plus()->log(
+				array(
+					$e->getMessage(),
+					$e->getCode(),
+				)
+			);
+
+			wp_send_json(
+				array(
+					'success' => false,
+					'message' => $e->getMessage(),
+				)
+			);
+		}
+
+		wp_send_json_success();
+	}
+
+
+    /**
+	 * Verify nonce in $_GET array
+	 *
+	 * @param string $function_name     function (action) name to verify. Use __FUNCTION__ to get right function name.
+	 * @param bool   $must_be_logged_in must the user be logged in.
+	 *
+	 * @return void
+	 */
+	public static function verify_nonce( string $function_name = '', bool $must_be_logged_in = false ) {
+		if ( $must_be_logged_in && ! is_user_logged_in() ) {
+			wp_die( esc_html__( 'You must be logged in', 'bonus-plus' ) );
+		}
+
+		$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ?? '' ) );
+
+		$verified = wp_verify_nonce( $nonce, static::get_action_name( $function_name ) );
+
+		if ( ! $verified ) {
+			wp_die( esc_html__( 'Action failed. Please try again.', 'bonus-plus' ) );
+		}
+	}
+
+
+
+
+
+
+    /*   End Копипаста из BonusPlus   */
+
+
+
+
+
+
+
+
 
     /**
      *  Добавим обязательное поле "Дата рождения" в платежный адрес
@@ -333,39 +443,39 @@ class BPWPMyAccount
      * AJAX Callback
      * Always Echos and Exits
      */
-    public static function bpwp_client_verify_phone_callback()
-    {
-        // Ensure we have the data we need to continue
-        if (!is_user_logged_in()) {
-            // If we don't - return custom error message and exit
-            header('HTTP/1.1 400 Empty POST Values');
-            wp_send_json('Could Not Verify POST Values.');
-            wp_die();
-        }
-        $user_id = get_current_user_id();
+    // public static function bpwp_client_verify_phone_callback()
+    // {
+    //     // Ensure we have the data we need to continue
+    //     if (!is_user_logged_in()) {
+    //         // If we don't - return custom error message and exit
+    //         header('HTTP/1.1 400 Empty POST Values');
+    //         wp_send_json('Could Not Verify POST Values.');
+    //         wp_die();
+    //     }
+    //     $user_id = get_current_user_id();
 
-        // if user already register, make verify phone request
-        $phone = bpwp_api_get_customer_phone($user_id);
+    //     // if user already register, make verify phone request
+    //     $phone = bpwp_api_get_customer_phone($user_id);
 
-        if (!empty($phone)) {
-            $res = bpwp_api_request(
-                'customer',
-                array(
-                    'phone' => $phone
-                ),
-                'GET'
-            );
-            if (!empty($res['request'])) {
-                $response = $res['request']['response'];
-                update_user_meta($user_id, 'bonus-plus', $res['request']);
-                $result = $res['request'];
-                // todo
-                // ... parse response data and return cardnumber
-                wp_send_json($res);
-                wp_die();
-            }
-        }
-    }
+    //     if (!empty($phone)) {
+    //         $res = bpwp_api_request(
+    //             'customer',
+    //             array(
+    //                 'phone' => $phone
+    //             ),
+    //             'GET'
+    //         );
+    //         if (!empty($res['request'])) {
+    //             $response = $res['request']['response'];
+    //             update_user_meta($user_id, 'bonus-plus', $res['request']);
+    //             $result = $res['request'];
+    //             // todo
+    //             // ... parse response data and return cardnumber
+    //             wp_send_json($res);
+    //             wp_die();
+    //         }
+    //     }
+    // }
 
     /**
      *  Return customer data for registration

@@ -262,16 +262,12 @@ class BPWPMyAccount
         
         if (empty($phone)) {
             
-            $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполните платежный адрес и телефон', 'bonus-plus-wp'));
+            $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста, заполните платежный адрес и телефон', 'bonus-plus-wp'));
             $msg .= sprintf('<a href="%s">%s</a>', '/my-account/edit-address/billing/', __('Перейти к заполнению данных', 'bonus-plus-wp'));
-        } else if (empty($birthDate)) {
-            
-            $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполните дату рождения в платежном адресе', 'bonus-plus-wp'));
         } else if (empty($verifiedUser)) {
             // Делаем запрос в б+ по номеру телефона
             self::bpwp_render_verify_phone_form($phone, $user_id);
         } else {
-
             printf('<h3>%s</h3>', __('text', 'bonus-plus-wp'));
         }
 

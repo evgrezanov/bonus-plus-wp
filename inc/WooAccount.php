@@ -384,7 +384,6 @@ class BPWPMyAccount
                 'fn'         => $firstName[0],
                 'ln'         => $lastName[0],
                 'desc'       => __('Регистрация на сайте', 'bonus-plus-wp'),
-                'birthDay'   => $newBDate,
             );
             //$registrationData['address']   = $billingPostcode . $billingCountry . $billingState . $billingCity . $address1 . $address2;
         }

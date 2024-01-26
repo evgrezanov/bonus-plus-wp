@@ -33,7 +33,6 @@ class BPWPMyAccount
         add_action('bpwp_veryfy_client_data', [__CLASS__, 'bpwp_api_render_customer_data']);
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_qrcode_scripts']);
         add_filter('bpwp_debug_phone_verify', '__return_true');
-        add_filter('woocommerce_billing_fields', [__CLASS__, 'bpwp_add_birth_date_billing_field'], 20, 1);
         if (wp_doing_ajax()) {
             add_action('wp_ajax_nopriv_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
             add_action('wp_ajax_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
@@ -249,8 +248,6 @@ class BPWPMyAccount
     {
         $phone = !empty(get_user_meta(get_current_user_id(), 'billing_phone', true)) ? get_user_meta(get_current_user_id(), 'billing_phone', true) : '';
 
-        $birthDate = !empty(get_user_meta(get_current_user_id(), 'billing_birth_date', true)) ? get_user_meta(get_current_user_id(), 'billing_birth_date', true) : '';
-
         $verifiedUser = !empty(get_user_meta(get_current_user_id(), 'bpwp_verified_user', true)) ? get_user_meta(get_current_user_id(), 'bpwp_verified_user', true) : '';
 
         $msg = '';
@@ -258,9 +255,6 @@ class BPWPMyAccount
         if (empty($phone)) {
 
             $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполнить платежный адрес и телефон', 'bonus-plus-wp'));
-        } else if (empty($birthDate)) {
-
-            $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполните дату рождения в платежном адресе', 'bonus-plus-wp'));
         } else if (empty($verifiedUser)) {
 
             self::bpwp_render_verify_phone_form($phone);
@@ -310,23 +304,6 @@ class BPWPMyAccount
             </div>
         </div>
 <?php
-    }
-
-    /**
-     *  Добавим обязательное поле "Дата рождения" в платежный адрес
-     */
-    public static function bpwp_add_birth_date_billing_field($billing_fields)
-    {
-        $billing_fields['billing_birth_date'] = array(
-            'type'        => 'date',
-            'label'       => __('Дата рождения', 'bonus-plus-wp'),
-            'class'       => array('form-row-wide'),
-            'priority'    => 25,
-            'required'    => false,
-            'clear'       => true,
-        );
-
-        return $billing_fields;
     }
 
     /**
@@ -388,17 +365,10 @@ class BPWPMyAccount
         //$billingCountry = !empty($customer['billing_country']) ? $customer['billing_country'] : '-';
         $billingEmail = !empty($customer['billing_email']) ? $customer['billing_email'] : '-';
         $billingPhone = !empty($customer['billing_phone']) ? $customer['billing_phone'] : '-';
-        // ДД.ММ.ГГГГ 
-        if (isset($customer['billing_birth_date'])) {
-            $originalBDate = $customer['billing_birth_date'][0];
-            $newBDate = date("d.m.Y", strtotime($originalBDate));
-        } else {
-            $newBDate = '';
-        }
 
         $registrationData = array();
 
-        if ($firstName && $lastName && $newBDate && $billingEmail && $billingPhone) {
+        if ($firstName && $lastName && $billingEmail && $billingPhone) {
             /*
             $registrationData['phone']      = $billingPhone;
             $registrationData['email']      = $billingEmail;

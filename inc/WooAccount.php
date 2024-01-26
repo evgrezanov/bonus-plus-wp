@@ -97,6 +97,7 @@ class BPWPMyAccount
      */
     public static function bpwp_api_print_customer_card_info()
     {
+        echo '<div id="loader" class="center-body"><div class="loader-ball-8"></div></div>';
         // get data
         $info = bpwp_api_get_customer_data();
         if ($info && is_array($info)) {
@@ -105,7 +106,7 @@ class BPWPMyAccount
             if (isset($_REQUEST['bpwp-debug']) && !empty($_REQUEST['bpwp-debug'])) {
                 $is_debug = sanitize_text_field($_REQUEST['bpwp-debug']);
             }
-
+            
             // not debug
             if (empty($is_debug)) {
                 printf('<h2>%s</h2>', 'Информация по карте лояльности');
@@ -314,9 +315,9 @@ class BPWPMyAccount
                 <!-- <button id="bpwpRegistration"><?php echo __('Создать учетную запись', 'bonus-plus-wp') ?></button> -->
             </div>
 
-            <div id="loader" class="center-body">
+            <!-- <div id="loader" class="center-body">
                 <div class="loader-ball-8"></div>
-            </div>
+            </div> -->
 
             <div id='bpwp-verify-start'>
                 <p><?php echo __('Подтвердите номер телефона', 'bonus-plus-wp') ?>

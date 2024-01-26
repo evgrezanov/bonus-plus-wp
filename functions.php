@@ -68,8 +68,8 @@ function bpwp_api_request($endpoint, $params, $type)
     }
     
     $args['headers']['Content-Length'] = strlen( $args['body'] ?: '' ); // Добавим Content-Length. Важно, если body пустой
-    // do_action('logger', $url);
-    // do_action('logger', $args);
+    do_action('logger', $url);
+    do_action('logger', $args);
 
     $request = wp_remote_request($url, $args);
 
@@ -83,15 +83,16 @@ function bpwp_api_request($endpoint, $params, $type)
     }
 
     $response['code'] = $response_code;
-    $response['message'] = bpwp_api_get_error_msg($response_code);
+    //$response['message'] = bpwp_api_get_error_msg($response_code);
 
-    if (!in_array($response_code, [200, 204])){
-        $response['request'] = $request;
-        $response['class'] = 'notice notice-warning';
-    } else {
-        $response['request'] = json_decode($request['body'], true);
-        $response['class'] = 'notice notice-success';
-    }
+    $response['request'] = $request;
+    // if (!in_array($response_code, [200, 204])){
+    //     $response['request'] = $request;
+    //     $response['class'] = 'notice notice-warning';
+    // } else {
+    //     $response['request'] = json_decode($request['body'], true);
+    //     $response['class'] = 'notice notice-success';
+    // }
 
     return $response;
 }
@@ -257,10 +258,10 @@ function bpwp_customer_endpoints() {
         'callback' => 'bpwp_customer_sendcode',
         //'permission_callback' => '__return_true', // разрешить все
         'permission_callback' => 'verify_wp_nonce', // разрешить все
-        //'permission_callback' => function($request) { // Функция проверки nonce
-            // $nonce = $request->get_header('x_wp_nonce');
-            // return wp_verify_nonce($nonce, 'wp_rest');
-        //}
+        // 'permission_callback' => function($request) { // Функция проверки nonce
+        //     $nonce = $request->get_header('x_wp_nonce');
+        //     return wp_verify_nonce($nonce, 'wp_rest');
+        // }
     ));
 
     register_rest_route('wp/v1', '/checkcode', array(
@@ -301,7 +302,6 @@ function bpwp_customer_sendcode(WP_REST_Request $request) {
     //$phone = '79278921123';
 
     // Написать правильный запрос
-    /*
     $res = bpwp_api_request(
         'customer/'.$phone.'/sendCode',
         array(),
@@ -313,9 +313,8 @@ function bpwp_customer_sendcode(WP_REST_Request $request) {
 
     do_action('logger', $res, 'error');
 
-    */
-
-    // if ($res['code'] == 200){
+    // 204 - success
+    // if ($res['code'] == 204){
     //     $message = 'Код отправлен!';
     // } else {
     //     wp_send_json(
@@ -362,6 +361,18 @@ function bpwp_customer_checkcode(WP_REST_Request $request) {
 
     do_action('logger', $res, 'error');
 
+    //TODO: POST /customer
+    // Если 204 - успех создаем клиента: запрос POST /customer, phone обязательно
+    /* сначала проверим??
+    сделаем сразу клиента в б+
+    $res = bpwp_api_request(
+        'customer/'. $phone,
+        array(),
+        'POST'
+    );
+    
+    */
+    // 412 - ошибка по разным причинам, обработать. получить message из msg
     // if ($res['code'] == 200){
     //     $message = 'Код отправлен!';
     // } else {

@@ -1,32 +1,31 @@
-jQuery( 'document' ).ready( function( $ ) {
+jQuery(document).ready(function () {
 
     window.onload = function() {
         
         hide(document.getElementById("loader"));
         
-        document.getElementById("bpwpSendSms").addEventListener("click", function() {
-            // Получаем телефон и отправлем запрос - на этот номер код в SMS
-            const phoneCustomer = this.getAttribute('data-phone');
-            bonusPlusWp.bp_send_sms(phoneCustomer);
-        });
-
+        if (typeof document.getElementById("qrcode") !== 'undefined' && document.getElementById("qrcode") != null){
         const cardNumber = document.getElementById("qrcode").getAttribute('data-cardnumber');
-
-        console.log(cardNumber);
-        if (cardNumber) {
-            bonusPlusWp.qrcode_render;
+        bonusPlusWp.qrcode_render(cardNumber);
         }
-
+        const accountContent = document.querySelector('.woocommerce-MyAccount-content')
+        
+        
+        // Добавляем слушатель клика на родительский элемент
+        accountContent.addEventListener('click', function(event) {
+        
+            // Проверяем, является ли целевой элемент нужным нам элементом
+            if (event.target.matches('#bpwpSendSms')) {
+                // Действия, которые нужно выполнить при клике на нужном элементе
+                // Получаем телефон и отправлем запрос - на этот номер код в SMS
+                const phoneCustomer = this.getAttribute('data-phone');
+                bonusPlusWp.bp_send_sms(phoneCustomer);
+            }
+        });
     }
-
 
 });
 
-    /**
-    *  hide dom element
-    * 
-    * @param {*} elements 
-    */
     function hide(elements) {
         elements = elements.length ? elements : [elements];
         for (var index = 0; index < elements.length; index++) {
@@ -34,11 +33,6 @@ jQuery( 'document' ).ready( function( $ ) {
         }
     }
 
-    /**
-    *  Show dom element
-    * 
-    * @param {*} elements 
-    */
     function show(elements) {
         elements = elements.length ? elements : [elements];
         for (var index = 0; index < elements.length; index++) {
@@ -71,7 +65,7 @@ jQuery( 'document' ).ready( function( $ ) {
                     hide(document.getElementById("loader"));
                 }
             } )
-            .success( function( response ) {
+            .done( function( response ) {
                 console.log( response );
                 if (response.success) {
                 show(document.getElementById("bpwp-verify-end"));
@@ -97,7 +91,7 @@ jQuery( 'document' ).ready( function( $ ) {
                     
                 }
             })
-            .error( function(error){ // ??
+            .fail( function(error){
                 console.log( 'Request error!');
                 console.log(error) 
             });
@@ -132,39 +126,34 @@ jQuery( 'document' ).ready( function( $ ) {
                     hide(document.getElementById("loader"));
                 }
             } )
-            .success( function( response ) {
+            .done( function( response ) {
                 console.log( response );
                 document.getElementById('bpmsg').innerHTML = 'Подтверждено!';
                 show(document.getElementById('bpmsg'));
-                hide(document.getElementById("loader"));
                 
                 // Вывести данные карты response.userdata
 
                 // Показать QR код
                 //bonusPlusWp.qrcode_render(response.cardnumber);
 
-                const qrcodeElement = document.getElementById('qrcode');
-                let dataCardValue = qrcodeElement.dataset.card;
-                if (dataCardValue != '') {
-                    let qrcode = new QRCode(qrcodeElement, {
-                        text: dataCardValue,
-                        width: 147,
-                        height: 147,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                }
+                // const qrcodeElement = document.getElementById('qrcode');
+                // let dataCardValue = qrcodeElement.dataset.card;
+                // if (dataCardValue != '') {
+                //     let qrcode = new QRCode(qrcodeElement, {
+                //         text: dataCardValue,
+                //         width: 147,
+                //         height: 147,
+                //         colorDark: "#000000",
+                //         colorLight: "#ffffff",
+                //         correctLevel: QRCode.CorrectLevel.H
+                //     });
+                // }
                 
             })
             .fail( function( data ) {
                 console.log(data);
                 console.log('Customer data updated request FAILED: ' + data.statusText);
             })
-            .error( function(error){ 
-                console.log( 'Request error!');
-                console.log(error) 
-            });
 
         },
 

@@ -40,7 +40,7 @@ function bpwp_api_request($endpoint, $params, $type)
                 'Content-Type'  => 'application/json',
                 'Authorization' => 'ApiKey ' . $token,
             ),
-            'body'        => $params,
+            'body'        => wp_json_encode($params),
         );
     }
 
@@ -54,6 +54,7 @@ function bpwp_api_request($endpoint, $params, $type)
             ),
             'body'        => $params,
         );
+        $args['headers']['Content-Length'] = strlen( $args['body'] ?: '' ); // Добавим Content-Length. Важно, если body пустой
     }
     
     if ($type == 'PATCH') {
@@ -67,10 +68,9 @@ function bpwp_api_request($endpoint, $params, $type)
         );
     }
     
-    $args['headers']['Content-Length'] = strlen( $args['body'] ?: '' ); // Добавим Content-Length. Важно, если body пустой
     do_action('logger', $url);
-    do_action('logger', $args);
-
+    do_action('logger', $args,'warning');
+    
     $request = wp_remote_request($url, $args);
 
     $response_code = wp_remote_retrieve_response_code($request);
@@ -85,14 +85,13 @@ function bpwp_api_request($endpoint, $params, $type)
     $response['code'] = $response_code;
     //$response['message'] = bpwp_api_get_error_msg($response_code);
 
-    $response['request'] = $request;
-    // if (!in_array($response_code, [200, 204])){
-    //     $response['request'] = $request;
-    //     $response['class'] = 'notice notice-warning';
-    // } else {
-    //     $response['request'] = json_decode($request['body'], true);
-    //     $response['class'] = 'notice notice-success';
-    // }
+    if (!in_array($response_code, [200, 204])){
+        $response['request'] = $request;
+        $response['class'] = 'notice notice-warning';
+    } else {
+        $response['request'] = json_decode($request['body'], true);
+        $response['class'] = 'notice notice-success';
+    }
 
     return $response;
 }
@@ -159,9 +158,6 @@ function bpwp_api_get_error_msg($code)
 
     return $code && key_exists($code, $errors) ? $errors[$code] : false;
 }
-
-
-
 
 /* Редактируем поля на странице оформления заказа 
 ** Отключаем ненужные поля в форме заказа
@@ -257,11 +253,8 @@ function bpwp_customer_endpoints() {
         'methods' => 'POST',
         'callback' => 'bpwp_customer_sendcode',
         //'permission_callback' => '__return_true', // разрешить все
-        'permission_callback' => 'verify_wp_nonce', // разрешить все
-        // 'permission_callback' => function($request) { // Функция проверки nonce
-        //     $nonce = $request->get_header('x_wp_nonce');
-        //     return wp_verify_nonce($nonce, 'wp_rest');
-        // }
+        'permission_callback' => 'verify_wp_nonce',
+        
     ));
 
     register_rest_route('wp/v1', '/checkcode', array(
@@ -277,7 +270,19 @@ function bpwp_customer_endpoints() {
                 'type' => 'integer',
                 'required' => true,
                 'sanitize_callback' => 'sanitize_text_field'
-                //'sanitize_callback' => 'absint'
+            )
+        ),
+        'permission_callback' => 'verify_wp_nonce',
+    ));
+
+    register_rest_route('wp/v1', '/customercreate', array(
+        'methods' => 'POST',
+        'callback' => 'bpwp_customer_create',
+        'args' => array(
+            'phone' => array(
+                'type' => 'string',
+                'required' => true,
+                'sanitize_callback' => 'sanitize_text_field'
             )
         ),
         'permission_callback' => 'verify_wp_nonce',
@@ -287,8 +292,61 @@ function bpwp_customer_endpoints() {
 
 function verify_wp_nonce($request) {
 		$nonce = $request->get_header('X-WP-Nonce');
+        // $check =  wp_verify_nonce($nonce, 'wp_rest');
+        // do_action('logger', $check);
         return wp_verify_nonce($nonce, 'wp_rest');
-	}
+}
+
+function bpwp_customer_create(WP_REST_Request $request) {
+
+    $phone = $request->get_param( 'phone' );
+
+    // if (is_user_logged_in()) {
+    //     $user_id = get_current_user_id();
+    // }
+
+    // $phone = bpwp_api_get_customer_phone($user_id); // Получаем тот же телефон у пользователя.
+    
+    // // Написать правильный запрос
+    $customer = bpwp_api_request(
+        'customer',
+        array(
+            'phone' => $phone,
+        ),
+        'POST'
+    );
+
+    do_action('logger', $customer, 'error');
+
+    // 204 - success
+    /*
+    if ($res['code'] == 200){
+        $response = array(
+            'success' => true,
+            'message' => 'Код отправлен',
+        );
+    } else {
+        wp_send_json(
+            array(
+                'success' => false,
+                'message' => 'Код не отправлен!',
+            )
+        );
+        wp_die();
+    }
+    */
+
+    wp_send_json(
+        array(
+            'success' => true,
+            'message' => 'Пользователь добавлен!',
+        )
+    );
+    wp_die();
+
+    //wp_send_json($response);
+    //wp_die();
+}
 
 // Отправляет проверочный код на номер телефона клиента посредством смс-сообщения
 function bpwp_customer_sendcode(WP_REST_Request $request) {
@@ -297,51 +355,37 @@ function bpwp_customer_sendcode(WP_REST_Request $request) {
         $user_id = get_current_user_id();
     }
 
-    $phone = bpwp_api_get_customer_phone($user_id); // Получаем тот же телефон из у пользователя.
+    $phone = bpwp_api_get_customer_phone($user_id); // Получаем тот же телефон у пользователя.
     
-    //$phone = '79278921123';
-
     // Написать правильный запрос
     $res = bpwp_api_request(
         'customer/'.$phone.'/sendCode',
         array(),
-        // array(
-        //     'phone' => $phone
-        // ),
         'PUT'
     );
 
-    do_action('logger', $res, 'error');
-
     // 204 - success
-    // if ($res['code'] == 204){
-    //     $message = 'Код отправлен!';
-    // } else {
-    //     wp_send_json(
-    //         array(
-    //             'success' => false,
-    //             'message' => 'Код не отправлен!',
-    //         )
-    //     );
-    //     wp_die();
-    // }
-
-    wp_send_json(
-        array(
+    if ($res['code'] == 204){
+        $response = array(
             'success' => true,
             'message' => 'Код отправлен',
-        )
-    );
+        );
+    } else {
+        wp_send_json(
+            array(
+                'success' => false,
+                'message' => 'Код не отправлен!',
+            )
+        );
+        wp_die();
+    }
+
+    wp_send_json($response);
     wp_die();
 }
 
-
 // Проверяет код, отправленный на номер телефона клиента
 function bpwp_customer_checkcode(WP_REST_Request $request) {
-    
-    if (is_user_logged_in()) {
-        $user_id = get_current_user_id();
-    }
 
     // ? Проверить, если нет телефона и кода, то возвращаем ошибку
     $args = array(
@@ -349,48 +393,46 @@ function bpwp_customer_checkcode(WP_REST_Request $request) {
         'code' => $request->get_param( 'code' )
     );
     
-    $phone = bpwp_api_get_customer_phone($user_id); // Получаем тот же телефон из у пользователя.
-    
-    //Написать правильный запрос
-    //customer/$phone/checkCode/$code
+    // customer/$phone/checkCode/$code
     $res = bpwp_api_request(
-        'customer/'. $phone .'/checkCode/'. $args['code'],
+        'customer/'. $args['phone'] .'/checkCode/'. $args['code'],
         array(),
         'PUT'
     );
 
-    do_action('logger', $res, 'error');
-
-    //TODO: POST /customer
-    // Если 204 - успех создаем клиента: запрос POST /customer, phone обязательно
-    /* сначала проверим??
-    сделаем сразу клиента в б+
-    $res = bpwp_api_request(
-        'customer/'. $phone,
-        array(),
-        'POST'
-    );
-    
-    */
-    // 412 - ошибка по разным причинам, обработать. получить message из msg
-    // if ($res['code'] == 200){
-    //     $message = 'Код отправлен!';
-    // } else {
-    //     wp_send_json(
-    //         array(
-    //             'success' => false,
-    //             'message' => 'Код не отправлен!',
-    //         )
-    //     );
-    //     wp_die();
-    // }
-
-    wp_send_json(
-        array(
+    if ($res['code'] == 204){
+        $response = array(
             'success' => true,
-            'message' => 'Код верен',
-        )
-    );
+            'message' => 'Код принят',
+        );
+        
+        // TODO: Добавить запрос проверки существования пользвателя в б+
+        // Если 204 - успех, создаем клиента: запрос POST /customer, phone обязательно
+        // $customer = bpwp_api_request(
+        //     'customer',
+        //     array(
+        //         'phone' => $args['phone']
+        //     ),
+        //     'POST'
+        // );
+
+        //do_action('logger', $customer);
+        
+        // $customer_info_html = bpwp_api_get_customer_phone();
+        // do_action('logger', $customer_info_html, 'warning');
+
+    // 412 - ошибка по разным причинам, обработать. получить message из msg
+    } else {
+        wp_send_json(
+            array(
+                'success' => false,
+                'message' => 'Код не верный!',
+            )
+        );
+        wp_die();
+    }
+
+    wp_send_json($response);
     wp_die();
 }
 
@@ -431,20 +473,18 @@ function bpwp_endpoint_get_customer() {
         // Обновляем мета пользователя
         update_user_meta($user_id, 'bonus-plus', $res['request']);
         $user_info = account_info();
-        // do_action('logger', $user_info);
-        
     } else {
-
-        echo 'Регистрация в системе';
-        // TODO: Отправка SMS
-        // Пишеем Ендпоинт для СМС, а функуию испльзуем сразу
-        // $user_info =
-        do_action(
-            'bpwp_logger',
-            $type = __CLASS__,
-            $title = __('Ошибка при получении данных клиента', 'bonus-plus-wp'),
-            $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
-        ); 
+        $user_info = '';
+        // echo 'Регистрация в системе';
+        // // TODO: Отправка SMS
+        // // Пишеем Ендпоинт для СМС, а функуию испльзуем сразу
+        // // $user_info =
+        // do_action(
+        //     'bpwp_logger',
+        //     $type = __CLASS__,
+        //     $title = __('Ошибка при получении данных клиента', 'bonus-plus-wp'),
+        //     $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
+        // ); 
     }
     
 
@@ -456,18 +496,6 @@ function bpwp_endpoint_get_customer() {
     //return wp_json_encode($res);
     return ($user_info); // возвращаяем HTML
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 function account_info()
 {

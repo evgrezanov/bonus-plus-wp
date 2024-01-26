@@ -18,7 +18,8 @@ jQuery(document).ready(function () {
             if (event.target.matches('#bpwpSendSms')) {
                 // Действия, которые нужно выполнить при клике на нужном элементе
                 // Получаем телефон и отправлем запрос - на этот номер код в SMS
-                const phoneCustomer = this.getAttribute('data-phone');
+                const phoneCustomer = event.target.getAttribute('data-phone');
+                console.log(phoneCustomer);
                 bonusPlusWp.bp_send_sms(phoneCustomer);
             }
         });
@@ -76,6 +77,7 @@ jQuery(document).ready(function () {
                     if (typeof otpInput !== 'undefined' && otpInput != null){
                         code = otpInput.value;
                         if (code != null){
+                            console.log(phoneCustomer);
                             bonusPlusWp.bp_check_code(phoneCustomer, code);
                         }
                     }
@@ -105,8 +107,6 @@ jQuery(document).ready(function () {
                 code: code,
             };
 
-            console.log(data);
-
             jQuery.ajax( {
                 url: wpApiSettings.root + 'wp/v1/checkcode',
                 method: 'POST',
@@ -128,8 +128,17 @@ jQuery(document).ready(function () {
             } )
             .done( function( response ) {
                 console.log( response );
+                if (response.success) {
                 document.getElementById('bpmsg').innerHTML = 'Подтверждено!';
                 show(document.getElementById('bpmsg'));
+                bonusPlusWp.bp_customer_create(phoneCustomer);
+                
+            } else {
+                document.getElementById('bpmsg').innerHTML = 'Код не верный, попробуйте еще раз';
+                hide(document.getElementById("bpwp-verify-start"));
+                show(document.getElementById("loader"));            
+                document.getElementById("bpwpSendSms").disabled = false;
+                }
                 
                 // Вывести данные карты response.userdata
 
@@ -149,6 +158,55 @@ jQuery(document).ready(function () {
                 //     });
                 // }
                 
+            })
+            .fail( function( data ) {
+                console.log(data);
+                console.log('Customer data updated request FAILED: ' + data.statusText);
+            })
+
+        },
+
+        // Отправка запроса - добавление пользователя 
+        bp_customer_create: async function(phoneCustomer, code){
+            const data = {
+                // Здесь добавьте данные, которые хотите передать
+                phone: phoneCustomer,
+            };
+
+            console.log(data);
+
+            jQuery.ajax( {
+                url: wpApiSettings.root + 'wp/v1/customercreate',
+                method: 'POST',
+                data: {                         
+                    phone : phoneCustomer,
+                },
+                beforeSend: function ( xhr ) {
+                    // Показываем лоадер
+                    show(document.getElementById("loader"));            
+                    //document.getElementById("bpwpSendOtp").disabled = true;
+                    
+                    xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce);
+                },
+                complete: function () {
+                    // Прячем лоадер или удаляем его из DOM
+                    hide(document.getElementById("loader"));
+                }
+            } )
+            .done( function( response ) {
+                console.log( response );
+                if (response.success) {
+                document.getElementById('bpmsg').innerHTML = 'Добавлен!';
+                show(document.getElementById('bpmsg'));
+
+            } else {
+                document.getElementById('bpmsg').innerHTML = 'Код не верный, попробуйте еще раз';
+                hide(document.getElementById("bpwp-verify-start"));
+                show(document.getElementById("loader"));            
+                document.getElementById("bpwpSendSms").disabled = false;
+                }
+                
+                // Вывести данные карты response.userdata
             })
             .fail( function( data ) {
                 console.log(data);

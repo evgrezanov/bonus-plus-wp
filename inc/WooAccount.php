@@ -254,7 +254,8 @@ class BPWPMyAccount
 
         if (empty($phone)) {
 
-            $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста заполнить платежный адрес и телефон', 'bonus-plus-wp'));
+            $msg .= sprintf('<h3>%s</h3>', __('Пожалуйста, заполните платежный адрес и телефон', 'bonus-plus-wp'));
+            $msg .= sprintf('<a href="%s">%s</a>', '/my-account/edit-address/billing/', __('Перейти к заполнению данных', 'bonus-plus-wp'));
         } else if (empty($verifiedUser)) {
 
             self::bpwp_render_verify_phone_form($phone);

@@ -15,6 +15,7 @@ class BPWPProfile
         add_action('init', [__CLASS__, 'bpwp_api_bonus_card_shortcode_init']);
         add_action('wp_login', [__CLASS__, 'bpwp_customer_login'], 10, 2);
         add_filter('bpwp_replace_customer_card_desc', [__CLASS__, 'bpwp_replace_customer_card_desc'], 10, 2);
+        //add_action('woocommerce_customer_save_address', [__CLASS__, 'bpwp_remove_user_meta_on_address_change'], 10, 2);
     }
 
     /**
@@ -236,6 +237,25 @@ class BPWPProfile
                 $desc = str_replace($key, $data[$key], $desc);
             }
         }
+    }
+    
+    /**
+     * Обновление метаданных Бонус+ при сохранении адреса из личного кабинета пользователя
+     * 
+     *  @param int    $user_id      User ID being saved.
+     *  @param string $address_type Type of address; 'billing' or 'shipping'.
+     *
+     * @return void
+     * 
+     */
+    public static function bpwp_remove_user_meta_on_address_change( $user_id, $load_address ){
+        if ( ! is_user_logged_in() ) return;
+
+        if ( $load_address !== 'billing') return;
+
+        $user = get_user_by_id($user_id);
+
+        self::bpwp_customer_login($user->user_login, $user);
     }
 }
 BPWPProfile::init();

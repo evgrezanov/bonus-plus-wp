@@ -94,6 +94,7 @@ PHP Рекомендуем 8.0 и выше
 
 ## 2.8
 - убрали поле дата рождения из личного кабинета https://github.com/evgrezanov/bonus-plus-wp/issues/58
+- удаляем мету с данными бонус+ при сохранении платежного адреса https://github.com/evgrezanov/bonus-plus-wp/issues/57
 
 ## 2.7
 - устранение бага с экспортом товаров и категорий https://github.com/evgrezanov/bonus-plus-wp/issues/50

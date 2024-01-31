@@ -78,7 +78,7 @@ class BPWPCustomerBalance
             
             // Добавим Скидку
 			$item_id = wc_add_order_item( $order_id, array(
-				'order_item_name' => 'Списание бонусов',
+				'order_item_name' => 'Списание бонусов _completed',
 				'order_item_type' => 'fee'
 				) );
 				

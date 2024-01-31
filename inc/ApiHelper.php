@@ -18,6 +18,10 @@ class BPWPApiHelper
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_short_description', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10, 1);
+
+        //TODO: Хук срабатывает два раза. Найти другой хук для чекаута
+        // Сначала просто вывести в чекауте, потом в competed - добавить fee
+        //add_filter( 'woocommerce_review_order_after_order_total', array( $this, 'add_earned_bonuses_to_order_review' ), 100, 1 );
         add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
 
     }
@@ -35,6 +39,7 @@ class BPWPApiHelper
             $taxable = true;
             $tax_class = 'bpwp-bonuses-reserved';
         
+            // TODO: ? Делать это после успешно выполнено
             WC()->cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
 
         }

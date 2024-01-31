@@ -242,6 +242,8 @@ function custom_override_checkout_fields($fields)
 	return $fields;
 }
 
+
+// TODO: перенести в WooAccount.php
 //add_action('rest_api_init', 'bpwp_register_get_customer_endpoint', 10);
 add_action('rest_api_init', 'bpwp_customer_endpoints', 20);
 

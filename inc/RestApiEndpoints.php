@@ -63,11 +63,8 @@ class BPWPRestApiEndpoints
     public function verify_wp_nonce($request)
     {
         $nonce = $request->get_header('X-WP-Nonce');
-        // $check =  wp_verify_nonce($nonce, 'wp_rest');
-        // do_action('logger', $check);
         return wp_verify_nonce($nonce, 'wp_rest');
     }
-
 
     // Отправляет проверочный код на номер телефона клиента посредством смс-сообщения
     public function bpwp_customer_sendcode(\WP_REST_Request $request)
@@ -84,8 +81,6 @@ class BPWPRestApiEndpoints
             array(),
             'PUT'
         );
-
-        $res['code'] = 204;
 
         // 204 - success
         if ($res['code'] == 204) {
@@ -110,6 +105,9 @@ class BPWPRestApiEndpoints
     // Проверяет код, отправленный на номер телефона клиента
     public function bpwp_customer_checkcode(\WP_REST_Request $request)
     {
+        if (is_user_logged_in()) {
+            $user_id = get_current_user_id();
+        }
 
         // ? Проверить, если нет телефона и кода, то возвращаем ошибку
         $args = array(
@@ -123,15 +121,15 @@ class BPWPRestApiEndpoints
             array(),
             'PUT'
         );
-
+        
+        // Если 204 - успех, создаем клиента: запрос POST /customer, phone обязательно
         if ($res['code'] == 204) {
             $response = array(
                 'success' => true,
                 'message' => 'Код принят',
             );
-
+            
             // TODO: Добавить запрос проверки существования пользвателя в б+
-            // Если 204 - успех, создаем клиента: запрос POST /customer, phone обязательно
             $customer = bpwp_api_request(
                 'customer',
                 array(
@@ -143,17 +141,23 @@ class BPWPRestApiEndpoints
             do_action('logger', $customer);
 
             if ($customer['code'] == 200) {
+                update_user_meta($user_id, 'bonus-plus', $customer['request']);
+                
                 $response = array(
                     'success' => true,
                     'message' => 'Пользователь добавлен',
+                    'customer_created' => true, // проверим и редиректим на /my-account/bonus-plus/
                 );
-
-
-                $customer_info_html = bpwp_api_get_customer_phone();
-                do_action('logger', $customer_info_html, 'warning');
+            } else {
+                do_action(
+                    'bpwp_logger',
+                    $type = __CLASS__,
+                    $title = __('Ошибка при получении данных клиента', 'bonus-plus-wp'),
+                    $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
+                ); 
             }
 
-            // 412 - ошибка по разным причинам, обработать. получить message из msg
+        // 412 - ошибка по разным причинам, обработать. получить message из msg
         } else {
             wp_send_json(
                 array(

@@ -134,12 +134,11 @@ jQuery(document).ready(function () {
             } )
             .done( function( response ) {
                 console.log( response );
-                if (response.success) {
-                document.getElementById('bpmsg').innerHTML = 'Подтверждено!';
-                show(document.getElementById('bpmsg'));
+                if (response.success && response.customer_created) {
                 hide(document.getElementById("bpwp-registration"));
-                // bonusPlusWp.bp_customer_create(phoneCustomer);
-                
+                document.getElementById('bpmsg').innerHTML = 'Подтверждено, сейчас вы будете перенаправлены!';
+                show(document.getElementById('bpmsg'));
+                window.location.href = '/my-account/bonus-plus/';
             } else {
                 document.getElementById('bpmsg').innerHTML = 'Код не верный, попробуйте еще раз';
                 hide(document.getElementById("bpwp-verify-start"));

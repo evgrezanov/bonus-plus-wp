@@ -252,10 +252,10 @@ class BPWPProfile
         if ( ! is_user_logged_in() ) return;
 
         if ( $load_address !== 'billing') return;
-
+        // TODO: Если есть мета и тел bonus-plus['phone] и billing_phone не совпадают, то чистим мета
         $user = get_user_by_id($user_id);
 
-        self::bpwp_customer_login($user->user_login, $user);
+        //self::bpwp_customer_login($user->user_login, $user);
     }
 }
 BPWPProfile::init();

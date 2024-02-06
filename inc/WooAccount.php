@@ -33,10 +33,10 @@ class BPWPMyAccount
         add_action('bpwp_veryfy_client_data', [__CLASS__, 'bpwp_api_render_customer_data']);
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_qrcode_scripts']);
         add_filter('bpwp_debug_phone_verify', '__return_true');
-        if (wp_doing_ajax()) {
-            add_action('wp_ajax_nopriv_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
-            add_action('wp_ajax_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
-        }
+        // if (wp_doing_ajax()) {
+        //     add_action('wp_ajax_nopriv_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
+        //     add_action('wp_ajax_bpwp_cv', [__CLASS__, 'bpwp_client_verify_phone_callback']);
+        // }
     }
 
     /**
@@ -109,9 +109,11 @@ class BPWPMyAccount
             if (empty($is_debug)) {
                 printf('<h2>%s</h2>', 'Информация по карте лояльности');
 
+                echo '<div id="loader" class="center-body"><div class="loader-ball-8"></div></div>';
+
                 //do_action('bpwp_after_bonus_card_info_title');
 
-                echo '<br><div id="qrcode"></div><br>';
+                echo '<br><div id="qrcode" data-cardnumber="'. $info['discountCardNumber'] .'"></div><br>';
 
                 foreach ($info as $key => $value) {
                     if ($key != 'person') {
@@ -181,21 +183,21 @@ class BPWPMyAccount
         if (!is_user_logged_in()) {
             return;
         }
-        $customerData = bpwp_api_get_customer_data();
-        $cardNumber = !empty($customerData['discountCardNumber']) ? $customerData['discountCardNumber'] : '';
-        //$clientInfo = [];
-        $apiKey = '';
-        $sendSmsUri = '';
-        $sendOtpUri = '';
-        $registrationUri = '';
+        // $customerData = bpwp_api_get_customer_data();
+        // $cardNumber = !empty($customerData['discountCardNumber']) ? $customerData['discountCardNumber'] : '';
+        // //$clientInfo = [];
+        // $apiKey = '';
+        // $sendSmsUri = '';
+        // $sendOtpUri = '';
+        // $registrationUri = '';
 
-        if (!empty($phone = get_user_meta(get_current_user_id(), 'billing_phone', true))) {
-            $apiKey = base64_encode(esc_attr(get_option('bpwp_api_key')));
-            $sendSmsUri = sprintf('https://bonusplus.pro/api/customer/%s/sendCode/', $phone);
-            $sendOtpUri = sprintf('https://bonusplus.pro/api/customer/%s/checkCode/', $phone);
-            $registrationUri = 'https://bonusplus.pro/api/customer/';
-            //$clientInfo = self::bpwp_get_client_registration_data(get_current_user_id());
-        }
+        // if (!empty($phone = get_user_meta(get_current_user_id(), 'billing_phone', true))) {
+        //     $apiKey = base64_encode(esc_attr(get_option('bpwp_api_key')));
+        //     $sendSmsUri = sprintf('https://bonusplus.pro/api/customer/%s/sendCode/', $phone);
+        //     $sendOtpUri = sprintf('https://bonusplus.pro/api/customer/%s/checkCode/', $phone);
+        //     $registrationUri = 'https://bonusplus.pro/api/customer/';
+        //     //$clientInfo = self::bpwp_get_client_registration_data(get_current_user_id());
+        // }
 
         wp_enqueue_script(
             'qrcodejs',
@@ -205,13 +207,13 @@ class BPWPMyAccount
             'in_footer'
         );
 
-        wp_enqueue_script(
-            'accountjs',
-            plugins_url('/assets/account.js', __DIR__),
-            ['qrcodejs', 'jquery'],
-            BPWP_PLUGIN_VERSION,
-            'in_footer'
-        );
+        // wp_enqueue_script(
+        //     'accountjs',
+        //     plugins_url('/assets/account.js', __DIR__),
+        //     ['qrcodejs', 'jquery'],
+        //     BPWP_PLUGIN_VERSION,
+        //     'in_footer'
+        // );
 
         wp_enqueue_script(
             'customerjs',
@@ -223,21 +225,21 @@ class BPWPMyAccount
 
         wp_enqueue_script( 'wp-api' );
 
-        wp_localize_script(
-            'accountjs',
-            'accountBonusPlusData',
-            array(
-                'auth'              => esc_attr($apiKey),
-                'sendSmsUri'        => $sendSmsUri,
-                'sendOtpUri'        => $sendOtpUri,
-                'registrationUri'   => esc_attr($registrationUri),
-                'redirect'          => site_url() . '/my-account/',
-                'ajax_url'          => admin_url('admin-ajax.php'),
-                'cardNumber'        => esc_attr($cardNumber),
-                'debug'             => apply_filters('bpwp_debug_phone_verify', false),
-                'clientInfo'        => wp_json_encode(self::bpwp_get_client_registration_data(get_current_user_id())),
-            )
-        );
+        // wp_localize_script(
+        //     'accountjs',
+        //     'accountBonusPlusData',
+        //     array(
+        //         'auth'              => esc_attr($apiKey),
+        //         'sendSmsUri'        => $sendSmsUri,
+        //         'sendOtpUri'        => $sendOtpUri,
+        //         'registrationUri'   => esc_attr($registrationUri),
+        //         'redirect'          => site_url() . '/my-account/',
+        //         'ajax_url'          => admin_url('admin-ajax.php'),
+        //         'cardNumber'        => esc_attr($cardNumber),
+        //         'debug'             => apply_filters('bpwp_debug_phone_verify', false),
+        //         'clientInfo'        => wp_json_encode(self::bpwp_get_client_registration_data(get_current_user_id())),
+        //     )
+        // );
         wp_enqueue_style('bpwp-bonus-loader-style');
     }
 
@@ -283,17 +285,15 @@ class BPWPMyAccount
 
             <!-- <div id="qrcode" style="display:none;"></div> -->
 
-            <div id='bpwp-registration' style="display:none;">
-                <p><?php echo __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?>
-                </p>
-                <button id="bpwpRegistration"><?php echo __('Создать учетную запись', 'bonus-plus-wp') ?></button>
+            <div id='bpwp-registration'>
+                <p><?php echo __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?></p>
             </div>
 
             <div id='bpwp-verify-start' style="display:none;">
                 <p><?php echo __('Подтвердите номер телефона', 'bonus-plus-wp') ?>
                     <strong><?php echo $phone ?></strong>
                 </p>
-                <button id="bpwpSendSms"><?php echo __('Отправить SMS c кодом подтверждения', 'bonus-plus-wp') ?></button>
+                <button id="bpwpSendSms" data-phone="<?php echo $phone ?>"><?php echo __('Отправить SMS c кодом подтверждения', 'bonus-plus-wp') ?></button>
             </div>
 
             <div id='bpwp-verify-end' style="display:none;">
@@ -391,5 +391,7 @@ class BPWPMyAccount
 
         return $registrationData;
     }
+
 }
+
 BPWPMyAccount::init();

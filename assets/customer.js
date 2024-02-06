@@ -2,18 +2,22 @@ jQuery(document).ready(function () {
 
     window.onload = function() {
         
-        hide(document.getElementById("loader"));
+    if (typeof document.getElementById('bpwp-verify-start') !== 'undefined' && document.getElementById('bpwp-verify-start') != null){
+    show(document.getElementById('bpwp-verify-start'));
+    }
         
-        if (typeof document.getElementById("qrcode") !== 'undefined' && document.getElementById("qrcode") != null){
+    if (typeof document.getElementById("qrcode") !== 'undefined' && document.getElementById("qrcode") != null){
         const cardNumber = document.getElementById("qrcode").getAttribute('data-cardnumber');
         bonusPlusWp.qrcode_render(cardNumber);
-        }
-        const accountContent = document.querySelector('.woocommerce-MyAccount-content')
+    }
+    
+    const accountContent = document.querySelector('.woocommerce-MyAccount-content')
+    
+    
+    // Добавляем слушатель клика на родительский элемент
+    accountContent.addEventListener('click', function(event) {
         
-        
-        // Добавляем слушатель клика на родительский элемент
-        accountContent.addEventListener('click', function(event) {
-        
+        console.log('hello');
             // Проверяем, является ли целевой элемент нужным нам элементом
             if (event.target.matches('#bpwpSendSms')) {
                 // Действия, которые нужно выполнить при клике на нужном элементе
@@ -23,6 +27,8 @@ jQuery(document).ready(function () {
                 bonusPlusWp.bp_send_sms(phoneCustomer);
             }
         });
+        
+        hide(document.getElementById("loader"));
     }
 
 });
@@ -131,7 +137,8 @@ jQuery(document).ready(function () {
                 if (response.success) {
                 document.getElementById('bpmsg').innerHTML = 'Подтверждено!';
                 show(document.getElementById('bpmsg'));
-                bonusPlusWp.bp_customer_create(phoneCustomer);
+                hide(document.getElementById("bpwp-registration"));
+                // bonusPlusWp.bp_customer_create(phoneCustomer);
                 
             } else {
                 document.getElementById('bpmsg').innerHTML = 'Код не верный, попробуйте еще раз';
@@ -158,55 +165,6 @@ jQuery(document).ready(function () {
                 //     });
                 // }
                 
-            })
-            .fail( function( data ) {
-                console.log(data);
-                console.log('Customer data updated request FAILED: ' + data.statusText);
-            })
-
-        },
-
-        // Отправка запроса - добавление пользователя 
-        bp_customer_create: async function(phoneCustomer, code){
-            const data = {
-                // Здесь добавьте данные, которые хотите передать
-                phone: phoneCustomer,
-            };
-
-            console.log(data);
-
-            jQuery.ajax( {
-                url: wpApiSettings.root + 'wp/v1/customercreate',
-                method: 'POST',
-                data: {                         
-                    phone : phoneCustomer,
-                },
-                beforeSend: function ( xhr ) {
-                    // Показываем лоадер
-                    show(document.getElementById("loader"));            
-                    //document.getElementById("bpwpSendOtp").disabled = true;
-                    
-                    xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce);
-                },
-                complete: function () {
-                    // Прячем лоадер или удаляем его из DOM
-                    hide(document.getElementById("loader"));
-                }
-            } )
-            .done( function( response ) {
-                console.log( response );
-                if (response.success) {
-                document.getElementById('bpmsg').innerHTML = 'Добавлен!';
-                show(document.getElementById('bpmsg'));
-
-            } else {
-                document.getElementById('bpmsg').innerHTML = 'Код не верный, попробуйте еще раз';
-                hide(document.getElementById("bpwp-verify-start"));
-                show(document.getElementById("loader"));            
-                document.getElementById("bpwpSendSms").disabled = false;
-                }
-                
-                // Вывести данные карты response.userdata
             })
             .fail( function( data ) {
                 console.log(data);

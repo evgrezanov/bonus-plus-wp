@@ -30,6 +30,8 @@ class BPWPCustomerBalance
 
         if (is_array($data) && isset($data['request'])) {
         $bonus_debit = $data['request']['maxDebitBonuses'];
+        do_action('logger', $bonus_debit, 'warning');
+        
         }
 
         // Запрос Резервируем бонусы
@@ -47,47 +49,26 @@ class BPWPCustomerBalance
         
         $balance_reserve = self::bpwp_balance_reserve($order_data);
 
+        if ($balance_reserve['code'] == 204) {
         
-        $info = bpwp_api_get_customer_data();
-        
-        if ($info && is_array($info)) {
-            $info['availableBonuses'] = $info['availableBonuses'] - $bonus_debit;
+            $info = bpwp_api_get_customer_data();
             
-            update_user_meta($user_id, 'bonus-plus', $info);
+            if ($info && is_array($info)) {
+                $info['availableBonuses'] = $info['availableBonuses'] - $bonus_debit;
+                
+                update_user_meta($user_id, 'bonus-plus', $info);
+            }
+
+            add_post_meta( $order_id, '_bonus_debit', $bonus_debit, true);
+        
+        } else {
+            do_action(
+                'bpwp_logger',
+                $type = __CLASS__,
+                $title = __('Ошибка при резервировании бонусов', 'bonus-plus-wp'),
+                $desc = sprintf(__('У заказа ИД %s, бонусы не зарезервированы!', 'bonus-plus-wp'), $order_id),
+            ); 
         }
-        
-        
-        //TODO В инфо заказа фильтр, начислено бонусов
-
-        /*
-        bonus-plus [
-            'availableBonuses' => 404.0
-        ]
-        */
-        // Обновление данных заказа
-        // if ($balance_reserve['code'] == 200){
-        //     update_order_meta($order_id, 'bonus_debit', $bonus_debit);
-            
-        //     //update_user_meta($order_id, 'bonus_debit', $balance_reserve['request']['customer']);
-        // }
-
-        add_post_meta( $order_id, '_bonus_debit', $bonus_debit );
-
-        //if ($deduction == 'true') { // TODO Если пользователь подтвердил списание бонусов
-            
-            // Добавим Скидку
-			$item_id = wc_add_order_item( $order_id, array(
-				'order_item_name' => 'Списание бонусов _completed',
-				'order_item_type' => 'fee'
-				) );
-				
-				wc_add_order_item_meta( $item_id, '_line_total', wc_format_decimal( -$bonus_debit) );
-			
-            $order->calculate_totals();
-            $order_id = $order->save();
-
-        //} End if
-
     }
 
     /**
@@ -107,12 +88,13 @@ class BPWPCustomerBalance
                 wp_json_encode($params),
                 'PATCH',
             );
-            
+
             return $balance_reserve;
+
         }
 
     }
-    
+
 
     /**
     *  Начисляем бонусы клиенту
@@ -133,15 +115,28 @@ class BPWPCustomerBalance
             
             // Освобождаем из резерва, передаем отрицательное число
             $balance_reserve = self::bpwp_balance_reserve($order_data);
-        }
-        
-        //Проведение продажи в БонусПлюс
-        $retail = self::bpwp_get_order_bonuses($order_id);
+            
+            //Проведение продажи в БонусПлюс
+            $retail = self::bpwp_get_order_bonuses($order_id);
 
-        // Обновление данных пользователя
-        if ($retail['code'] == 200){
+            do_action('logger', $retail, 'error');
+            
+            // Обновление данных пользователя
+            if ($retail['code'] == 200){
+                update_user_meta($user_id, 'bonus-plus', $retail['request']['customer']);
+            }
+            /*
+            if ($balance_reserve['code'] == 204) {
 
-            update_user_meta($user_id, 'bonus-plus', $retail['request']['customer']);
+
+            } else {
+                do_action(
+                    'bpwp_logger',
+                    $type = __CLASS__,
+                    $title = __('Ошибка при списании бонусов', 'bonus-plus-wp'),
+                    $desc = sprintf(__('У заказа ИД %s, бонусы не зарезервированы!', 'bonus-plus-wp'), $order_id),
+                ); 
+            }*/
         }
     }
 
@@ -177,6 +172,8 @@ class BPWPCustomerBalance
 
         $params['items'] = $items;
 
+        do_action('logger', $params);
+        
         // Отправим запрос "Проведение продажи в БонусПлюс"
         if (!empty($billingPhone) && !empty($store) && count($items) >= 1){
             $retail = bpwp_api_request(

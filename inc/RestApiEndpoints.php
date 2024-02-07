@@ -2,6 +2,8 @@
 
 namespace BPWP;
 
+defined('ABSPATH') || exit; // Exit if accessed directly
+
 class BPWPRestApiEndpoints
 {
 
@@ -9,9 +11,7 @@ class BPWPRestApiEndpoints
 
     public function __construct()
     {
-
         add_action('rest_api_init', [$this, 'register_endpoints'], 10);
-
     }
 
     /**
@@ -29,12 +29,10 @@ class BPWPRestApiEndpoints
     // Регистрация эндпоинтов для отправки SMS и проверки полученного кода
     public function register_endpoints()
     {
-
         register_rest_route('wp/v1', '/sendcode', array(
             'methods' => 'POST',
             'callback' => array($this, 'bpwp_customer_sendcode'),
             'permission_callback' => array($this, 'verify_wp_nonce'),
-
         ));
 
         register_rest_route('wp/v1', '/checkcode', array(
@@ -54,7 +52,6 @@ class BPWPRestApiEndpoints
             ),
             'permission_callback' => array($this, 'verify_wp_nonce'),
         ));
-
     }
 
     /**
@@ -137,8 +134,6 @@ class BPWPRestApiEndpoints
                 ),
                 'POST'
             );
-
-            do_action('logger', $customer);
 
             if ($customer['code'] == 200) {
                 update_user_meta($user_id, 'bonus-plus', $customer['request']);

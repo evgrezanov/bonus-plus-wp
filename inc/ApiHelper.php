@@ -26,6 +26,7 @@ class BPWPApiHelper
 
     }
 
+    
     public static function add_custom_fee_on_checkout()
     {
         // TODO: Если юзер выбрал Да( списать), то уменьшаем сумму заказа

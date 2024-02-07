@@ -68,9 +68,6 @@ function bpwp_api_request($endpoint, $params, $type)
         );
     }
     
-    do_action('logger', $url);
-    do_action('logger', $args,'warning');
-    
     $request = wp_remote_request($url, $args);
 
     $response_code = wp_remote_retrieve_response_code($request);

@@ -311,6 +311,8 @@ class BPWPMyAccount
      * AJAX Callback
      * Always Echos and Exits
      */
+
+    // todo Удалить
     public static function bpwp_client_verify_phone_callback()
     {
         // Ensure we have the data we need to continue

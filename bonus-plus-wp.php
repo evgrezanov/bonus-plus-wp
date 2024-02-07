@@ -70,12 +70,12 @@ class BPWPBonusPlus_Core
     {
         if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
             require_once __DIR__ . '/inc/WooAccount.php';
+            require_once __DIR__ . '/inc/ApiHelper.php';
         }
         require_once __DIR__ . '/inc/MenuSettings.php';
         require_once __DIR__ . '/inc/Logger.php';
         require_once __DIR__ . '/inc/ClientProfile.php';
         require_once __DIR__ . '/inc/WooProductCatExport.php';
-        require_once __DIR__ . '/inc/ApiHelper.php';
         require_once __DIR__ . '/inc/CustomerBalance.php';
         require_once __DIR__ . '/inc/RestApiEndpoints.php';
     }   

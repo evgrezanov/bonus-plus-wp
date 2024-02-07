@@ -40,12 +40,11 @@ function bpwp_api_request($endpoint, $params, $type)
                 'Content-Type'  => 'application/json',
                 'Authorization' => 'ApiKey ' . $token,
             ),
-            'body'        => wp_json_encode($params),
+            'body'        => $params,
         );
     }
 
     if ($type == 'PUT') {
-        
         $args = array(
             'method'      => $type,
             'headers'     => array(
@@ -56,7 +55,7 @@ function bpwp_api_request($endpoint, $params, $type)
         );
         $args['headers']['Content-Length'] = strlen( $args['body'] ?: '' ); // Добавим Content-Length. Важно, если body пустой
     }
-    
+
     if ($type == 'PATCH') {
         $args = array(
             'method'      => $type,
@@ -67,7 +66,7 @@ function bpwp_api_request($endpoint, $params, $type)
             'body'        => $params,
         );
     }
-    
+
     $request = wp_remote_request($url, $args);
 
     $response_code = wp_remote_retrieve_response_code($request);
@@ -80,7 +79,7 @@ function bpwp_api_request($endpoint, $params, $type)
     }
 
     $response['code'] = $response_code;
-    //$response['message'] = bpwp_api_get_error_msg($response_code);
+    $response['message'] = bpwp_api_get_error_msg($response_code);
 
     if (!in_array($response_code, [200, 204])){
         $response['request'] = $request;
@@ -154,72 +153,4 @@ function bpwp_api_get_error_msg($code)
     ];
 
     return $code && key_exists($code, $errors) ? $errors[$code] : false;
-}
-
-/* Редактируем поля на странице оформления заказа 
-** Отключаем ненужные поля в форме заказа
-** Меняем порядок вывода
-** Редактируем текст внутри полей
-*/
-//add_filter('woocommerce_checkout_fields', 'custom_override_checkout_fields', 9999);
-function custom_override_checkout_fields($fields)
-{
-
-	$fields['order']['order_comments']['placeholder'] = 'Расскажите о пожеланиях к заказу или как улучшить работу сайта'; // Примечеания к заказу
-	$fields['billing']['billing_first_name']['class'][0] = 'form-row-wide'; // Поле Имя на всю ширину
-	$fields['billing']['billing_email']['class'][0] = 'form-row-first'; // Поле email 50%
-	$fields['billing']['billing_phone']['class'][0] = 'form-row-last'; // Поле Тел 50%
-	unset($fields['billing']['billing_first_name']['label']);
-	unset($fields['billing']['billing_email']['label']);
-	unset($fields['billing']['billing_phone']['label']);
-
-	$fields['billing']['billing_first_name']['placeholder'] = 'Имя';
-	$fields['billing']['billing_email']['placeholder'] = 'Email';
-    $fields['billing']['billing_phone']['placeholder'] = '+7 (999) 999-99-99'; //Телефон
-	
-	// Вставляем телефон пользователя в поле
-    if ( is_user_logged_in() ) {
-        $user_id = get_current_user_id();
-
-        // Получаем значение поля "Телефон" пользователя
-        $user_phone = get_user_meta( $user_id, 'billing_phone', true );
-
-        // Проверяем, заполнено ли поле "Телефон" у пользователя
-        if ( ! empty( $user_phone ) ) {
-            // Задаем значение по умолчанию для поля "Телефон"
-            $fields['billing']['billing_phone']['default'] = $user_phone;
-        }
-    } else {
-	$fields['billing']['billing_phone']['placeholder'] = '+7 (999) 999-99-99'; //Телефон
-	}
-	
-	unset($fields['billing']['billing_last_name']); //Фамилия
-
-	unset($fields['billing']['billing_city']); //Населенный пункт
-	unset($fields['billing']['billing_state']); //Область/Регион
-	unset($fields['billing']['billing_company']); //Название компании
-	unset($fields['billing']['billing_address_1']); //Адрес
-	unset($fields['billing']['billing_address_2']); //Подъезд этаж и т.п.
-	unset($fields['billing']['billing_postcode']); //Почтовый индекс
-	unset($fields['billing']['billing_country']); //Страна
-
-	// remove shipping fields
-	unset($fields['shipping']['shipping_first_name']);
-	unset($fields['shipping']['shipping_last_name']);
-	unset($fields['shipping']['shipping_company']);
-	unset($fields['shipping']['shipping_address_1']);
-	unset($fields['shipping']['shipping_address_2']);
-	unset($fields['shipping']['shipping_city']);
-	unset($fields['shipping']['shipping_postcode']);
-	unset($fields['shipping']['shipping_country']);
-	unset($fields['shipping']['shipping_state']);
-
-	unset($fields['order']['order_comments']); //Примечания к заказу
-
-	// Порядок полей
-	$fields["billing"]["billing_first_name"]["priority"] = 10;
-	$fields["billing"]["billing_email"]["priority"] = 20;
-	$fields["billing"]["billing_phone"]["priority"] = 30;
-
-	return $fields;
 }

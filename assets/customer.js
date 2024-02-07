@@ -1,36 +1,37 @@
 jQuery(document).ready(function () {
 
     window.onload = function() {
-        
-    if (typeof document.getElementById('bpwp-verify-start') !== 'undefined' && document.getElementById('bpwp-verify-start') != null){
-    show(document.getElementById('bpwp-verify-start'));
-    }
-        
-    if (typeof document.getElementById("qrcode") !== 'undefined' && document.getElementById("qrcode") != null){
-        const cardNumber = document.getElementById("qrcode").getAttribute('data-cardnumber');
-        bonusPlusWp.qrcode_render(cardNumber);
-    }
-    
-    const accountContent = document.querySelector('.woocommerce-MyAccount-content')
-    
-    
-    // Добавляем слушатель клика на родительский элемент
-    accountContent.addEventListener('click', function(event) {
-        
-        console.log('hello');
-            // Проверяем, является ли целевой элемент нужным нам элементом
-            if (event.target.matches('#bpwpSendSms')) {
-                // Действия, которые нужно выполнить при клике на нужном элементе
-                // Получаем телефон и отправлем запрос - на этот номер код в SMS
-                const phoneCustomer = event.target.getAttribute('data-phone');
-                console.log(phoneCustomer);
-                bonusPlusWp.bp_send_sms(phoneCustomer);
-            }
-        });
-        
-        hide(document.getElementById("loader"));
-    }
 
+        params = bonusPlusWp.get_params(); 
+    console.log(params); 
+        
+        isElemetsExist = bonusPlusWp.is_elements_exist();
+
+        if (typeof document.getElementById("qrcode") !== 'undefined' && document.getElementById("qrcode") != null){
+            if (params['card_number']){ 
+                const cardNumber = params['card_number']; 
+                bonusPlusWp.qrcode_render(cardNumber);
+                hide(document.getElementById("loader"));
+            }
+        }
+
+        // if (typeof params['card_number'] != 'undefined' && params['card_number'] != null ){
+        // }
+        
+        // Регистрация
+        if (isElemetsExist){
+            show(document.getElementById('bpwp-verify-start'));
+            // Запрос СМС
+            document.getElementById("bpwpSendSms").addEventListener("click", function() {
+                if (params['phone']){
+                    const phoneCustomer = params['phone']; 
+                    bonusPlusWp.bp_send_sms(phoneCustomer);
+                }
+            });
+            hide(document.getElementById("loader"));
+        }
+
+    }
 });
 
     function hide(elements) {
@@ -49,10 +50,42 @@ jQuery(document).ready(function () {
 
     var bonusPlusWp = {
 
+        /**
+         *  prepare localization user data 
+         */
+        get_params: function () {
+            var arrayResult = {};
+            accountBonusPlusData = window['accountBonusPlusData'];
+            arrayResult['phone'] = accountBonusPlusData['phone'];
+            arrayResult['card_number'] = accountBonusPlusData['cardNumber'];
+            arrayResult['redirect'] = accountBonusPlusData['redirect'];
+            arrayResult['is_debug'] = accountBonusPlusData['debug'];
+            return arrayResult;
+        },
+
+        /**
+         * Проверяет наличие элементов
+         * 
+         * @returns boolean
+         */
+        is_elements_exist: function(){
+            var verifyContainerStart = document.getElementById("bpwp-verify-start");
+                verifyContainerEnd = document.getElementById("bpwp-verify-end");
+                sendSmsButton = document.getElementById("bpwpSendSms");
+                sendOtpButton = document.getElementById("bpwpSendOtp");
+                otpInput = document.getElementById("bpwpOtpInput");
+            if (typeof verifyContainerStart !== 'undefined' && verifyContainerStart != null && typeof verifyContainerEnd !== 'undefined' &&
+                verifyContainerEnd != null && typeof sendSmsButton !== 'undefined' && sendSmsButton != null && typeof sendOtpButton !== 'undefined' &&
+                sendOtpButton != null) {
+                    return 1;
+            } else {
+                    return 0;
+            }
+        },
+
         // Отправка запроса SMS на телефон 
         bp_send_sms: async function(phoneCustomer){
             const data = {
-                // Здесь добавьте данные, которые хотите передать
                 phone: phoneCustomer,
             };
 
@@ -60,22 +93,24 @@ jQuery(document).ready(function () {
                 url: wpApiSettings.root + 'wp/v1/sendcode',
                 method: 'POST',
                 beforeSend: function ( xhr ) {
-                    // Показываем лоадер
-                    hide(document.getElementById("bpwp-verify-start"));
                     show(document.getElementById("loader"));            
+                    hide(document.getElementById("bpwp-registration"));
+                    hide(document.getElementById("bpwp-verify-start"));
+                    hide(document.getElementById("bpmsg"));
                     document.getElementById("bpwpSendSms").disabled = true;
                     
                     xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce);
                 },
                 complete: function () {
-                    // Прячем лоадер или удаляем его из DOM
                     hide(document.getElementById("loader"));
                 }
             } )
             .done( function( response ) {
-                console.log( response );
                 if (response.success) {
-                show(document.getElementById("bpwp-verify-end"));
+                    document.getElementById('bpmsg').innerHTML = response.message;
+                    show(document.getElementById('bpmsg'));
+                    show(document.getElementById("bpwp-verify-end"));
+                    hide(document.getElementById("bpwp-registration"));
                 
                 document.getElementById("bpwpSendOtp").addEventListener("click", function() {
                     hide(document.getElementById("bpwp-verify-end"));
@@ -83,8 +118,7 @@ jQuery(document).ready(function () {
                     if (typeof otpInput !== 'undefined' && otpInput != null){
                         code = otpInput.value;
                         if (code != null){
-                            console.log(phoneCustomer);
-                            bonusPlusWp.bp_check_code(phoneCustomer, code);
+                            bonusPlusWp.bp_check_code(phoneCustomer, code, params['redirect']);
                         }
                     }
                 });
@@ -99,16 +133,15 @@ jQuery(document).ready(function () {
                     
                 }
             })
-            .fail( function(error){
-                console.log( 'Request error!');
-                console.log(error) 
-            });
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR.responseText);
+                console.log(textStatus);
+            })
         },
 
         // Отправка запроса - проверка кода 
-        bp_check_code: async function(phoneCustomer, code){
+        bp_check_code: async function(phoneCustomer, code, redirect){
             const data = {
-                // Здесь добавьте данные, которые хотите передать
                 phone: phoneCustomer,
                 code: code,
             };
@@ -123,53 +156,33 @@ jQuery(document).ready(function () {
                 beforeSend: function ( xhr ) {
                     // Показываем лоадер
                     show(document.getElementById("loader"));            
-                    //document.getElementById("bpwpSendOtp").disabled = true;
+                    hide(document.getElementById("bpmsg"));
+                    document.getElementById("bpwpSendOtp").disabled = true;
                     
                     xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce);
                 },
                 complete: function () {
-                    // Прячем лоадер или удаляем его из DOM
                     hide(document.getElementById("loader"));
                 }
             } )
             .done( function( response ) {
-                console.log( response );
                 if (response.success && response.customer_created) {
-                hide(document.getElementById("bpwp-registration"));
                 document.getElementById('bpmsg').innerHTML = 'Подтверждено, сейчас вы будете перенаправлены!';
                 show(document.getElementById('bpmsg'));
-                window.location.href = '/my-account/bonus-plus/';
+                window.location.href = redirect;
             } else {
                 document.getElementById('bpmsg').innerHTML = 'Код не верный, попробуйте еще раз';
-                hide(document.getElementById("bpwp-verify-start"));
-                show(document.getElementById("loader"));            
+                show(document.getElementById('bpmsg'));
+                show(document.getElementById('bpwp-verify-start'));
                 document.getElementById("bpwpSendSms").disabled = false;
+                document.getElementById("bpwpSendOtp").disabled = false;
                 }
                 
-                // Вывести данные карты response.userdata
-
-                // Показать QR код
-                //bonusPlusWp.qrcode_render(response.cardnumber);
-
-                // const qrcodeElement = document.getElementById('qrcode');
-                // let dataCardValue = qrcodeElement.dataset.card;
-                // if (dataCardValue != '') {
-                //     let qrcode = new QRCode(qrcodeElement, {
-                //         text: dataCardValue,
-                //         width: 147,
-                //         height: 147,
-                //         colorDark: "#000000",
-                //         colorLight: "#ffffff",
-                //         correctLevel: QRCode.CorrectLevel.H
-                //     });
-                // }
-                
             })
-            .fail( function( data ) {
-                console.log(data);
-                console.log('Customer data updated request FAILED: ' + data.statusText);
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR.responseText);
+                console.log(textStatus);
             })
-
         },
 
         /**
@@ -177,7 +190,6 @@ jQuery(document).ready(function () {
          */
         qrcode_render: function (cardNumber){
             if (cardNumber) { 
-                console.log('generate qr code');
                 var elem = document.getElementById("qrcode");
                 qrcode = new QRCode(elem, {
                     text: cardNumber,

@@ -17,16 +17,11 @@ class BPWPApiHelper
 
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
-        add_action('woocommerce_short_description', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10, 1);
-
-        //TODO: Хук срабатывает два раза. Найти другой хук для чекаута
-        // Сначала просто вывести в чекауте, потом в competed - добавить fee
-        //add_filter( 'woocommerce_review_order_after_order_total', array( $this, 'add_earned_bonuses_to_order_review' ), 100, 1 );
+        add_action('woocommerce_product_meta_end', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10);
         add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
 
     }
 
-    
     public static function add_custom_fee_on_checkout()
     {
         // TODO: Если юзер выбрал Да( списать), то уменьшаем сумму заказа
@@ -40,9 +35,7 @@ class BPWPApiHelper
             $taxable = true;
             $tax_class = 'bpwp-bonuses-reserved';
         
-            // TODO: ? Делать это после успешно выполнено
             WC()->cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
-
         }
     }
 
@@ -124,6 +117,8 @@ class BPWPApiHelper
                 'id'        => $product->get_id(),
                 'quantity'  => $quantity
             );
+            do_action('logger', $items);
+            
         }
 
         // Если находимся в корзине
@@ -159,7 +154,7 @@ class BPWPApiHelper
                 'PUT',
             );
             
-            $response_code = wp_remote_retrieve_response_code($retailcalc);
+            //$response_code = wp_remote_retrieve_response_code($retailcalc);
 
             return $retailcalc;
         }
@@ -279,16 +274,18 @@ class BPWPApiHelper
     }
 
     /**
-     * 
+     *  Выводит доступные бонусы на странице товара
      */
-    public static function bpwp_single_product_bonusplus_price($post_excerpt){
-        $content = '';
+    public static function bpwp_single_product_bonusplus_price(){
         
-        if (is_product()) {
-            $price_data = self::bpwp_get_calc_bonusplus_price();
-            $content = $post_excerpt . self::bpwp_render_retailitems_calc($price_data);
+        if (!is_product()) {
+            return;
         }
-
+        
+        $content = '';
+        $price_data = self::bpwp_get_calc_bonusplus_price();
+        $content = self::bpwp_render_retailitems_calc($price_data);
+            
         return $content;
     }
 

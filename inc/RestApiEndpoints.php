@@ -78,7 +78,7 @@ class BPWPRestApiEndpoints
             array(),
             'PUT'
         );
-
+        
         // 204 - success
         if ($res['code'] == 204) {
             $response = array(
@@ -86,13 +86,10 @@ class BPWPRestApiEndpoints
                 'message' => 'Код отправлен',
             );
         } else {
-            wp_send_json(
-                array(
-                    'success' => false,
-                    'message' => 'Код не отправлен!',
-                )
+            $response = array(
+                'success' => false,
+                'message' => 'Код не отправлен!',
             );
-            wp_die();
         }
 
         wp_send_json($response);
@@ -119,6 +116,8 @@ class BPWPRestApiEndpoints
             'PUT'
         );
         
+        do_action('logger', $res);
+
         // Если 204 - успех, создаем клиента: запрос POST /customer, phone обязательно
         if ($res['code'] == 204) {
             $response = array(
@@ -127,13 +126,36 @@ class BPWPRestApiEndpoints
             );
             
             // TODO: Добавить запрос проверки существования пользвателя в б+
+            /*
+            $get_customer = bpwp_api_request(
+                'customer',
+                'GET',
+                array(
+                    'phone' => $args['phone'],
+                )
+            );
+            
+            if ($get_customer['code'] == 200) {
+                $response = array(
+                    'success' => false,
+                    'message' => 'Ошибка. Пользователь уже существует!',
+                    'customer_created' => false, // проверим и редиректим на /my-account/bonus-plus/
+                );
+                wp_send_json($response);
+                wp_die();
+            }
+            */
+
             $customer = bpwp_api_request(
                 'customer',
-                array(
+                wp_json_encode( array(
                     'phone' => $args['phone']
-                ),
+                )),
                 'POST'
             );
+
+            do_action('logger', $customer, 'error');
+            
 
             if ($customer['code'] == 200) {
                 update_user_meta($user_id, 'bonus-plus', $customer['request']);
@@ -151,16 +173,13 @@ class BPWPRestApiEndpoints
                     $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
                 ); 
             }
-
+            
         // 412 - ошибка по разным причинам, обработать. получить message из msg
         } else {
-            wp_send_json(
-                array(
-                    'success' => false,
-                    'message' => 'Код не верный!',
-                )
+            $response = array(
+                'success' => false,
+                'message' => 'Код не верный!',
             );
-            wp_die();
         }
 
         wp_send_json($response);

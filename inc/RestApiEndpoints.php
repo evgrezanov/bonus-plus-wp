@@ -126,25 +126,22 @@ class BPWPRestApiEndpoints
             );
             
             // TODO: Добавить запрос проверки существования пользвателя в б+
-            /*
             $get_customer = bpwp_api_request(
                 'customer',
-                'GET',
                 array(
                     'phone' => $args['phone'],
-                )
+                ),
+                'GET',
             );
             
             if ($get_customer['code'] == 200) {
                 $response = array(
                     'success' => false,
                     'message' => 'Ошибка. Пользователь уже существует!',
-                    'customer_created' => false, // проверим и редиректим на /my-account/bonus-plus/
                 );
                 wp_send_json($response);
                 wp_die();
             }
-            */
 
             $customer = bpwp_api_request(
                 'customer',
@@ -153,10 +150,7 @@ class BPWPRestApiEndpoints
                 )),
                 'POST'
             );
-
-            do_action('logger', $customer, 'error');
             
-
             if ($customer['code'] == 200) {
                 update_user_meta($user_id, 'bonus-plus', $customer['request']);
                 

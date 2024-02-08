@@ -243,6 +243,11 @@ class BPWPApiHelper
         echo $output;
     }
 
+    /**
+     * Renders retail items calculation based on the provided data.
+     *
+     * @param array $data The data for the retail items calculation.
+     */
     public static function bpwp_render_retailitems_calc($data)
     {
         if (is_array($data) && isset($data['request']) && is_array($data['request']['discount'])) {
@@ -303,6 +308,11 @@ class BPWPApiHelper
         return $content;
     }
 
+    /**
+     * Get the maximum debit bonuses from the provided data array.
+     *
+     * @param array $data The input data array
+     */
     public function bpwp_get_max_debit_bonuses($data) {
         if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
             $this->maxDebitBonuses = $data['request']['maxDebitBonuses'];

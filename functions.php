@@ -139,6 +139,12 @@ function bpwp_api_get_customer_data($customer_id = '')
     return $data;
 }
 
+/**
+ * Get the error message for a given code.
+ *
+ * @param int $code The error code.
+ * @return string|false The error message, or false if not found.
+ */
 function bpwp_api_get_error_msg($code)
 {
     $errors = [

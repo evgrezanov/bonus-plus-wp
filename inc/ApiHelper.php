@@ -235,7 +235,7 @@ class BPWPApiHelper
             }
 
             $output .= '<div class="bonus-plus-price">';
-            $output .= '<p>Ваш бонусный баланс '. $available_bonuses .'.</p><p>Сумма бонусов, которые будут начислены '. $bonuses .'.</p><p> На эту покупку будет списано '. $maxDebitBonuses .' бон.</p>'; 
+            $output .= '<p>Ваш бонусный баланс '. $available_bonuses .'.</p><p>Сумма бонусов, которые будут начислены '. $bonuses .'.</p><p> На эту покупку будет списано '. $maxDebitBonuses .' бонусов</p>'; 
             $output .= '</div>';
             
         }

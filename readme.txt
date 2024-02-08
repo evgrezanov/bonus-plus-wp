@@ -4,7 +4,7 @@ Donate link: https://github.com/evgrezanov
 Tags: bonus, woocommerce, sync, integration
 Requires at least: 4.0
 Tested up to: 6.4.2
-Stable tag: 2.7
+Stable tag: 2.8
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -93,8 +93,11 @@ PHP Рекомендуем 8.0 и выше
 == Changelog ==
 
 = 2.8 =
-- убрали поле дата рождения из личного кабинета https://github.com/evgrezanov/bonus-plus-wp/issues/58
-- удаляем мету с данными бонус+ при сохранении платежного адреса https://github.com/evgrezanov/bonus-plus-wp/issues/57
+- убрали поле "дата рождения" из личного кабинета https://github.com/evgrezanov/bonus-plus-wp/issues/58
+- добавлена обработка ошибок при экспорте товаров и категорий https://github.com/evgrezanov/bonus-plus-wp/issues/56
+- рефакторинг процесса авторизации и регистрации в программе лояльности https://github.com/evgrezanov/bonus-plus-wp/issues/47
+- исправлена функция списания и резервирования бонусов https://github.com/evgrezanov/bonus-plus-wp/issues/40
+- исправлена проблема с безопастностью при генерации QR кода в личном кабинете исправить проблему с безопастностью https://github.com/evgrezanov/bonus-plus-wp/issues/21
 
 = 2.7 =
 - устранение бага с экспортом товаров и категорий https://github.com/evgrezanov/bonus-plus-wp/issues/50

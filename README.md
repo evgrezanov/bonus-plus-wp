@@ -5,7 +5,7 @@
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
 * Tested up to: 6.4.2
-* Stable tag: 2.7
+* Stable tag: 2.8
 * Requires PHP: 8.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -45,13 +45,13 @@ e.g.
 
 ## Automatic installation
 
-Automatic installation is the easiest option -- WordPress will handles the file transfer, and you won’t need to leave your web browser. To do an automatic install of WP-bonus-plus, log in to your WordPress dashboard, navigate to the Plugins menu, and click “Add New.”
+Automatic installation is the easiest option -- WordPress will handles the file transfer, and you won’t need to leave your web browser. To do an automatic install of bonus-plus-wp, log in to your WordPress dashboard, navigate to the Plugins menu, and click “Add New.”
 
-In the search field type “wp-bonus-plus,” then click “Search Plugins.” Once you’ve found us,  you can view details about it such as the point release, rating, and description. Most importantly of course, you can install it by! Click “Install Now,” and WordPress will take it from there.
+In the search field type “bonus-plus-wp” then click “Search Plugins.” Once you’ve found us,  you can view details about it such as the point release, rating, and description. Most importantly of course, you can install it by! Click “Install Now,” and WordPress will take it from there.
 
 ## Manual installation
 
-Manual installation method requires downloading the wp-bonus-plus plugin and uploading it to your web server via your favorite FTP application. The WordPress codex contains [instructions on how to do this here](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
+Manual installation method requires downloading the bonus-plus-wp plugin and uploading it to your web server via your favorite FTP application. The WordPress codex contains [instructions on how to do this here](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
 
 
 
@@ -91,6 +91,14 @@ PHP Рекомендуем 8.0 и выше
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 2.8
+- убрали поле "дата рождения" из личного кабинета https://github.com/evgrezanov/bonus-plus-wp/issues/58
+- добавлена обработка ошибок при экспорте товаров и категорий https://github.com/evgrezanov/bonus-plus-wp/issues/56
+- рефакторинг процесса авторизации и регистрации в программе лояльности https://github.com/evgrezanov/bonus-plus-wp/issues/47
+- исправлена функция списания и резервирования бонусов https://github.com/evgrezanov/bonus-plus-wp/issues/40
+- исправлена проблема с безопастностью при генерации QR кода в личном кабинете исправить проблему с безопастностью https://github.com/evgrezanov/bonus-plus-wp/issues/21
+
 
 ## 2.7
 - устранение бага с экспортом товаров и категорий https://github.com/evgrezanov/bonus-plus-wp/issues/50

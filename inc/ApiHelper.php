@@ -17,9 +17,9 @@ class BPWPApiHelper
 
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
-        add_action('woocommerce_short_description', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10, 1);
+        add_action('woocommerce_product_meta_end', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10);
         add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
-        
+
     }
 
     public static function add_custom_fee_on_checkout()
@@ -36,7 +36,6 @@ class BPWPApiHelper
             $tax_class = 'bpwp-bonuses-reserved';
         
             WC()->cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
-
         }
     }
 
@@ -118,6 +117,8 @@ class BPWPApiHelper
                 'id'        => $product->get_id(),
                 'quantity'  => $quantity
             );
+            do_action('logger', $items);
+            
         }
 
         // Если находимся в корзине
@@ -149,11 +150,11 @@ class BPWPApiHelper
         if (!empty($billingPhone) && !empty($store) && count($items) >= 1){
             $retailcalc = bpwp_api_request(
                 'retail/calc',
-                json_encode($params),
+                wp_json_encode($params),
                 'PUT',
             );
             
-            $response_code = wp_remote_retrieve_response_code($retailcalc);
+            //$response_code = wp_remote_retrieve_response_code($retailcalc);
 
             return $retailcalc;
         }
@@ -170,7 +171,7 @@ class BPWPApiHelper
     public static function bpwp_render_calc_bonusplus_price($data) {
         
         $output = '';
-        
+        // TODO добавить проверку на nonce if (isset($_GET['testrequest']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'nonce_action_name')) {}
         if (isset($_GET['testrequest'])) {
             
             $output .= '<ul>';
@@ -234,7 +235,7 @@ class BPWPApiHelper
             }
 
             $output .= '<div class="bonus-plus-price">';
-            $output .= '<p>Ваш бонусный баланс '. $available_bonuses .'.</p><p>Сумма бонусов, которые будут начислены '. $bonuses .'.</p><p> На эту покупку будет списано '. $maxDebitBonuses .' бон.</p>'; 
+            $output .= '<p>Ваш бонусный баланс '. $available_bonuses .'.</p><p>Сумма бонусов, которые будут начислены '. $bonuses .'.</p><p> На эту покупку будет списано '. $maxDebitBonuses .' бонусов</p>'; 
             $output .= '</div>';
             
         }
@@ -242,6 +243,11 @@ class BPWPApiHelper
         echo $output;
     }
 
+    /**
+     * Renders retail items calculation based on the provided data.
+     *
+     * @param array $data The data for the retail items calculation.
+     */
     public static function bpwp_render_retailitems_calc($data)
     {
         if (is_array($data) && isset($data['request']) && is_array($data['request']['discount'])) {
@@ -273,16 +279,18 @@ class BPWPApiHelper
     }
 
     /**
-     * 
+     *  Выводит доступные бонусы на странице товара
      */
-    public static function bpwp_single_product_bonusplus_price($post_excerpt){
-        $content = '';
+    public static function bpwp_single_product_bonusplus_price(){
         
-        if (is_product()) {
-            $price_data = self::bpwp_get_calc_bonusplus_price();
-            $content = $post_excerpt . self::bpwp_render_retailitems_calc($price_data);
+        if (!is_product()) {
+            return;
         }
-
+        
+        $content = '';
+        $price_data = self::bpwp_get_calc_bonusplus_price();
+        $content = self::bpwp_render_retailitems_calc($price_data);
+            
         return $content;
     }
 
@@ -300,6 +308,11 @@ class BPWPApiHelper
         return $content;
     }
 
+    /**
+     * Get the maximum debit bonuses from the provided data array.
+     *
+     * @param array $data The input data array
+     */
     public function bpwp_get_max_debit_bonuses($data) {
         if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
             $this->maxDebitBonuses = $data['request']['maxDebitBonuses'];
@@ -307,5 +320,7 @@ class BPWPApiHelper
     }
 
 }
+
+
 
 BPWPApiHelper::init();

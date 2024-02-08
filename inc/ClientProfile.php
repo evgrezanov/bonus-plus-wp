@@ -15,6 +15,7 @@ class BPWPProfile
         add_action('init', [__CLASS__, 'bpwp_api_bonus_card_shortcode_init']);
         add_action('wp_login', [__CLASS__, 'bpwp_customer_login'], 10, 2);
         add_filter('bpwp_replace_customer_card_desc', [__CLASS__, 'bpwp_replace_customer_card_desc'], 10, 2);
+        //add_action('woocommerce_customer_save_address', [__CLASS__, 'bpwp_remove_user_meta_on_address_change'], 10, 2);
     }
 
     /**
@@ -137,14 +138,13 @@ class BPWPProfile
 
             // Проверим заполнены ли у порльзователя дата рождения и телефон
             $user_id = get_current_user_id();
-            $billing_birth_date = get_user_meta( $user_id, 'billing_birth_date', true );
             $billing_phone = get_user_meta(get_current_user_id(), 'billing_phone', true);
             $bonus_plus = get_user_meta(get_current_user_id(), 'bonus-plus', true);
             
-            if ( empty( $billing_birth_date ) || empty($billing_phone) ) {
+            if (empty($billing_phone) ) {
                 $data['title']  =   __('ОШИБКА!', 'bonus-plus-wp');
                 $data['url']    =   get_option('bpwp_uri_customers_lk_billing_address');
-                $data['desc']   =   'Добавьте дату рождения и/или номер телефона в личном кабинете';
+                $data['desc']   =   'Добавьте номер телефона в личном кабинете';
                 $data['class']  =   'card3';
                 // или данные из Бонус+ пустые
             } elseif (empty($bonus_plus)){
@@ -237,6 +237,25 @@ class BPWPProfile
                 $desc = str_replace($key, $data[$key], $desc);
             }
         }
+    }
+    
+    /**
+     * Обновление метаданных Бонус+ при сохранении адреса из личного кабинета пользователя
+     * 
+     *  @param int    $user_id      User ID being saved.
+     *  @param string $address_type Type of address; 'billing' or 'shipping'.
+     *
+     * @return void
+     * 
+     */
+    public static function bpwp_remove_user_meta_on_address_change( $user_id, $load_address ){
+        if ( ! is_user_logged_in() ) return;
+
+        if ( $load_address !== 'billing') return;
+        // TODO: Если есть мета и тел bonus-plus['phone] и billing_phone не совпадают, то чистим мета
+        $user = get_user_by_id($user_id);
+
+        //self::bpwp_customer_login($user->user_login, $user);
     }
 }
 BPWPProfile::init();

@@ -7,14 +7,14 @@
  * Author URI: https://github.com/evgrezanov/
  * Developer: redmonkey73
  * Developer URI: https://github.com/evgrezanov/
- * Text Domain: wp-bonus-plus
+ * Text Domain: bonus-plus-wp
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.4.2
- * Version: 2.7
+ * Version: 2.8
  */
 namespace BPWP;
 
@@ -27,7 +27,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.7');
+        define('BPWP_PLUGIN_VERSION', '2.8');
 
         require_once __DIR__ . '/functions.php';
 
@@ -70,13 +70,14 @@ class BPWPBonusPlus_Core
     {
         if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
             require_once __DIR__ . '/inc/WooAccount.php';
+            require_once __DIR__ . '/inc/ApiHelper.php';
         }
         require_once __DIR__ . '/inc/MenuSettings.php';
         require_once __DIR__ . '/inc/Logger.php';
         require_once __DIR__ . '/inc/ClientProfile.php';
         require_once __DIR__ . '/inc/WooProductCatExport.php';
-        require_once __DIR__ . '/inc/ApiHelper.php';
         require_once __DIR__ . '/inc/CustomerBalance.php';
+        require_once __DIR__ . '/inc/RestApiEndpoints.php';
     }   
 
     /**

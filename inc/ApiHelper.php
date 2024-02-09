@@ -117,8 +117,6 @@ class BPWPApiHelper
                 'id'        => $product->get_id(),
                 'quantity'  => $quantity
             );
-            do_action('logger', $items);
-            
         }
 
         // Если находимся в корзине

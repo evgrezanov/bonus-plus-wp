@@ -92,6 +92,9 @@ PHP Рекомендуем 8.0 и выше
 
 == Changelog ==
 
+= 2.9 =
+- линковка существующего клиента из б+ https://github.com/evgrezanov/bonus-plus-wp/issues/42
+
 = 2.8 =
 - убрали поле "дата рождения" из личного кабинета https://github.com/evgrezanov/bonus-plus-wp/issues/58
 - добавлена обработка ошибок при экспорте товаров и категорий https://github.com/evgrezanov/bonus-plus-wp/issues/56

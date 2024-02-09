@@ -15,9 +15,6 @@ jQuery(document).ready(function () {
             }
         }
 
-        // if (typeof params['card_number'] != 'undefined' && params['card_number'] != null ){
-        // }
-        
         // Регистрация
         if (isElemetsExist){
             show(document.getElementById('bpwp-verify-start'));
@@ -94,7 +91,6 @@ jQuery(document).ready(function () {
                 method: 'POST',
                 beforeSend: function ( xhr ) {
                     show(document.getElementById("loader"));            
-                    hide(document.getElementById("bpwp-registration"));
                     hide(document.getElementById("bpwp-verify-start"));
                     hide(document.getElementById("bpmsg"));
                     document.getElementById("bpwpSendSms").disabled = true;
@@ -110,7 +106,6 @@ jQuery(document).ready(function () {
                     document.getElementById('bpmsg').innerHTML = response.message;
                     show(document.getElementById('bpmsg'));
                     show(document.getElementById("bpwp-verify-end"));
-                    hide(document.getElementById("bpwp-registration"));
                 
                 document.getElementById("bpwpSendOtp").addEventListener("click", function() {
                     hide(document.getElementById("bpwp-verify-end"));

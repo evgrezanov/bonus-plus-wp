@@ -116,8 +116,6 @@ class BPWPRestApiEndpoints
             'PUT'
         );
         
-        do_action('logger', $res);
-
         // Если 204 - успех, создаем клиента: запрос POST /customer, phone обязательно
         if ($res['code'] == 204) {
             $response = array(
@@ -125,7 +123,8 @@ class BPWPRestApiEndpoints
                 'message' => 'Код принят',
             );
             
-            // TODO: Добавить запрос проверки существования пользвателя в б+
+            // Код верный. Запрос проверки существования пользвателя в б+
+            // Если такой номер существует, обновляем мета и редиректим
             $get_customer = bpwp_api_request(
                 'customer',
                 array(
@@ -133,16 +132,19 @@ class BPWPRestApiEndpoints
                 ),
                 'GET',
             );
-            
+
             if ($get_customer['code'] == 200) {
+                
+                update_user_meta($user_id, 'bonus-plus', $get_customer['request']);
                 $response = array(
-                    'success' => false,
-                    'message' => 'Ошибка. Пользователь уже существует!',
+                    'success' => true,
+                    'message' => 'Пользователь уже существует!',
+                    'customer_created' => true, // проверим и редиректим на /my-account/bonus-plus/
                 );
                 wp_send_json($response);
                 wp_die();
             }
-
+            
             $customer = bpwp_api_request(
                 'customer',
                 wp_json_encode( array(

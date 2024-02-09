@@ -257,7 +257,7 @@ class BPWPMyAccount
 
             <!-- <div id="qrcode" style="display:none;"></div> -->
 
-            <div id='bpwp-registration'>
+            <div id='bpwp-registration' style="display:none;">
                 <p><?php echo __('Вы еще не зарегистрированы в программе лояльности', 'bonus-plus-wp') ?></p>
             </div>
 

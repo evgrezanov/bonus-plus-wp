@@ -103,9 +103,16 @@ class BPWPRestApiEndpoints
             $user_id = get_current_user_id();
         }
 
+        $phone = bpwp_api_get_customer_phone($user_id);
+
+        $debit_bonuses = $request->get_param('code');
+        do_action('logger', $request);
+        do_action('logger', $debit_bonuses);
+        
         // ? Проверить, если нет телефона и кода, то возвращаем ошибку
         $args = array(
-            'phone' => $request->get_param('phone'),
+            //'phone' => $request->get_param('phone'),
+            'phone' => $phone,
             'code' => $request->get_param('code')
         );
 

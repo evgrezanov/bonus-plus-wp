@@ -6,6 +6,7 @@ jQuery(document).ready(function () {
     console.log(params); 
         
         isElemetsExist = bonusPlusWp.is_elements_exist();
+        isFormExist = bonusPlusWp.is_form_exist();
 
         if (typeof document.getElementById("qrcode") !== 'undefined' && document.getElementById("qrcode") != null){
             if (params['card_number']){ 
@@ -19,12 +20,18 @@ jQuery(document).ready(function () {
         if (isElemetsExist){
             show(document.getElementById('bpwp-verify-start'));
             // Запрос СМС
+            console.log('Elemnts Exists');
             document.getElementById("bpwpSendSms").addEventListener("click", function() {
                 if (params['phone']){
                     const phoneCustomer = params['phone']; 
                     bonusPlusWp.bp_send_sms(phoneCustomer);
+                } else {
+                    
+                    bonusPlusWp.bp_send_sms('debit_bonuses');
+
                 }
             });
+
             hide(document.getElementById("loader"));
         }
 
@@ -70,6 +77,27 @@ jQuery(document).ready(function () {
                 verifyContainerEnd = document.getElementById("bpwp-verify-end");
                 sendSmsButton = document.getElementById("bpwpSendSms");
                 sendOtpButton = document.getElementById("bpwpSendOtp");
+                bonusesInput = document.getElementById("bpwpInput");
+                otpInput = document.getElementById("bpwpInput");
+            if (typeof verifyContainerStart !== 'undefined' && verifyContainerStart != null && typeof verifyContainerEnd !== 'undefined' &&
+                verifyContainerEnd != null && typeof sendSmsButton !== 'undefined' && sendSmsButton != null && typeof sendOtpButton !== 'undefined' &&
+                sendOtpButton != null) {
+                    return 1;
+            } else {
+                    return 0;
+            }
+        },
+
+        /**
+         * Проверяет наличие элементов
+         * 
+         * @returns boolean
+         */
+        is_form_exist: function(){
+            var verifyContainerStart = document.getElementById("bpwp-verify-start");
+                verifyContainerEnd = document.getElementById("bpwp-verify-end");
+                sendSmsButton = document.getElementById("bpwpSendSms");
+                sendOtpButton = document.getElementById("bpwpSendOtp");
                 otpInput = document.getElementById("bpwpOtpInput");
             if (typeof verifyContainerStart !== 'undefined' && verifyContainerStart != null && typeof verifyContainerEnd !== 'undefined' &&
                 verifyContainerEnd != null && typeof sendSmsButton !== 'undefined' && sendSmsButton != null && typeof sendOtpButton !== 'undefined' &&
@@ -92,6 +120,7 @@ jQuery(document).ready(function () {
                 beforeSend: function ( xhr ) {
                     show(document.getElementById("loader"));            
                     hide(document.getElementById("bpwp-verify-start"));
+                    hide(document.getElementById("bpwpOtpInput"));
                     hide(document.getElementById("bpmsg"));
                     document.getElementById("bpwpSendSms").disabled = true;
                     
@@ -110,12 +139,20 @@ jQuery(document).ready(function () {
                 document.getElementById("bpwpSendOtp").addEventListener("click", function() {
                     hide(document.getElementById("bpwp-verify-end"));
                     otpInput = document.getElementById('bpwpOtpInput');
+                    bonusInput = document.getElementById('bpwpBonusInput');
                     if (typeof otpInput !== 'undefined' && otpInput != null){
                         code = otpInput.value;
                         if (code != null){
                             bonusPlusWp.bp_check_code(phoneCustomer, code, params['redirect']);
                         }
                     }
+                    if (typeof bonusInput !== 'undefined' && bonusInput != null){
+                        code = bonusInput.value;
+                        if (code != null){
+                            bonusPlusWp.bp_check_code(phoneCustomer, code, params['redirect'], bonusInput);
+                        }
+                    }
+                    
                 });
                 hide(document.getElementById("loader"));
                 show(document.getElementById("bpwp-verify-end"));
@@ -135,10 +172,11 @@ jQuery(document).ready(function () {
         },
 
         // Отправка запроса - проверка кода 
-        bp_check_code: async function(phoneCustomer, code, redirect){
+        bp_check_code: async function(phoneCustomer, code, redirect, debit = null){
             const data = {
                 phone: phoneCustomer,
                 code: code,
+                code: debit,
             };
 
             jQuery.ajax( {

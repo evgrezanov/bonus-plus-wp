@@ -106,14 +106,13 @@ class BPWPRestApiEndpoints
         $phone = bpwp_api_get_customer_phone($user_id);
 
         $debit_bonuses = $request->get_param('code');
-        do_action('logger', $request);
-        do_action('logger', $debit_bonuses);
         
         // ? Проверить, если нет телефона и кода, то возвращаем ошибку
         $args = array(
             //'phone' => $request->get_param('phone'),
             'phone' => $phone,
-            'code' => $request->get_param('code')
+            'code' => $request->get_param('code'),
+            'debit' => $request->get_param('debit')
         );
 
         // customer/$phone/checkCode/$code
@@ -141,6 +140,19 @@ class BPWPRestApiEndpoints
             );
 
             if ($get_customer['code'] == 200) {
+                
+                // TODO: Если это проверка кода при списании бонусов, то вернуть - успешная проверка
+                // Добавить Fee
+                /*
+                if (is_array($data) && isset($data['request'])) {
+                    $fee_amount = -(int)$data['request']['maxDebitBonuses'];
+                    $fee_name = 'Списание бонусов';
+                    $taxable = true;
+                    $tax_class = 'bpwp-bonuses-reserved';
+                
+                    WC()->cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
+                }
+                */
                 
                 update_user_meta($user_id, 'bonus-plus', $get_customer['request']);
                 $response = array(

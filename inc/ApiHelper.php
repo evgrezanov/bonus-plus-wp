@@ -2,6 +2,8 @@
 
 namespace BPWP;
 
+use WC_Cart;
+
 defined('ABSPATH') || exit; // Exit if accessed directly
 
 class BPWPApiHelper
@@ -18,15 +20,24 @@ class BPWPApiHelper
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_product_meta_end', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10);
-        //add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
+        add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
+
+        add_action( 'woocommerce_add_to_cart', [__CLASS__, 'cart_updated' ] );
+        add_action( 'woocommerce_update_cart_action_cart_updated', [__CLASS__, 'cart_updated' ] );
 
     }
 
-    public static function add_custom_fee_on_checkout()
+    public static function add_custom_fee_on_checkout( WC_Cart $cart)
     {
-        // TODO: Если юзер выбрал Да( списать), то уменьшаем сумму заказа
-
-        // Получить maxDebitBonus
+        //session_start();
+        // Получить данные для списания бонусов
+        $bonuses = $_SESSION['bpwp_debit_bonuses'];
+        
+            if ( ! empty( $bonuses ) ) {
+                $cart->add_fee($bonuses['fee_name'], $bonuses['fee_amount'], $bonuses['taxable'], $bonuses['tax_class']);
+            }
+            
+        /*
         $data = self::bpwp_get_calc_bonusplus_price();
 
         if (is_array($data) && isset($data['request'])) {
@@ -34,11 +45,18 @@ class BPWPApiHelper
             $fee_name = 'Списание бонусов';
             $taxable = true;
             $tax_class = 'bpwp-bonuses-reserved';
-        
+            
             WC()->cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
         }
+        */
     }
-
+    
+    public static function cart_updated( $cart_updated) {
+		$_SESSION['bpwp_debit_bonuses'] = 0;
+        do_action('logger', $_SESSION['bpwp_debit_bonuses']);
+        
+		return true;
+    }
     /**
      *  Возвращает товары в формате RetailItem по ИД
      * 
@@ -218,9 +236,8 @@ class BPWPApiHelper
         
         $info = bpwp_api_get_customer_data();
         if ($info && is_array($info)) {
-
             $available_bonuses = $info['availableBonuses'];
-
+            
             if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
                 
                 $bonuses = 0;
@@ -236,69 +253,47 @@ class BPWPApiHelper
             }
 
             $output .= '<div class="bonus-plus-price">';
-            $output .= '<p>Ваш бонусный баланс '. $available_bonuses .'.</p><p>Сумма бонусов, которые будут начислены '. $bonuses .'.</p><p>Доступно для списания '. $maxDebitBonuses .' бонусов</p>'; 
+            $output .= '<p>Ваш бонусный баланс '. $available_bonuses .'.</p><p>Сумма бонусов, которые будут начислены '. $bonuses .'.</p>'; 
             $output .= '</div>';
-            
-        }
 
-        echo $output;
-    }
-
-    // COPY
-    // Выводим инфу о бонусах
-    public static function bpwp_render_bonusplus_balance($data) {
-        $output = '';
-
-        $info = bpwp_api_get_customer_data(); // Return customer bonus data
-
-        if (!$info && !is_array($info)) {
-            return;
-        }
-
-            $available_bonuses = $info['availableBonuses'];
-
-            if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
-                
-                $bonuses = 0;
-
-                foreach ($data['request']['discount'] as $discount) {
-                    if (isset($discount['cb']) && !empty($discount['cb'])){
-                        $bonuses = $bonuses + $discount['cb'];
-                    }
-                }
-
-                $maxDebitBonuses = $data['request']['maxDebitBonuses'];
-
-            }
-
-            $output .= '<div class="bonus-plus-price">';
-            $output .= '<p>Ваш бонусный баланс '. $available_bonuses .'.</p><p>Сумма бонусов, которые будут начислены '. $bonuses .'.</p><p>Доступно для списания '. $maxDebitBonuses .' бонусов</p>'; 
-            $output .= '</div>';
-            
-            $output .= '
-            <div id="verify-phone-dialog">
-
-            <div id="loader" class="center-body">
+            // На чекаут выводим поле для сипсывания бонусов
+            if ( is_checkout() && $maxDebitBonuses > 0 ) {
+                // var_dump($info);
+                // $phone = $info['phone'];
+                // $cardNumber = $info['cardnumber'];
+                // wp_localize_script(
+                //     'customerjs',
+                //     'accountBonusPlusData',
+                //     array(
+                //         'phone'      => esc_attr($phone),
+                //         'cardNumber' => esc_attr($cardNumber),
+                //     )
+                // );
+                $output .= '<p>Доступно для списания '. $maxDebitBonuses .' бонусов</p>';
+                $output .= '<div id="verify-phone-dialog">
+                <div id="loader" class="center-body">
                 <div class="loader-ball-8"></div>
-            </div>
-            <div hidden id="bpmsg" class="msg" style="display:none;"></div>
-
-                <div id="bpwp-verify-start" style="display:none;">
-                    <p>'. __('Сколько бонусов списать для этой покупки?', 'bonus-plus-wp').'
-                    <strong><?php echo $bonuses ?></strong>
-                </p>
-                <input id="bpwpBonusesInput" type="number" maxLength="1" size="6" min="0" max="'. $maxDebitBonuses .'" pattern="[0-9]*"/>
-                <button id="bpwpSendSms">'. __('Списать бонусы', 'bonus-plus-wp').'</button>
                 </div>
-
-            <div id="bpwp-verify-end" style="display:none;">
-                <p>'. __('Введите код высланый в SMS, на номер телефона:', 'bonus-plus-wp').'
-                    <strong><?php echo $bonuses ?></strong>
-                </p>
-                <input id="bpwpOtpInput" type="number" maxLength="1" size="6" min="0" max="999999" pattern="[0-9]{6}" />
-                <button id="bpwpSendOtp">'. __('Подтвердить номер телефона', 'bonus-plus-wp').'</button>
-            </div>
-            </div>';
+                <div hidden id="bpmsg" class="msg" style="display:none;"></div>
+    
+                    <div id="bpwp-verify-start" style="display:none;">
+                        <p>'. __('Сколько бонусов списать для этой покупки?', 'bonus-plus-wp').'
+                        <strong><?php echo $bonuses ?></strong>
+                        </p>
+                    <input id="bpwpBonusesInput" type="number" maxLength="1" size="6" min="0" max="'. $maxDebitBonuses .'" pattern="[0-9]*"/>
+                    <button id="bpwpSendSms">'. __('Списать бонусы', 'bonus-plus-wp').'</button>
+                    </div>
+    
+                <div id="bpwp-verify-end" style="display:none;">
+                    <p>'. __('Введите код высланый в SMS, на номер телефона:', 'bonus-plus-wp').'
+                        <strong><?php echo $bonuses ?></strong>
+                    </p>
+                    <input id="bpwpOtpInput" type="number" maxLength="1" size="6" min="0" max="999999" pattern="[0-9]{6}" />
+                    <button id="bpwpSendOtp">'. __('Подтвердить номер телефона', 'bonus-plus-wp').'</button>
+                </div>
+                </div>';
+                }
+        }
 
         echo $output;
     }
@@ -360,15 +355,9 @@ class BPWPApiHelper
     public static function bpwp_cart_checkout_bonusplus_price(){
         $content = '';
 
-        // рендер бонусов без формы
-        if (is_cart()) {
+        if (is_cart() || is_checkout()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
             $content = self::bpwp_render_calc_bonusplus_price($price_data);
-        }
-
-        // рендер бонусов с формой списания
-        if (is_checkout() ) {
-        $content = self::bpwp_render_bonusplus_balance($price_data);
         }
         return $content;
     }

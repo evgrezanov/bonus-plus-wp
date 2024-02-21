@@ -48,7 +48,12 @@ class BPWPRestApiEndpoints
                     'type' => 'integer',
                     'required' => true,
                     'sanitize_callback' => 'sanitize_text_field'
-                )
+                ),
+                'debit' => array(
+                    'type' => 'integer',
+                    'required' => true,
+                    'sanitize_callback' => 'sanitize_text_field'
+                ),
             ),
             'permission_callback' => array($this, 'verify_wp_nonce'),
         ));
@@ -71,7 +76,7 @@ class BPWPRestApiEndpoints
             $user_id = get_current_user_id();
         }
 
-        $phone = bpwp_api_get_customer_phone($user_id); // Получаем тот же телефон у пользователя.
+        $phone = bpwp_api_get_customer_phone($user_id); // Получаем телефон у пользователя.
 
         $res = bpwp_api_request(
             'customer/' . $phone . '/sendCode',
@@ -103,14 +108,10 @@ class BPWPRestApiEndpoints
             $user_id = get_current_user_id();
         }
 
-        $phone = bpwp_api_get_customer_phone($user_id);
-
-        $debit_bonuses = $request->get_param('code');
-        
+        //$phone = bpwp_api_get_customer_phone($user_id);
         // ? Проверить, если нет телефона и кода, то возвращаем ошибку
         $args = array(
-            //'phone' => $request->get_param('phone'),
-            'phone' => $phone,
+            'phone' => $request->get_param('phone'),
             'code' => $request->get_param('code'),
             'debit' => $request->get_param('debit')
         );
@@ -128,9 +129,39 @@ class BPWPRestApiEndpoints
                 'success' => true,
                 'message' => 'Код принят',
             );
+
+            //do_action('logger', $args,'warning');
+            
+            // Если это проверка кода при списании бонусов, то вернуть - успешная проверка
+            if ($args['debit'] > 0) {
+                $fee_amount = -(int)$args['debit'];
+                $fee_name = 'Списание бонусов';
+                $taxable = true;
+                $tax_class = 'bpwp-bonuses-reserved';
+                
+                // *! Добавить Fee
+                // *？В мета юзера
+                // Вариант с $_SESSION['bpwp_debit_bonuses']
+                // позже получим в момент обнолвения - trigger('update_checkout');
+                //session_start();
+                $_SESSION['bpwp_debit_bonuses'] = array(
+                    'fee_amount' => $fee_amount,
+                    'fee_name' => $fee_name,
+                    'taxable' => $taxable,
+                    'tax_class' => $tax_class
+                );
+
+                $response = array(
+                    'success' => true,
+                    'message' => $fee_name,
+                    'debit_bonuses' => true,
+                );
+
+                wp_send_json($response);
+                wp_die();
+            }
             
             // Код верный. Запрос проверки существования пользвателя в б+
-            // Если такой номер существует, обновляем мета и редиректим
             $get_customer = bpwp_api_request(
                 'customer',
                 array(
@@ -139,20 +170,8 @@ class BPWPRestApiEndpoints
                 'GET',
             );
 
+            // Если такой номер существует, обновляем мета и редиректим
             if ($get_customer['code'] == 200) {
-                
-                // TODO: Если это проверка кода при списании бонусов, то вернуть - успешная проверка
-                // Добавить Fee
-                /*
-                if (is_array($data) && isset($data['request'])) {
-                    $fee_amount = -(int)$data['request']['maxDebitBonuses'];
-                    $fee_name = 'Списание бонусов';
-                    $taxable = true;
-                    $tax_class = 'bpwp-bonuses-reserved';
-                
-                    WC()->cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
-                }
-                */
                 
                 update_user_meta($user_id, 'bonus-plus', $get_customer['request']);
                 $response = array(
@@ -164,6 +183,7 @@ class BPWPRestApiEndpoints
                 wp_die();
             }
             
+            // Добавляем пользователя в б+
             $customer = bpwp_api_request(
                 'customer',
                 wp_json_encode( array(
@@ -188,9 +208,9 @@ class BPWPRestApiEndpoints
                     $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
                 ); 
             }
-            
-        // 412 - ошибка по разным причинам, обработать. получить message из msg
+
         } else {
+            // 412 - ошибка по разным причинам, обработать. получить message из msg
             $response = array(
                 'success' => false,
                 'message' => 'Код не верный!',

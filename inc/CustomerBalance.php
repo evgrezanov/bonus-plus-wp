@@ -23,6 +23,9 @@ class BPWPCustomerBalance
      */
     public static function bpwp_balance_reserve_bonusplus($order_id, $order)
     {
+        // *! Сейчас списывает все бонусы
+        
+        // TODO: Добавить в мета значение из $_SESSION['bpwp_debit_bonuses']
         $user_id = $order->get_user_id();
                 
         // Получить бонусы для списания и добавить в мета заказа

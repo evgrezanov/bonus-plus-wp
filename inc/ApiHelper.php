@@ -29,32 +29,19 @@ class BPWPApiHelper
 
     public static function add_custom_fee_on_checkout( WC_Cart $cart)
     {
-        //session_start();
         // Получить данные для списания бонусов
-        $bonuses = $_SESSION['bpwp_debit_bonuses'];
+        $fee_amount = -(int)$_SESSION['bpwp_debit_bonuses'];
+        $fee_name = apply_filters('bpwp_order_fee_name', 'Списание бонусов');
+        $taxable = true;
+        $tax_class = 'bpwp-bonuses-reserved';
         
-            if ( ! empty( $bonuses ) ) {
-                $cart->add_fee($bonuses['fee_name'], $bonuses['fee_amount'], $bonuses['taxable'], $bonuses['tax_class']);
-            }
-            
-        /*
-        $data = self::bpwp_get_calc_bonusplus_price();
-
-        if (is_array($data) && isset($data['request'])) {
-            $fee_amount = -(int)$data['request']['maxDebitBonuses'];
-            $fee_name = 'Списание бонусов';
-            $taxable = true;
-            $tax_class = 'bpwp-bonuses-reserved';
-            
-            WC()->cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
+        if ( ! empty( $fee_amount ) ) {
+            $cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
         }
-        */
     }
     
     public static function cart_updated( $cart_updated) {
 		$_SESSION['bpwp_debit_bonuses'] = 0;
-        do_action('logger', $_SESSION['bpwp_debit_bonuses']);
-        
 		return true;
     }
     /**

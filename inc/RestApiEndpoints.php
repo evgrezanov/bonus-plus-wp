@@ -129,31 +129,17 @@ class BPWPRestApiEndpoints
                 'success' => true,
                 'message' => 'Код принят',
             );
-
-            //do_action('logger', $args,'warning');
             
-            // Если это проверка кода при списании бонусов, то вернуть - успешная проверка
+            // *! Добавить Fee
+            // Сохраним значение в $_SESSION['bpwp_debit_bonuses']
+            // позже получим в момент обновления - trigger('update_checkout');
             if ($args['debit'] > 0) {
-                $fee_amount = -(int)$args['debit'];
-                $fee_name = 'Списание бонусов';
-                $taxable = true;
-                $tax_class = 'bpwp-bonuses-reserved';
                 
-                // *! Добавить Fee
-                // *？В мета юзера
-                // Вариант с $_SESSION['bpwp_debit_bonuses']
-                // позже получим в момент обнолвения - trigger('update_checkout');
-                //session_start();
-                $_SESSION['bpwp_debit_bonuses'] = array(
-                    'fee_amount' => $fee_amount,
-                    'fee_name' => $fee_name,
-                    'taxable' => $taxable,
-                    'tax_class' => $tax_class
-                );
+                $_SESSION['bpwp_debit_bonuses'] = (int)$args['debit'];
 
                 $response = array(
                     'success' => true,
-                    'message' => $fee_name,
+                    'message' => 'Списание бонусов',
                     'debit_bonuses' => true,
                 );
 

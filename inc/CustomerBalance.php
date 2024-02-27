@@ -16,8 +16,10 @@ class BPWPCustomerBalance
 
         // Заказ выполнен, запрос с начислением бонусов. Комментарий в заказ - "бонусы начисены"
         add_action('woocommerce_order_status_completed', [__CLASS__, 'bpwp_customer_balance_bonusplus']);
-    }
 
+        // TODO: Если отменен или возврат - делаем возврат 
+        // hook WC
+    }
     /**
      * Резервируем бонусы
      */

@@ -97,74 +97,51 @@ class BPWPMyAccount
         $info = bpwp_api_get_customer_data();
         if ($info && is_array($info)) {
 
-            // for debug
-            if (isset($_REQUEST['bpwp-debug']) && !empty($_REQUEST['bpwp-debug'])) {
-                $is_debug = sanitize_text_field($_REQUEST['bpwp-debug']);
-            }
+            printf('<h2>%s</h2>', 'Информация по карте лояльности');
+            echo '<div id="loader" class="center-body"><div class="loader-ball-8"></div></div>';
+            //do_action('bpwp_after_bonus_card_info_title');
+            echo '<br><div id="qrcode"></div><br>';
 
-            // not debug
-            if (empty($is_debug)) {
-                printf('<h2>%s</h2>', 'Информация по карте лояльности');
-
-                echo '<div id="loader" class="center-body"><div class="loader-ball-8"></div></div>';
-
-                //do_action('bpwp_after_bonus_card_info_title');
-
-                echo '<br><div id="qrcode"></div><br>';
-
-                foreach ($info as $key => $value) {
-                    if ($key != 'person') {
-                        if ($key == 'discountCardName') {
-                            printf('%s:%s<br />', esc_html(__('Тип карты', 'bonus-plus-wp')), esc_html($value));
-                        }
-                        if ($key == 'discountCardNumber') {
-                            printf('%s:%s<br />', esc_html(__('Номер карты', 'bonus-plus-wp')), esc_html($value));
-                        }
-                        if ($key == 'availableBonuses') {
-                            printf('%s:%s<br />', esc_html(__('Доступных бонусов', 'bonus-plus-wp')), esc_html($value));
-                        }
-                        if ($key == 'notActiveBonuses') {
-                            printf('%s:%s<br />', esc_html(__('Неактивных бонусов', 'bonus-plus-wp')), esc_html($value));
-                        }
-                        if ($key == 'purchasesTotalSum') {
-                            printf('%s:%s<br />', esc_html(__('Сумма покупок', 'bonus-plus-wp')), esc_html($value));
-                        }
-                        if ($key == 'purchasesSumToNextCard') {
-                            printf('%s:%s<br />', esc_html(__('Сумма покупок для смены карты', 'bonus-plus-wp')), esc_html($value));
-                        }
-                        if ($key == 'lastPurchaseDate') {
-                            printf('%s:%s<br />', esc_html(__('Последняя покупка', 'bonus-plus-wp')), esc_html($value));
-                        }
-                    } else {
-                        $person_data = $value;
-                        $person = array();
-                        foreach ($person_data as $pkey => $pvalue) {
-                            if ($pkey == 'ln' || $pkey == 'fn' || $pkey == 'mn') {
-                                $person[$pkey] = $pvalue;
-                            }
-                        }
-                        if (!empty($person)) {
-                            $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
-                            if (!empty($owner)) {
-                                printf('%s:%s<br />', esc_html(__('Держатель', 'bonus-plus-wp')), esc_html($owner));
-                            }
+            foreach ($info as $key => $value) {
+                if ($key != 'person') {
+                    if ($key == 'discountCardName') {
+                        printf('%s:%s<br />', esc_html(__('Тип карты', 'bonus-plus-wp')), esc_html($value));
+                    }
+                    if ($key == 'discountCardNumber') {
+                        printf('%s:%s<br />', esc_html(__('Номер карты', 'bonus-plus-wp')), esc_html($value));
+                    }
+                    if ($key == 'availableBonuses') {
+                        printf('%s:%s<br />', esc_html(__('Доступных бонусов', 'bonus-plus-wp')), esc_html($value));
+                    }
+                    if ($key == 'notActiveBonuses') {
+                        printf('%s:%s<br />', esc_html(__('Неактивных бонусов', 'bonus-plus-wp')), esc_html($value));
+                    }
+                    if ($key == 'purchasesTotalSum') {
+                        printf('%s:%s<br />', esc_html(__('Сумма покупок', 'bonus-plus-wp')), esc_html($value));
+                    }
+                    if ($key == 'purchasesSumToNextCard') {
+                        printf('%s:%s<br />', esc_html(__('Сумма покупок для смены карты', 'bonus-plus-wp')), esc_html($value));
+                    }
+                    if ($key == 'lastPurchaseDate') {
+                        printf('%s:%s<br />', esc_html(__('Последняя покупка', 'bonus-plus-wp')), esc_html($value));
+                    }
+                } else {
+                    $person_data = $value;
+                    $person = array();
+                    foreach ($person_data as $pkey => $pvalue) {
+                        if ($pkey == 'ln' || $pkey == 'fn' || $pkey == 'mn') {
+                            $person[$pkey] = $pvalue;
                         }
                     }
-                }
-            } else { // debug
-                foreach ($info as $key => $value) {
-                    if ($key !== 'person') {
-                        printf('%s:%s<br />', esc_html($key), esc_html($value));
-                    } else {
-                        $personalInfo = $value;
-                        foreach ($personalInfo as $pkey => $pvalue) {
-                            if (!is_array($pvalue)) {
-                                printf('%s:%s<br />', esc_html($pkey), esc_html($pvalue));
-                            }
+                    if (!empty($person)) {
+                        $owner = $person['ln'] . ' ' . $person['fn'] . ' ' . $person['mn'];
+                        if (!empty($owner)) {
+                            printf('%s:%s<br />', esc_html(__('Держатель', 'bonus-plus-wp')), esc_html($owner));
                         }
                     }
+                    }
                 }
-            }
+
         } else { // нет данных в бонус+ 
             do_action('bpwp_veryfy_client_data');
         }
@@ -238,7 +215,7 @@ class BPWPMyAccount
             printf('<h3>%s</h3>', __('text', 'bonus-plus-wp'));
         }
 
-        echo $msg;
+        echo $msg; 
     }
 
     /**

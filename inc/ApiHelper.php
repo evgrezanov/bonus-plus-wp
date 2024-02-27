@@ -19,7 +19,7 @@ class BPWPApiHelper
 
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
-        add_action('woocommerce_product_meta_end', [__CLASS__, 'bpwp_single_product_bonusplus_price'], 10);
+        add_action('woocommerce_product_meta_end', [__CLASS__, 'bpwp_single_bonusplus_price'], 10);
         add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
 
         add_action( 'woocommerce_add_to_cart', [__CLASS__, 'cart_updated' ] );
@@ -27,7 +27,7 @@ class BPWPApiHelper
 
     }
 
-    public static function add_custom_fee_on_checkout( WC_Cart $cart)
+    public static function add_custom_fee_on_checkout(WC_Cart $cart)
     {
         // Получить данные для списания бонусов
         $fee_amount = -(int)$_SESSION['bpwp_debit_bonuses'];
@@ -40,7 +40,7 @@ class BPWPApiHelper
         }
     }
     
-    public static function cart_updated( $cart_updated) {
+    public static function cart_updated($cart_updated) {
 		$_SESSION['bpwp_debit_bonuses'] = 0;
 		return true;
     }
@@ -51,7 +51,7 @@ class BPWPApiHelper
      * 
      *  @return object RetailItem для переданных товаров https://bonusplus.pro/api/Help/ResourceModel?modelName=RetailItem
      */
-    public static function bpwp_product_to_retailitems ($product_ids) 
+    public static function bpwp_product_to_retailitems($product_ids) 
     {
         $products_data = [];
         $ext = 0;
@@ -107,10 +107,6 @@ class BPWPApiHelper
      *  
      *  @return object CalcResult https://bonusplus.pro/api/Help/ResourceModel?modelName=CalcResult
      * 
-     * 
-     *  TODO: дописать обработку массива
-     *  ! Если товар один. смотри bpwp_product_to_retailitems - нужно сформировать массив retail item. Проверить как отрабатывает
-     *  ..
      */
     public static function bpwp_get_calc_bonusplus_price()
     {
@@ -119,7 +115,6 @@ class BPWPApiHelper
 
         // Если находимся на странице товара
         if (is_product() && $product) {
-            $items[] = $product->get_id();
             $quantity = 1;
             $items[] = array(
                 'id'        => $product->get_id(),
@@ -138,7 +133,7 @@ class BPWPApiHelper
                 );
             }
         }
-
+        
         $items = self::bpwp_product_to_retailitems($items);
 
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
@@ -177,56 +172,15 @@ class BPWPApiHelper
     public static function bpwp_render_calc_bonusplus_price($data) {
         
         $output = '';
-        // TODO добавить проверку на nonce if (isset($_GET['testrequest']) && isset($_GET['nonce']) && wp_verify_nonce($_GET['nonce'], 'nonce_action_name')) {}
-        if (isset($_GET['testrequest'])) {
-            
-            $output .= '<ul>';
-        
-            if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
 
-                foreach ($data['request']['discount'] as $discount) {
-                    $output .= '<li>';
-                    $output .= '<strong>ext:</strong> ' . $discount['ext'] . '<br>';
-
-                    if (is_array($discount['messages']) && !empty($discount['messages'])) {
-                        $output .= '<strong>messages:</strong> <ul>';
-                        foreach ($discount['messages'] as $message) {
-                            $output .= '<li>' . $message . '</li>';
-                        }
-                        $output .= '</ul>';
-                    }
-                
-                    $output .= '<strong>cb:</strong> ' . $discount['cb'] . ' - Сумма бонусов, которые будут начислены на данную позицию<br>';
-                    $output .= '<strong>db:</strong> ' . $discount['db'] . ' - Сумма бонусов, которые будут списаны для данной позиции<br>';
-                    $output .= '<strong>ds:</strong> ' . $discount['ds'] . ' - Общая сумма скидки для позиции (без учета бонусов)<br>';
-                    $output .= '<strong>dp:</strong> ' . $discount['dp'] . ' - Процент скидки для позиции (без учета бонусов)<br>';
-                    $output .= '<strong>ids:</strong> ' . $discount['ids'] . ' - Сумма скидки, примененная на стороне БонусПлюс для данной позиции (внутренняя скидка)<br>';
-                    $output .= '<strong>idp:</strong> ' . $discount['idp'] . ' - Процент скидки, примененный на стороне БонусПлюс для данной позиции (внутренняя скидка)<br>';
-                    $output .= '<strong>dbp:</strong> ' . $discount['dbp'] . ' - Процент списания бонусов<br>';
-                    $output .= '<strong>cbp:</strong> ' . $discount['cbp'] . ' - Процент начисления бонусов<br>';
-                    $output .= '</li>';
-                }
-            } else {
-                $output .= '<li>Invalid data format</li>';
-            }
-        
-            $output .= '</ul>';
-            $maxDebitBonuses = $data['request']['maxDebitBonuses'];
-            $multiplicityDebitBonus = $data['request']['multiplicityDebitBonus'];
-            $output .= '<strong>maxDebitBonuses:</strong> ';
-            $output .= $maxDebitBonuses . '<br>';
-            $output .= '<strong>multiplicityDebitBonus:</strong> ';
-            $output .= $multiplicityDebitBonus . '<br>';
-        
-        }
-
-        
         $info = bpwp_api_get_customer_data();
+        
         if ($info && is_array($info)) {
+
             $available_bonuses = $info['availableBonuses'];
             
             if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
-                
+
                 $bonuses = 0;
 
                 foreach ($data['request']['discount'] as $discount) {
@@ -245,17 +199,6 @@ class BPWPApiHelper
 
             // На чекаут выводим поле для сипсывания бонусов
             if ( is_checkout() && $maxDebitBonuses > 0 ) {
-                // var_dump($info);
-                // $phone = $info['phone'];
-                // $cardNumber = $info['cardnumber'];
-                // wp_localize_script(
-                //     'customerjs',
-                //     'accountBonusPlusData',
-                //     array(
-                //         'phone'      => esc_attr($phone),
-                //         'cardNumber' => esc_attr($cardNumber),
-                //     )
-                // );
                 $output .= '<p>Доступно для списания '. $maxDebitBonuses .' бонусов</p>';
                 $output .= '<div id="verify-phone-dialog">
                 <div id="loader" class="center-body">
@@ -267,7 +210,7 @@ class BPWPApiHelper
                         <p>'. __('Сколько бонусов списать для этой покупки?', 'bonus-plus-wp').'
                         <strong><?php echo $bonuses ?></strong>
                         </p>
-                    <input id="bpwpBonusesInput" type="number" maxLength="1" size="6" min="0" max="'. $maxDebitBonuses .'" pattern="[0-9]*"/>
+                    <input id="bpwpBonusesInput" type="number" maxLength="1" size="6" min="0" max="'. esc_attr($maxDebitBonuses) .'" pattern="[0-9]*"/>
                     <button id="bpwpSendSms">'. __('Списать бонусы', 'bonus-plus-wp').'</button>
                     </div>
     
@@ -282,7 +225,7 @@ class BPWPApiHelper
                 }
         }
 
-        echo $output;
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -308,31 +251,19 @@ class BPWPApiHelper
             }
             $output .= '</div>';
 
-            echo $output;
+            echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         }
     }
 
     /**
      *  Выводим информацию по бонусам
      */
-    public static function bpwp_single__bonusplus_price(){
-        $price_data = self::bpwp_get_calc_bonusplus_price();
-        echo self::bpwp_render_retailitems_calc($price_data);
-    }
-
-    /**
-     *  Выводит доступные бонусы на странице товара
-     */
-    public static function bpwp_single_product_bonusplus_price(){
-        
-        if (!is_product()) {
-            return;
-        }
+    public static function bpwp_single_bonusplus_price(){
         
         $content = '';
         $price_data = self::bpwp_get_calc_bonusplus_price();
         $content = self::bpwp_render_retailitems_calc($price_data);
-            
+
         return $content;
     }
 

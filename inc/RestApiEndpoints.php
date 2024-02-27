@@ -123,7 +123,7 @@ class BPWPRestApiEndpoints
             'PUT'
         );
         
-        // Если 204 - успех, создаем клиента: запрос POST /customer, phone обязательно
+        // Cоздаем клиента или резервируем бонусы
         if ($res['code'] == 204) {
             $response = array(
                 'success' => true,
@@ -131,18 +131,16 @@ class BPWPRestApiEndpoints
             );
             
             // *! Добавить Fee
-            // Сохраним значение в $_SESSION['bpwp_debit_bonuses']
-            // позже получим в момент обновления - trigger('update_checkout');
             if ($args['debit'] > 0) {
                 
                 $_SESSION['bpwp_debit_bonuses'] = (int)$args['debit'];
-
+                
                 $response = array(
                     'success' => true,
                     'message' => 'Списание бонусов',
                     'debit_bonuses' => true,
                 );
-
+                
                 wp_send_json($response);
                 wp_die();
             }

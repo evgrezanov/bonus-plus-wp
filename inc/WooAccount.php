@@ -288,31 +288,16 @@ class BPWPMyAccount
      */
     public static function bpwp_get_client_registration_data($user_id)
     {
-        //$customerMeta = new WC_Customer($user_id);
         $customer = get_user_meta($user_id);
         $firstName = !empty($customer['billing_first_name']) ? $customer['billing_first_name'] : '-';
         $lastName = !empty($customer['billing_last_name']) ? $customer['billing_last_name'] : '-';
-        //$address1 = !empty($customer['billing_address_1']) ? $customer['billing_address_1'] : '-';
-        //$address2 = !empty($customer['billing_address_2']) ? $customer['billing_address_2'] : '-';
-        //$billingCity = !empty($customer['billing_city']) ? $customer['billing_city'] : '-';
-        //$billingState = !empty($customer['billing_state']) ? $customer['billing_state'] : '-';
-        //$billingPostcode = !empty($customer['billing_postcode']) ? $customer['billing_postcode'] : '-';
-        //$billingCountry = !empty($customer['billing_country']) ? $customer['billing_country'] : '-';
+        
         $billingEmail = !empty($customer['billing_email']) ? $customer['billing_email'] : '-';
         $billingPhone = !empty($customer['billing_phone']) ? $customer['billing_phone'] : '-';
 
         $registrationData = array();
 
         if ($firstName && $lastName && $billingEmail && $billingPhone) {
-            /*
-            $registrationData['phone']      = $billingPhone;
-            $registrationData['email']      = $billingEmail;
-            $registrationData['fn']         = $firstName;
-            $registrationData['ln']         = $lastName;
-            $registrationData['desc']       = __('Регистрация на сайте', 'bonus-plus-wp');
-            $registrationData['birthDay']   = $birthday;
-            */
-
             $registrationData = array(
                 'phone'      => $billingPhone[0],
                 'email'      => $billingEmail[0],
@@ -320,7 +305,6 @@ class BPWPMyAccount
                 'ln'         => $lastName[0],
                 'desc'       => __('Регистрация на сайте', 'bonus-plus-wp'),
             );
-            //$registrationData['address']   = $billingPostcode . $billingCountry . $billingState . $billingCity . $address1 . $address2;
         }
 
         return $registrationData;

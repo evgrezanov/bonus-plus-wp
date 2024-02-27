@@ -92,6 +92,10 @@ PHP Рекомендуем 8.0 и выше
 
 == Changelog ==
 
+= 2.11=
+- возможность списания части бонусов на чекауте https://github.com/evgrezanov/bonus-plus-wp/issues/63
+- bugs fixing
+
 = 2.10 =
 - version fix
 

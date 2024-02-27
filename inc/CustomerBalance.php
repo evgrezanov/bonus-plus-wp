@@ -12,14 +12,40 @@ class BPWPCustomerBalance
     public static function init()
     {
         // Создание заказа - Резервирование бонусов на счету клиента
-        add_action( 'woocommerce_new_order', [__CLASS__, 'bpwp_balance_reserve_bonusplus'], 10, 2);
+        add_action( 'woocommerce_new_order', [__CLASS__, 'bpwp_balance_reserve_bonusplus'], 10, 2 );
 
         // Заказ выполнен, запрос с начислением бонусов. Комментарий в заказ - "бонусы начисены"
-        add_action('woocommerce_order_status_completed', [__CLASS__, 'bpwp_customer_balance_bonusplus']);
-
-        // TODO: Если отменен или возврат - делаем возврат 
-        // hook WC
+        add_action( 'woocommerce_order_status_completed', [__CLASS__, 'bpwp_customer_balance_bonusplus'] );
+        add_action( 'woocommerce_cancelled_order', [__CLASS__,'bpwp_cancelled_order'] ); // Заказ отменен
     }
+
+    /**
+     * Возврат резерва бонусов
+     * 
+     * @param  $order_id 
+     *
+     * @return void
+     */
+    public static function bpwp_cancelled_order ($order_id ){
+    
+        $order = wc_get_order($order_id);
+        $bonus_debit = $order->get_meta( '_bonus_debit' );
+        
+        if (isset($bonus_debit) || !empty($bonus_debit)) {
+            
+            $user_id = $order->get_user_id();
+            $order_data = array(
+                'billing_phone' => bpwp_api_get_customer_phone($user_id),
+                'order_id' => $order_id,
+                'bonus_debit' => -(int)$bonus_debit,
+            );
+            
+            // Освобождаем из резерва, передаем отрицательное число
+            self::bpwp_balance_reserve($order_data);
+        }
+    }
+
+
     /**
      * Резервируем бонусы
      */

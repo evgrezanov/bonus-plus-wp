@@ -20,14 +20,14 @@ class BPWPApiHelper
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_product_meta_end', [__CLASS__, 'bpwp_single_bonusplus_price'], 10);
-        add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'add_custom_fee_on_checkout']);
+        add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'bpwp_add_custom_fee_on_checkout']);
 
-        add_action( 'woocommerce_add_to_cart', [__CLASS__, 'cart_updated' ] );
-        add_action( 'woocommerce_update_cart_action_cart_updated', [__CLASS__, 'cart_updated' ] );
+        add_action( 'woocommerce_add_to_cart', [__CLASS__, 'bpwp_cart_updated' ] );
+        add_action( 'woocommerce_update_cart_action_cart_updated', [__CLASS__, 'bpwp_cart_updated' ] );
 
     }
 
-    public static function add_custom_fee_on_checkout(WC_Cart $cart)
+    public static function bpwp_add_custom_fee_on_checkout(WC_Cart $cart)
     {
         // Получить данные для списания бонусов
         $fee_amount = -(int)$_SESSION['bpwp_debit_bonuses'];
@@ -40,7 +40,7 @@ class BPWPApiHelper
         }
     }
     
-    public static function cart_updated($cart_updated) {
+    public static function bpwp_cart_updated($cart_updated) {
 		$_SESSION['bpwp_debit_bonuses'] = 0;
 		return true;
     }

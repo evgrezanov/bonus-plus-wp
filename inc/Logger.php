@@ -123,10 +123,10 @@ final class BPWPLogger
       $callback = function ($args) {
         printf(
           '<input type="checkbox" name="%s" value="1" %s />',
-          $args['key'],
+          esc_attr($args['key']),
           checked(1, $args['value'], false)
         );
-        printf('<p><small>При включении, ошибки и ключевые изменения данных будут записываться в <a href="%s">журнал WooCommerce</a></small></p>', admin_url('admin.php?page=wc-status&tab=logs'));
+        printf('<p><small>При включении, ошибки и ключевые изменения данных будут записываться в <a href="%s">журнал WooCommerce</a></small></p>', admin_url('admin.php?page=wc-status&tab=logs')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
       },
       $page = 'bpwp-settings',
       $section = 'bpwp_section_access',

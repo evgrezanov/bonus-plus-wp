@@ -280,7 +280,7 @@ class BPWPApiHelper
         return $content;
     }
 
-    /**11
+    /**
      * Get the maximum debit bonuses from the provided data array.
      *
      * @param array $data The input data array

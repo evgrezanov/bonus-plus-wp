@@ -29,8 +29,11 @@ class BPWPApiHelper
 
     public static function bpwp_add_custom_fee_on_checkout(WC_Cart $cart)
     {
+        // TODO: Проверить WC()->session
+        if ( isset(WC()->session) && ! WC()->session->has_session() ) {
         $fee_amount = WC()->session->get('bpwp_debit_bonuses');
         do_action('logger', $fee_amount,'error');
+        }
 
         if ( $fee_amount = WC()->session->get('bpwp_debit_bonuses')) {
             

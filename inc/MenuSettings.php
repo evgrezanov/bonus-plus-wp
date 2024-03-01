@@ -481,7 +481,7 @@ class BPWPMenuSettings
 
         } else {
 
-            printf('<a href="%s">Вернуться...</a>', remove_query_arg('a', self::$url));
+            printf('<a href="%s">Вернуться...</a>', esc_url(remove_query_arg('a', self::$url)) );
             // TODO Processing form data without nonce verification.
             // if ( isset( $_GET['a'] ) && isset( $_GET['nonce'] ) && wp_verify_nonce( $_GET['nonce'], 'your_action_nonce' ) ) {
             //do_action( 'bpwp_tool_actions_' . $_GET['a'] );

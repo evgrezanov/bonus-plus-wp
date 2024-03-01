@@ -14,7 +14,7 @@
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.4.2
- * Version: 2.10
+ * Version: 2.11
  */
 namespace BPWP;
 
@@ -27,10 +27,13 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.10');
+        define('BPWP_PLUGIN_VERSION', '2.11');
 
         require_once __DIR__ . '/functions.php';
 
+        if ( ! session_id() && ! headers_sent() ) {
+			session_start();
+		}
         /**
          * Add hook for activate plugin
          */

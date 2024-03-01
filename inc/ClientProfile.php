@@ -48,8 +48,8 @@ class BPWPProfile
 
         <div class="container">
             <a class="<?php echo esc_attr($class); ?>" href="<?php echo esc_url_raw($url); ?>">
-                <h3 class="bp-bonuses-card-title"><?php esc_html_e($title); ?></h3>
-                <p class="small bp-bonuses-card"><?php esc_html_e($desc); ?></p>
+                <h3 class="bp-bonuses-card-title"><?php esc_html_e( $title, 'bonus-plus-wp' ); ?></h3>
+                <p class="small bp-bonuses-card"><?php esc_html_e( $desc, 'bonus-plus-wp' ); ?></p>
                 <div class="go-corner" href="<?php echo esc_url_raw($url); ?>">
                     <div class="go-arrow">
                         →
@@ -200,7 +200,9 @@ class BPWPProfile
                     do_action(
                         'bpwp_logger',
                         $type = __CLASS__,
+                        /* translators: Error message when retrieving customer data. %s is the user ID. */
                         $title = __('Ошибка при получении данных клиента', 'bonus-plus-wp'),
+                        /* translators: %s is the user ID. */
                         $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
                     ); 
                 }
@@ -209,7 +211,9 @@ class BPWPProfile
                 do_action(
                     'bpwp_logger',
                     $type = __CLASS__,
+                    /* translators: Message displayed when phone is not verified. */
                     $title = __('Не верифицирован телефон', 'bonus-plus-wp'),
+                    /* translators: Message displayed when phone is not verified. %s is the user ID. */
                     $desc = sprintf(__('У пользователя с ИД %s не верифицирован телефон, данные не получены!', 'bonus-plus-wp'), $user_id),
                 );
             }

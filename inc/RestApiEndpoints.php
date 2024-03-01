@@ -12,6 +12,17 @@ class BPWPRestApiEndpoints
     public function __construct()
     {
         add_action('rest_api_init', [$this, 'register_endpoints'], 10);
+        // Early enable customer WC_Session
+        add_action( 'init', [$this,'wc_session_enabler'] ); //https://rajaamanullah.com/how-to-use-woocommerce-sessions-and-cookies/
+    }
+    
+    public static function wc_session_enabler() {
+        if ( is_user_logged_in() || is_admin() )
+            return;
+    
+        if ( isset(WC()->session) && ! WC()->session->has_session() ) {
+            WC()->session->set_customer_session_cookie( true );
+        }
     }
 
     /**
@@ -133,7 +144,12 @@ class BPWPRestApiEndpoints
             // *! Добавить Fee
             if ($args['debit'] > 0) {
                 
-                $_SESSION['bpwp_debit_bonuses'] = (int)$args['debit'];
+                // TODO: использовать WC_Session
+                //$_SESSION['bpwp_debit_bonuses'] = (int)$args['debit'];
+                //update_user_meta($user_id, 'bpwp_debit_bonuses', (int)$args['debit']);
+                $bonus_debit = WC()->session->set('bpwp_debit_bonuses', (int)$args['debit']);
+                
+                do_action('logger', $bonus_debit);
                 
                 $response = array(
                     'success' => true,

@@ -51,8 +51,13 @@ class BPWPCustomerBalance
      */
     public static function bpwp_balance_reserve_bonusplus($order_id, $order)
     {
+        if ( !($bonus_debit = WC()->session->get('bpwp_debit_bonuses')) ) {
+            return;
+        }
+        
         // Добавить в мета значение из $_SESSION['bpwp_debit_bonuses']
-        $bonus_debit = $_SESSION['bpwp_debit_bonuses'];
+        //$bonus_debit = $_SESSION['bpwp_debit_bonuses'];
+        //$bonus_debit = WC()->session->get('bpwp_debit_bonuses');
         $user_id = $order->get_user_id();
         
         $order_data = array(

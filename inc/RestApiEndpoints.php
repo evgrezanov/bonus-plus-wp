@@ -148,10 +148,8 @@ class BPWPRestApiEndpoints
                 // TODO: использовать WC_Session
                 //$_SESSION['bpwp_debit_bonuses'] = (int)$args['debit'];
                 //update_user_meta($user_id, 'bpwp_debit_bonuses', (int)$args['debit']);
-                global $woocommerce;
-                $bonus_debit = $woocommerce()->session->set('bpwp_debit_bonuses', (int)$args['debit']);
-                
-                do_action('logger', $bonus_debit);
+                $fee_amount = WC()->session->set('bpwp_debit_bonuses', 123);
+                do_action('logger', $fee_amount,'warning');
                 
                 $response = array(
                     'success' => true,

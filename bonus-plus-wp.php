@@ -14,7 +14,7 @@
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.4.2
- * Version: 2.11
+ * Version: 2.12
  */
 namespace BPWP;
 
@@ -27,7 +27,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.11');
+        define('BPWP_PLUGIN_VERSION', '2.12');
 
         require_once __DIR__ . '/functions.php';
 
@@ -100,6 +100,13 @@ class BPWPBonusPlus_Core
         wp_register_style(
             'bpwp-bonus-loader-style',
             plugins_url('/assets/loader.css', __FILE__),
+            [],
+            BPWP_PLUGIN_VERSION,
+            'all'
+        );
+        wp_register_style(
+            'bpwp-user-qr-card-style',
+            plugins_url('/assets/qrcard.css', __FILE__),
             [],
             BPWP_PLUGIN_VERSION,
             'all'

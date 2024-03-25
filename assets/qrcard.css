@@ -1,0 +1,19 @@
+.bp-info-card{
+    border: 2px outset #666;
+    width: 250px;
+    height: 500px;
+    border-radius: 10px;
+    padding: 20px 0px;
+    margin: 15px;
+    text-align:center;
+  }
+  
+  .bp-card-number{
+    margin-top: 15px;
+    font-size: larger;
+    font-weight: 400;
+  }
+  
+  .bp-bonuses{
+    font-size: larger;
+  }

@@ -53,18 +53,8 @@ class BPWPBonusPlus_Core
 
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_shortcode_wp_enqueue_styles']);
 
-        add_action( 'woocommerce_init', [__CLASS__, 'enable_wc_session_cookie' ] );
     }
     
-    public static function enable_wc_session_cookie(){ 
-        if( is_admin() )
-            return;
-    
-        if ( isset(WC()->session) && ! WC()->session->has_session() ) 
-            WC()->session->set_customer_session_cookie( true );
-        
-    }
-
     /**
      * Add languages
      *

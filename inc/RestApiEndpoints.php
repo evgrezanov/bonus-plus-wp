@@ -141,26 +141,20 @@ class BPWPRestApiEndpoints
                 'message' => 'Код принят',
             );
             
-            // *! Добавить Fee
+            // *! Передаем количество бонусов
             if ($args['debit'] > 0) {
                 
                 do_action('logger', (int)$args['debit']);
-                // TODO: использовать WC_Session
-                //$_SESSION['bpwp_debit_bonuses'] = (int)$args['debit'];
-                //update_user_meta($user_id, 'bpwp_debit_bonuses', (int)$args['debit']);
-                $fee_amount = WC()->session->set('bpwp_debit_bonuses', 123);
-                do_action('logger', $fee_amount,'warning');
-                
                 $response = array(
                     'success' => true,
                     'message' => 'Списание бонусов',
-                    'debit_bonuses' => true,
+                    'debit_bonuses' => $args['debit'],
                 );
                 
                 wp_send_json($response);
                 wp_die();
             }
-            
+
             // Код верный. Запрос проверки существования пользвателя в б+
             $get_customer = bpwp_api_request(
                 'customer',

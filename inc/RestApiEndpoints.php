@@ -144,11 +144,12 @@ class BPWPRestApiEndpoints
             // *! Передаем количество бонусов
             if ($args['debit'] > 0) {
                 
-                do_action('logger', (int)$args['debit']);
+                update_user_meta($user_id, 'bpwp_debit_bonuses', esc_attr($args['debit']));
+
                 $response = array(
                     'success' => true,
                     'message' => 'Списание бонусов',
-                    'debit_bonuses' => $args['debit'],
+                    'debit_bonuses' => true,
                 );
                 
                 wp_send_json($response);

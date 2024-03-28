@@ -12,11 +12,12 @@ class BPWPCustomerBalance
     public static function init()
     {
         // Создание заказа - Резервирование бонусов на счету клиента
-        add_action( 'woocommerce_new_order', [__CLASS__, 'bpwp_balance_reserve_bonusplus'], 10, 2 );
+        // Добавление данных из мета корзины в мета данные заказа
+        add_action( 'woocommerce_new_order', [__CLASS__, 'bpwp_balance_reserve_bonusplus'], 90, 2 );
 
         // Заказ выполнен, запрос с начислением бонусов. Комментарий в заказ - "бонусы начисены"
         add_action( 'woocommerce_order_status_completed', [__CLASS__, 'bpwp_customer_balance_bonusplus'] );
-        add_action( 'woocommerce_cancelled_order', [__CLASS__,'bpwp_cancelled_order'] ); // Заказ отменен
+        add_action( 'woocommerce_order_status_cancelled', [__CLASS__,'bpwp_cancelled_order'] ); // Заказ отменен
     }
 
     /**
@@ -41,23 +42,24 @@ class BPWPCustomerBalance
             );
             
             // Освобождаем из резерва, передаем отрицательное число
-            self::bpwp_balance_reserve($order_data);
+            $balance_reserve = self::bpwp_balance_reserve($order_data);
+            if ($balance_reserve['code'] == 204) {
+                delete_post_meta( $order_id, '_bonus_debit');
+            }
         }
     }
-
 
     /**
      * Резервируем бонусы
      */
     public static function bpwp_balance_reserve_bonusplus($order_id, $order)
     {
-        if ( !($bonus_debit = WC()->session->get('bpwp_debit_bonuses')) ) {
+        if (  WC()->session->__isset( 'bpwp_debit_bonuses' ) ) {
+            $bonus_debit = WC()->session->get('bpwp_debit_bonuses');
+        } else {
             return;
         }
-        
-        // Добавить в мета значение из $_SESSION['bpwp_debit_bonuses']
-        //$bonus_debit = $_SESSION['bpwp_debit_bonuses'];
-        //$bonus_debit = WC()->session->get('bpwp_debit_bonuses');
+
         $user_id = $order->get_user_id();
         
         $order_data = array(
@@ -70,19 +72,22 @@ class BPWPCustomerBalance
         https://bonusplus.pro/api/Help/Api/PATCH-customer-phoneNumber-balance-reserve
         */
         $balance_reserve = self::bpwp_balance_reserve($order_data);
-
+        
         if ($balance_reserve['code'] == 204) {
             
             $info = bpwp_api_get_customer_data();
             
             if ($info && is_array($info)) {
                 $info['availableBonuses'] = $info['availableBonuses'] - $bonus_debit;
-                
                 update_user_meta($user_id, 'bonus-plus', $info);
             }
-
+            
             // Добавить бонусы в мета заказа
             add_post_meta( $order_id, '_bonus_debit', $bonus_debit, true);
+
+            if (  WC()->session->__isset( 'bpwp_debit_bonuses' ) ) {
+                WC()->session->set('bpwp_debit_bonuses', null);
+            }
         
         } else {
             do_action(
@@ -125,7 +130,7 @@ class BPWPCustomerBalance
         $order = wc_get_order($order_id);
         $user_id = $order->get_user_id();
         $bonus_debit = $order->get_meta( '_bonus_debit' );
-        
+
         if (isset($bonus_debit) || !empty($bonus_debit)) {
             
             $order_data = array(
@@ -133,7 +138,7 @@ class BPWPCustomerBalance
                 'order_id' => $order_id,
                 'bonus_debit' => -(int)$bonus_debit,
             );
-            
+
             // Освобождаем из резерва, передаем отрицательное число
             $balance_reserve = self::bpwp_balance_reserve($order_data);
             
@@ -150,7 +155,7 @@ class BPWPCustomerBalance
                     'bpwp_logger',
                     $type = __CLASS__,
                     $title = __('Проведение продажи в БонусПлюс', 'bonus-plus-wp'),
-                    $desc = sprintf(__('Заказа ИД %s, код ошибки %s', 'bonus-plus-wp'), $order_id,),
+                    $desc = sprintf(__('Заказа ИД %s, код ошибки %s', 'bonus-plus-wp'), $order_id),
                     );
                 }
 

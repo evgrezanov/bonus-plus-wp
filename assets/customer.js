@@ -191,7 +191,6 @@ jQuery(document).ready(function () {
                 document.getElementById('bpmsg').innerHTML = 'Списание бонусов';
                 show(document.getElementById('bpmsg'));
                 
-                console.log(response.debit_bonuses)
                 jQuery.ajax({
                     type: "post",
                     url:  wc_checkout_params.ajax_url,
@@ -201,7 +200,6 @@ jQuery(document).ready(function () {
                     },
                     success: function(response) {
                         jQuery('body').trigger('update_checkout');
-                        console.log('response: '+response);
                     },
                     error: function(error){
                         console.log('error: '+error);

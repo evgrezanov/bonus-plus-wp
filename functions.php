@@ -161,28 +161,21 @@ function bpwp_api_get_error_msg($code)
     return $code && key_exists($code, $errors) ? $errors[$code] : false;
 }
 
-
-// Wordpress Ajax code (set ajax data in Woocommerce session)
+// Запишем bpwp_debit_bonuses в WC()->session
 add_action( 'wp_ajax_set_bpwp_debit_bonuses', 'set_bpwp_debit_bonuses' );
 add_action( 'wp_ajax_nopriv_set_bpwp_debit_bonuses', 'set_bpwp_debit_bonuses' );
 function set_bpwp_debit_bonuses() {
-    if( isset($_POST['bonuses']) ){
-        WC()->session->set( 'bpwp_debit_bonuses', esc_attr( $_POST['bonuses'] ) );
+    
+    if (!is_user_logged_in()) {
+        return;
+    }
+    
+    $bonuses = get_user_meta(get_current_user_id(), 'bpwp_debit_bonuses', true);
+    
+    if( true == $_POST['bonuses'] && isset($bonuses) && isset($bonuses) > 0 ){
+        delete_user_meta(get_current_user_id(), 'bpwp_debit_bonuses');
+        WC()->session->set( 'bpwp_debit_bonuses', $bonuses );
         echo true;
     }
     exit();
-}
-
-// Списание бонусов в заказе
-add_action( 'woocommerce_cart_calculate_fees', 'bpwp_custom_fee_on_checkout', 20, 1 );
-function bpwp_custom_fee_on_checkout( $cart ) {
-    if ( is_admin() && ! defined( 'DOING_AJAX' ) )
-        return;
-
-    // Only for targeted shipping method
-    if (  WC()->session->__isset( 'bpwp_debit_bonuses' ) )
-        $discount = (float) WC()->session->get( 'bpwp_debit_bonuses' );
-
-    if( isset($discount) && $discount > 0 )
-        $cart->add_fee( __( 'Списание бонусов', 'woocommerce' ), -$discount );
 }

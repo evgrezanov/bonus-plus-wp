@@ -2,8 +2,6 @@
 
 namespace BPWP;
 
-use WC_Cart;
-
 defined('ABSPATH') || exit; // Exit if accessed directly
 
 class BPWPApiHelper
@@ -20,28 +18,29 @@ class BPWPApiHelper
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_product_meta_end', [__CLASS__, 'bpwp_single_bonusplus_price'], 10);
-        add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'bpwp_add_custom_fee_on_checkout']);
+        add_action('woocommerce_cart_calculate_fees', [__CLASS__, 'bpwp_add_custom_fee_on_checkout'], 20, 1);
 
         add_action( 'woocommerce_add_to_cart', [__CLASS__, 'bpwp_cart_updated' ] );
         add_action( 'woocommerce_update_cart_action_cart_updated', [__CLASS__, 'bpwp_cart_updated' ] );
-
     }
-
-    public static function bpwp_add_custom_fee_on_checkout(WC_Cart $cart)
+    
+    // Списание бонусов в заказе
+    public static function bpwp_add_custom_fee_on_checkout($cart)
     {
-        // Получить данные для списания бонусов
-        $fee_amount = -(int)$_SESSION['bpwp_debit_bonuses'];
-        $fee_name = apply_filters('bpwp_order_fee_name', 'Списание бонусов');
-        $taxable = true;
-        $tax_class = 'bpwp-bonuses-reserved';
+        if (WC()->session->__isset('bpwp_debit_bonuses')) {
+            $discount = (float) WC()->session->get('bpwp_debit_bonuses');
+        }
         
-        if ( ! empty( $fee_amount ) ) {
-            $cart->add_fee($fee_name, $fee_amount, $taxable, $tax_class);
+        if (isset($discount) && $discount > 0) {
+        $cart->add_fee(__('Списание бонусов', 'bonus-plus-wp'), -$discount);
         }
     }
     
     public static function bpwp_cart_updated($cart_updated) {
-		$_SESSION['bpwp_debit_bonuses'] = 0;
+        if (  WC()->session->__isset( 'bpwp_debit_bonuses' ) ) {
+            WC()->session->set('bpwp_debit_bonuses', null);
+        }
+        delete_user_meta(get_current_user_id(), 'bpwp_debit_bonuses');
 		return true;
     }
     /**

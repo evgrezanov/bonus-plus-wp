@@ -97,11 +97,6 @@ class BPWPMyAccount
         $info = bpwp_api_get_customer_data();
         if ($info && is_array($info)) {
 
-            //printf('<h2>%s</h2>', 'Информация по карте лояльности');
-            //echo '<div id="loader" class="center-body"><div class="loader-ball-8"></div></div>';
-            //do_action('bpwp_after_bonus_card_info_title');
-            //echo '<br><div id="qrcode"></div><br>';
-
             foreach ($info as $key => $value) {
                 if ($key != 'person') {
                     if ($key == 'discountCardName') {
@@ -146,7 +141,7 @@ class BPWPMyAccount
                     }
                 }
             }
-        include_once(BPWP_PLUGIN_PATH . 'templates/client-card.php');
+        include_once(BPWP_PLUGIN_DIR . 'templates/client-card.php');
         } else { // нет данных в бонус+ 
             do_action('bpwp_veryfy_client_data');
         }

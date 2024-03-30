@@ -17,3 +17,7 @@
   .bp-bonuses{
     font-size: larger;
   }
+
+  #qrcode{
+    display: inline-block;
+  }

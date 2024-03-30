@@ -29,6 +29,8 @@ class BPWPBonusPlus_Core
     {
         define('BPWP_PLUGIN_VERSION', '2.12');
 
+        define('BPWP_PLUGIN_DIR', plugin_dir_path(__FILE__));
+
         require_once __DIR__ . '/functions.php';
 
         if ( ! session_id() && ! headers_sent() ) {

@@ -33,9 +33,6 @@ class BPWPBonusPlus_Core
 
         require_once __DIR__ . '/functions.php';
 
-        if ( ! session_id() && ! headers_sent() ) {
-			session_start();
-		}
         /**
          * Add hook for activate plugin
          */

@@ -1,5 +1,5 @@
 === WPBonusPlus ===
-Contributors: redmonkey73
+Contributors: redmonkey73, mickuznetsov
 Donate link: https://github.com/evgrezanov
 Tags: bonus, woocommerce, sync, integration
 Requires at least: 4.0

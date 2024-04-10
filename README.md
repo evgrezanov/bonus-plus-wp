@@ -4,7 +4,7 @@
 * Donate link: https://github.com/evgrezanov
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
-* Tested up to: 6.4.2
+* Tested up to: 6.5
 * Stable tag: 2.12
 * Requires PHP: 8.1
 * License: GPLv2 or later
@@ -91,6 +91,10 @@ PHP Рекомендуем 8.0 и выше
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 2.12
+- fix bugs
+- Вынести шаблон карты в лк в /templates
 
 ## 2.11
 - возможность списания части бонусов на чекауте https://github.com/evgrezanov/bonus-plus-wp/issues/63

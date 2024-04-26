@@ -160,3 +160,22 @@ function bpwp_api_get_error_msg($code)
 
     return $code && key_exists($code, $errors) ? $errors[$code] : false;
 }
+
+// Запишем bpwp_debit_bonuses в WC()->session
+add_action( 'wp_ajax_set_bpwp_debit_bonuses', 'set_bpwp_debit_bonuses' );
+add_action( 'wp_ajax_nopriv_set_bpwp_debit_bonuses', 'set_bpwp_debit_bonuses' );
+function set_bpwp_debit_bonuses() {
+    
+    if (!is_user_logged_in()) {
+        return;
+    }
+    
+    $bonuses = get_user_meta(get_current_user_id(), 'bpwp_debit_bonuses', true);
+    
+    if( true == $_POST['bonuses'] && isset($bonuses) && isset($bonuses) > 0 ){
+        delete_user_meta(get_current_user_id(), 'bpwp_debit_bonuses');
+        WC()->session->set( 'bpwp_debit_bonuses', $bonuses );
+        echo true;
+    }
+    exit();
+}

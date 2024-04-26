@@ -294,7 +294,7 @@ class BPWPWooProductCatExport
                 'bpwp_logger_error',
                 $type = __CLASS__,
                 $title = __('Экспорт товаров в Бонус+, невозможен', 'bonus-plus-wp'),
-                $desc = __('Параметры название магазина или список продуктовпереданы неверно', 'bonus-plus-wp'),
+                $desc = __('Параметры название магазина или список продуктов переданы неверно', 'bonus-plus-wp'),
             );
         }
 

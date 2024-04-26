@@ -14,7 +14,7 @@
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.4.2
- * Version: 2.11
+ * Version: 2.12
  */
 namespace BPWP;
 
@@ -27,13 +27,12 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.11');
+        define('BPWP_PLUGIN_VERSION', '2.12');
+
+        define('BPWP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
         require_once __DIR__ . '/functions.php';
 
-        if ( ! session_id() && ! headers_sent() ) {
-			session_start();
-		}
         /**
          * Add hook for activate plugin
          */
@@ -52,8 +51,9 @@ class BPWPBonusPlus_Core
         add_action('bpwp_deactivate', [__CLASS__, 'bpwp_plugin_deactivate']);
 
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_shortcode_wp_enqueue_styles']);
-    }
 
+    }
+    
     /**
      * Add languages
      *
@@ -72,6 +72,7 @@ class BPWPBonusPlus_Core
     public static function bpwp_load_components()
     {
         if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+            require_once __DIR__ . '/inc/RestApiEndpoints.php';
             require_once __DIR__ . '/inc/WooAccount.php';
             require_once __DIR__ . '/inc/ApiHelper.php';
         }
@@ -80,7 +81,6 @@ class BPWPBonusPlus_Core
         require_once __DIR__ . '/inc/ClientProfile.php';
         require_once __DIR__ . '/inc/WooProductCatExport.php';
         require_once __DIR__ . '/inc/CustomerBalance.php';
-        require_once __DIR__ . '/inc/RestApiEndpoints.php';
     }   
 
     /**
@@ -100,6 +100,13 @@ class BPWPBonusPlus_Core
         wp_register_style(
             'bpwp-bonus-loader-style',
             plugins_url('/assets/loader.css', __FILE__),
+            [],
+            BPWP_PLUGIN_VERSION,
+            'all'
+        );
+        wp_register_style(
+            'bpwp-user-qr-card-style',
+            plugins_url('/assets/qrcard.css', __FILE__),
             [],
             BPWP_PLUGIN_VERSION,
             'all'

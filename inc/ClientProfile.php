@@ -43,7 +43,7 @@ class BPWPProfile
         $class  = $customer_bonuses['class'];
 
         wp_enqueue_style('bpwp-bonus-card-style');
-
+        wp_enqueue_style('bpwp-user-qr-card-style');
         ob_start(); ?>
 
         <div class="container">
@@ -136,7 +136,7 @@ class BPWPProfile
             $data['desc']   =   $desc;
             $data['class']  =   'card3';
 
-            // Проверим заполнены ли у порльзователя дата рождения и телефон
+            // Проверим заполнены ли у пользователя платежный телефон
             $user_id = get_current_user_id();
             $billing_phone = get_user_meta(get_current_user_id(), 'billing_phone', true);
             $bonus_plus = get_user_meta(get_current_user_id(), 'bonus-plus', true);
@@ -182,42 +182,38 @@ class BPWPProfile
         // Check billing_phone 
         $phone = bpwp_api_get_customer_phone($user_id);
         // Если у пользователя есть мета bonus-plus, значит телефон ранее верифицирован
-        // if (!empty(get_user_meta($user_id, 'bonus-plus', true))){
-            // Значит обновим данные
-            //$phone = bpwp_api_get_customer_phone($user_id);
-            //$isPhoneVerified = get_user_meta($user_id, 'bpwp_phone_verified', true);
-            if (!empty($phone)) {
-                $res = bpwp_api_request(
-                    'customer',
-                    array(
-                        'phone' => $phone
-                    ),
-                    'GET'
-                );
-                if ($res['code'] == 200){
-                    update_user_meta($user_id, 'bonus-plus', $res['request']);
-                } else {
-                    do_action(
-                        'bpwp_logger',
-                        $type = __CLASS__,
-                        /* translators: Error message when retrieving customer data. %s is the user ID. */
-                        $title = __('Ошибка при получении данных клиента', 'bonus-plus-wp'),
-                        /* translators: %s is the user ID. */
-                        $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
-                    ); 
-                }
-                
-            } else {  
+        // Значит обновим данные
+        if (!empty($phone)) {
+            $res = bpwp_api_request(
+                'customer',
+                array(
+                    'phone' => $phone
+                ),
+                'GET'
+            );
+            if ($res['code'] == 200){
+                update_user_meta($user_id, 'bonus-plus', $res['request']);
+            } else {
                 do_action(
                     'bpwp_logger',
                     $type = __CLASS__,
-                    /* translators: Message displayed when phone is not verified. */
-                    $title = __('Не верифицирован телефон', 'bonus-plus-wp'),
-                    /* translators: Message displayed when phone is not verified. %s is the user ID. */
-                    $desc = sprintf(__('У пользователя с ИД %s не верифицирован телефон, данные не получены!', 'bonus-plus-wp'), $user_id),
-                );
+                    /* translators: Error message when retrieving customer data. %s is the user ID. */
+                    $title = __('Ошибка при получении данных клиента', 'bonus-plus-wp'),
+                    /* translators: %s is the user ID. */
+                    $desc = sprintf(__('У пользователя с ИД %s, данные не получены!', 'bonus-plus-wp'), $user_id),
+                ); 
             }
-        //}    
+                
+        } else {  
+            do_action(
+                'bpwp_logger',
+                $type = __CLASS__,
+                /* translators: Message displayed when phone is not verified. */
+                $title = __('Не верифицирован телефон', 'bonus-plus-wp'),
+                /* translators: Message displayed when phone is not verified. %s is the user ID. */
+                $desc = sprintf(__('У пользователя с ИД %s не верифицирован телефон, данные не получены!', 'bonus-plus-wp'), $user_id),
+            );
+        }  
     }
 
     /**

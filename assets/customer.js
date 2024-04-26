@@ -190,7 +190,22 @@ jQuery(document).ready(function () {
             } else if (response.success && response.debit_bonuses) {
                 document.getElementById('bpmsg').innerHTML = 'Списание бонусов';
                 show(document.getElementById('bpmsg'));
-                jQuery('body').trigger('update_checkout');
+                
+                jQuery.ajax({
+                    type: "post",
+                    url:  wc_checkout_params.ajax_url,
+                    data: {
+                        'action' : 'set_bpwp_debit_bonuses',
+                        'bonuses' : response.debit_bonuses
+                    },
+                    success: function(response) {
+                        jQuery('body').trigger('update_checkout');
+                    },
+                    error: function(error){
+                        console.log('error: '+error);
+                    }
+                });
+
             } else {
                 document.getElementById('bpmsg').innerHTML = 'Код не верный, попробуйте еще раз';
                 show(document.getElementById('bpmsg'));

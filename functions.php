@@ -170,11 +170,14 @@ function set_bpwp_debit_bonuses() {
         return;
     }
     
-    $bonuses = get_user_meta(get_current_user_id(), 'bpwp_debit_bonuses', true);
+    $user_id = get_current_user_id();
+    $bonuses = get_user_meta($user_id, 'bpwp_debit_bonuses', true);
+    $max_debit_bonuses = get_user_meta($user_id, 'bpwp_max_debit_bonuses', true);
+    $debit_bonuses = $bonuses <= $max_debit_bonuses ? $bonuses : $max_debit_bonuses;
     
     if( true == $_POST['bonuses'] && isset($bonuses) && isset($bonuses) > 0 ){
-        delete_user_meta(get_current_user_id(), 'bpwp_debit_bonuses');
-        WC()->session->set( 'bpwp_debit_bonuses', $bonuses );
+        delete_user_meta($user_id, 'bpwp_debit_bonuses');
+        WC()->session->set( 'bpwp_debit_bonuses', $debit_bonuses );
         echo true;
     }
     exit();

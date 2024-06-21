@@ -14,7 +14,7 @@
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.4.2
- * Version: 2.12
+ * Version: 2.12.dev
  */
 namespace BPWP;
 

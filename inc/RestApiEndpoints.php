@@ -88,7 +88,7 @@ class BPWPRestApiEndpoints
         }
 
         $phone = bpwp_api_get_customer_phone($user_id); // Получаем телефон у пользователя.
-
+        $phone = preg_replace('/\D/', '', $phone);
         $res = bpwp_api_request(
             'customer/' . $phone . '/sendCode',
             array(),
@@ -121,8 +121,9 @@ class BPWPRestApiEndpoints
 
         //$phone = bpwp_api_get_customer_phone($user_id);
         // ? Проверить, если нет телефона и кода, то возвращаем ошибку
+
         $args = array(
-            'phone' => $request->get_param('phone'),
+            'phone' => preg_replace('/\D/', '', $request->get_param('phone')),
             'code' => $request->get_param('code'),
             'debit' => $request->get_param('debit')
         );

@@ -154,8 +154,6 @@ class BPWPApiHelper
                 'PUT',
             );
             
-            //$response_code = wp_remote_retrieve_response_code($retailcalc);
-
             return $retailcalc;
         }
         
@@ -179,7 +177,7 @@ class BPWPApiHelper
             $available_bonuses = $info['availableBonuses'];
             
             if (is_array($data) && isset($data['request']) && isset($data['request']['discount'])) {
-
+                
                 $bonuses = 0;
 
                 foreach ($data['request']['discount'] as $discount) {
@@ -189,7 +187,9 @@ class BPWPApiHelper
                 }
 
                 $maxDebitBonuses = $data['request']['maxDebitBonuses'];
-
+                if (is_user_logged_in()) {
+                    update_user_meta(get_current_user_id(), 'bpwp_max_debit_bonuses', $maxDebitBonuses);
+                }
             }
 
             $output .= '<div class="bonus-plus-price">';
@@ -261,6 +261,7 @@ class BPWPApiHelper
         
         $content = '';
         $price_data = self::bpwp_get_calc_bonusplus_price();
+        
         $content = self::bpwp_render_retailitems_calc($price_data);
 
         return $content;
@@ -274,6 +275,7 @@ class BPWPApiHelper
 
         if (is_cart() || is_checkout()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
+            
             $content = self::bpwp_render_calc_bonusplus_price($price_data);
         }
         return $content;

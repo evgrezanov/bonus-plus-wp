@@ -154,11 +154,6 @@ class BPWPApiHelper
                 'PUT',
             );
             
-            //$response_code = wp_remote_retrieve_response_code($retailcalc);
-            do_action('logger', 'RETAIL/CALC');
-            do_action('logger', $params);
-            do_action('logger', $retailcalc);
-            
             return $retailcalc;
         }
         
@@ -175,9 +170,7 @@ class BPWPApiHelper
         
         $output = '';
 
-        
         $info = bpwp_api_get_customer_data();
-        do_action('logger', $info);
         
         if ($info && is_array($info)) {
 
@@ -268,7 +261,6 @@ class BPWPApiHelper
         
         $content = '';
         $price_data = self::bpwp_get_calc_bonusplus_price();
-        do_action('logger', $price_data, 'error');
         
         $content = self::bpwp_render_retailitems_calc($price_data);
 
@@ -283,7 +275,6 @@ class BPWPApiHelper
 
         if (is_cart() || is_checkout()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
-            do_action('logger', $price_data,'warning');
             
             $content = self::bpwp_render_calc_bonusplus_price($price_data);
         }

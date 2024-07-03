@@ -5,7 +5,7 @@
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
 * Tested up to: 6.5
-* Stable tag: 2.12
+* Stable tag: 2.13
 * Requires PHP: 8.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,10 @@ PHP Рекомендуем 8.0 и выше
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 2.13
+- исправлена ошибка при списании бонусов https://github.com/evgrezanov/bonus-plus-wp/issues/75
+- добавлена проверка номера телефона https://github.com/evgrezanov/bonus-plus-wp/issues/72
 
 ## 2.12
 - fix bugs

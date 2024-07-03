@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Bonus-Plus-wp
- * Plugin URI: https://github.com/evgrezanov/bonus-plus-wp
+ * Plugin URI: https://bonuspluswp.site/
  * Description: Интеграция WooCommerce и БонусПлюс. Для отображения данных пользователя используйте шорткод [bpwp_api_customer_bonus_card]
  * Author: redmonkey73
  * Author URI: https://github.com/evgrezanov/
@@ -14,7 +14,7 @@
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.4.2
- * Version: 2.12.dev
+ * Version: 2.13
  */
 namespace BPWP;
 
@@ -27,7 +27,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.12');
+        define('BPWP_PLUGIN_VERSION', '2.13');
 
         define('BPWP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 

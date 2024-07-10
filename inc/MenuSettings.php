@@ -43,6 +43,11 @@ class BPWPMenuSettings
     public static $product_cat_export_wiki_page_url;
 
     /**
+     *  needHelpUrl
+     */
+    public static $need_help_url;
+
+    /**
      * The Init
      */
     public static function init()
@@ -55,7 +60,9 @@ class BPWPMenuSettings
 
         self::$url = $_SERVER['REQUEST_URI'];
 
-        self::$product_cat_export_wiki_page_url = 'https://bonuspluswp.site/wiki/products-export/';
+        self::$product_cat_export_wiki_page_url = 'https://bonuspluswp.site/category/docs/';
+
+        self::$need_help_url = 'https://bonuspluswp.site/request/';
 
         add_action(
             'admin_menu',
@@ -116,10 +123,18 @@ class BPWPMenuSettings
         );
 
         printf(
-            '<a href="%s" target="_blank">%s</a>',
+            '<a href="%s" target="_blank">%s</a> | ',
             esc_url(self::$bpwp_dev_doc_url),
             esc_html(
                 __('БонусПлюс для разработчиков', 'bonus-plus-wp')
+            )
+        );
+
+        printf(
+            '<a href="%s" target="_blank" style="color: green; font-weight: bold;">%s</a>',
+            esc_url(self::$need_help_url),
+            esc_html(
+                __('Нужна помошь?', 'bonus-plus-wp')
             )
         );
     }

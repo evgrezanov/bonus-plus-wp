@@ -13,8 +13,8 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
- * Tested up to: 6.4.2
- * Version: 2.13
+ * Tested up to: 6.5
+ * Version: 2.14
  */
 namespace BPWP;
 
@@ -27,7 +27,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.13');
+        define('BPWP_PLUGIN_VERSION', '2.14');
 
         define('BPWP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -52,6 +52,9 @@ class BPWPBonusPlus_Core
 
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_shortcode_wp_enqueue_styles']);
 
+        add_filter('plugin_action_links_bonus-plus-wp/bonus-plus-wp.php', [__CLASS__, 'bpwp_add_support_link']);
+
+        add_filter('plugin_row_meta', [__CLASS__, 'bpwp_plugin_row_meta'], 10, 2);
     }
     
     /**
@@ -132,6 +135,34 @@ class BPWPBonusPlus_Core
     public static function bpwp_plugin_deactivate()
     {
         flush_rewrite_rules();
+    }
+
+    /**
+     * Добавляет ссылку на страницу поддержки на странице плагинов.
+     *
+     * @param array $links Существующие ссылки.
+     * @return array Модифицированный массив ссылок.
+     */
+    public static function bpwp_add_support_link($links) {
+        $support_link = '<a href="https://bonuspluswp.site/request/" target="_blank" style="color: green; font-weight: bold;">' . __('Нужна помошь', 'bonus-plus-wp') . '</a>';
+        array_push($links, $support_link);
+
+        return $links;
+    }
+
+    /**
+     * Добавляет ссылку на страницу документации в мета-данные плагина.
+     *
+     * @param array $links Существующие ссылки.
+     * @param string $file Путь к файлу плагина.
+     * @return array Модифицированный массив ссылок.
+     */
+    public static function bpwp_plugin_row_meta($links, $file) {
+        if ($file == 'bonus-plus-wp/bonus-plus-wp.php') {
+            $support_link = '<a href="https://bonuspluswp.site/category/docs/" target="_blank" font-weight: bold;">' . __('Документация', 'bonus-plus-wp') . '</a>';
+            $links[] = $support_link;
+        }
+        return $links;
     }
 }
 BPWPBonusPlus_Core::init();

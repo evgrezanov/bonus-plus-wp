@@ -1,11 +1,11 @@
 # Bonus-plus-wp 
 
 * Contributors: redmonkey73, mickuznetsov
-* Donate link: https://github.com/evgrezanov
+* Donate link: https://ko-fi.com/evgeniyrezanov
 * Tags: bonus, woocommerce, sync, integration
 * Requires at least: 4.0
 * Tested up to: 6.5
-* Stable tag: 2.13
+* Stable tag: 2.14
 * Requires PHP: 8.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -33,9 +33,9 @@ Integration WordPress/WooCommerce & [BonusPlus](http://bonusplus.pro) (for Russi
 
 Примеры получаемых данных REST API Бонус+: [https://bonusplus.pro/api/Help](https://bonusplus.pro/api/Help)
 
-[Документация по началу работы](https://github.com/evgrezanov/bonus-plus-wp/wiki)
+[Документация по началу работы](https://bonuspluswp.site/category/docs/)
 
-[Нужна доработка плагина?](https://github.com/evgrezanov/bonus-plus-wp/issues/new)
+[Нужна доработка плагина?](https://bonuspluswp.site/request/)
 
 # Installation
 
@@ -91,6 +91,9 @@ PHP Рекомендуем 8.0 и выше
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 2.14
+- добавлены ссылки на документацию и форму обратной связи
 
 ## 2.13
 - исправлена ошибка при списании бонусов https://github.com/evgrezanov/bonus-plus-wp/issues/75

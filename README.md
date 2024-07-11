@@ -1,4 +1,58 @@
-# Bonus-plus-wp 
+<div id="top"></div>
+<!--
+*** Thanks for checking out the Best-README-Template. If you have a suggestion
+*** that would make this better, please fork the repo and create a pull request
+*** or simply open an issue with the tag "enhancement".
+*** Don't forget to give the project a star!
+*** Thanks again! Now go create something AMAZING! :D
+-->
+
+
+
+<!-- PROJECT SHIELDS -->
+<!--
+*** I'm using markdown "reference style" links for readability.
+*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** See the bottom of this document for the declaration of the reference variables
+*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
+<div align="center">
+  
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+  
+</div>
+
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+
+  <h3 align="center">bonus-plus-wp</h3>
+
+  <p align="center">
+    Интеграция WordPress/Woocommerce с программой лояльности Бонус+
+    <br />
+    <br />
+    <a href="https://bonuspluswp.site/">Перейти на сайт</a>
+    ·
+    <a href="https://github.com/evgrezanov/bonus-plus-wp/issues">Сообщить об ошибке</a>
+    ·
+    <a href="https://github.com/evgrezanov/bonus-plus-wp/issues">Нужна доработка</a>
+  </p>
+</div>
+
+
+
+<!-- ABOUT THE PROJECT -->
+
+## Bonus-plus-wp 
+
+[![bonus-plus-wp Banner][product-screenshot]](https://bonuspluswp.site/)
+
 
 * Contributors: redmonkey73, mickuznetsov
 * Donate link: https://ko-fi.com/evgeniyrezanov
@@ -189,3 +243,17 @@ PHP Рекомендуем 8.0 и выше
 - Страница настроек подключения
 - Шорткод бонусной карты
 - Интеграция с WooCommerce
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/evgrezanov/bonus-plus-wp.svg?style=for-the-badge
+[contributors-url]: https://github.com/evgrezanov/bonus-plus-wp/graphs/contributors.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/evgrezanov/bonus-plus-wp.svg?style=for-the-badge
+[forks-url]: https://github.com/evgrezanov/bonus-plus-wp/network/members
+[stars-shield]: https://img.shields.io/github/stars/evgrezanov/bonus-plus-wp.svg?style=for-the-badge
+[stars-url]: https://github.com/evgrezanov/bonus-plus-wp/stargazers
+[issues-shield]: https://img.shields.io/github/issues/evgrezanov/bonus-plus-wp.svg?style=for-the-badge
+[issues-url]: https://github.com/evgrezanov/bonus-plus-wp/issues
+[license-shield]: https://img.shields.io/github/license/evgrezanov/bonus-plus-wp.svg?style=for-the-badge
+[license-url]: https://github.com/evgrezanov/bonus-plus-wp/blob/master/LICENSE.txt
+[product-screenshot]: banner.png

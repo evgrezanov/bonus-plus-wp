@@ -15,6 +15,10 @@ class BPWPApiHelper
     {
         self::$maxDebitBonuses = 0;
 
+        // Cart Item Price
+        add_filter( 'woocommerce_cart_item_price', [__CLASS__, 'bpwp_cart_price_view'], 1000, 2 );
+        add_filter( 'woocommerce_cart_item_price_html', [__CLASS__, 'bpwp_cart_price_view'], 1000, 2 );
+
         add_action('woocommerce_before_cart_totals', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_checkout_before_order_review', [__CLASS__, 'bpwp_cart_checkout_bonusplus_price']);
         add_action('woocommerce_product_meta_end', [__CLASS__, 'bpwp_single_bonusplus_price'], 10);
@@ -131,6 +135,8 @@ class BPWPApiHelper
                     'quantity'  => $cart_item['quantity']
                 );
             }
+            do_action('logger', $items);
+            
         }
         
         $items = self::bpwp_product_to_retailitems($items);
@@ -255,6 +261,35 @@ class BPWPApiHelper
     }
 
     /**
+     *  Выводим цену товара с учетом скидки
+     */
+    public static function bpwp_cart_price_view($item_price, $cart_item)
+    {
+
+        $discounted_price = null;
+
+        $price = $cart_item['data']->get_price(); // get cart price
+
+        // TODO делать запрос на каждый товар. Или по циклу по id товара
+        $price_data = self::bpwp_get_calc_bonusplus_price();
+
+        if (is_array($price_data) && isset($price_data['request']) && isset($price_data['request']['discount'])) {
+            foreach ($price_data['request']['discount'] as $discount) {
+
+                if (isset($discount['ids']) && !empty($discount['ids'])) {
+                    $discounted_price = $price - $discount['ids'];
+                }
+            }
+
+        }
+
+        $item_price = $discounted_price ? wc_format_sale_price($item_price, $discounted_price) : $item_price;
+
+        return $item_price;
+
+    }
+
+    /**
      *  Выводим информацию по бонусам
      */
     public static function bpwp_single_bonusplus_price(){
@@ -275,7 +310,7 @@ class BPWPApiHelper
 
         if (is_cart() || is_checkout()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
-            
+
             $content = self::bpwp_render_calc_bonusplus_price($price_data);
         }
         return $content;

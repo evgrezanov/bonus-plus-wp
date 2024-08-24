@@ -11,11 +11,11 @@
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Playground: https://raw.githubusercontent.com/evgrezanov/bonus-plus-wp/main/blueprint.json
+ * Playground: https://raw.githubusercontent.com/evgrezanov/bonus-plus-wp/main/blueprints/blueprint.json
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.6.1
- * Version: 2.17
+ * Version: 2.18
  */
 namespace BPWP;
 

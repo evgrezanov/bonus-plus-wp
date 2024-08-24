@@ -59,11 +59,11 @@
 * Tags: bonus, woocommerce, sync, integration, loyalty program
 * Requires at least: 4.0
 * Tested up to: 6.5
-* Stable tag: 2.17
+* Stable tag: 2.18
 * Requires PHP: 8.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
-* Playground: https://github.com/evgrezanov/bonus-plus-wp/blob/main/assets/blueprints/blueprint.json
+* Playground: https://raw.githubusercontent.com/evgrezanov/bonus-plus-wp/main/blueprints/blueprint.json
 
 БонусПлюс ([bonusplus.pro](http://bonusplus.pro/)) and WordPress/WooCommerce - sync, integration, connection
 

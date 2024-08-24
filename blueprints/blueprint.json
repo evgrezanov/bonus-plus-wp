@@ -5,7 +5,7 @@
       "wp": "6.6"
     },
     "features": {
-      "networking": true
+      "networking": false
     },
     "phpExtensionBundles": [
       "kitchen-sink"

@@ -68,7 +68,7 @@
 
 # Description
 
-Integration WordPress/WooCommerce & [BonusPlus](http://bonusplus.pro) (for Russia)
+Integration WordPress/WooCommerce & [BonusPlus](https://bonusplus.pro/api/link/KEETCJEL) (for Russia)
 
 Интеграция приложения БонусПлюс (программа лояльности) и WordPress/WooCommerce
 
@@ -83,9 +83,9 @@ Integration WordPress/WooCommerce & [BonusPlus](http://bonusplus.pro) (for Russi
 
 [Обработка персональных данных](https://bonusplus.pro/new/data-processing/)
 
-Документация разработчика: [https://bonusplus.pro/api](https://bonusplus.pro/api)
+[Документация разработчика](https://bonusplus.pro/api)
 
-Примеры получаемых данных REST API Бонус+: [https://bonusplus.pro/api/Help](https://bonusplus.pro/api/Help)
+[Примеры получаемых данных REST API Бонус+](https://bonusplus.pro/api/Help)
 
 [Документация по началу работы](https://bonuspluswp.site/category/docs/)
 
@@ -145,6 +145,10 @@ PHP Рекомендуем 8.0 и выше
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 2.15
+- добавлена функция обязательного ввода номера телефона при регистрации
+- исправлена работа с бонусами джля вариативных товаров
 
 ## 2.14
 - добавлены ссылки на документацию и форму обратной связи

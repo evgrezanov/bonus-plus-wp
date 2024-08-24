@@ -34,6 +34,23 @@ class BPWPApiHelper
         if (isset($discount) && $discount > 0) {
         $cart->add_fee(__('Списание бонусов', 'bonus-plus-wp'), -$discount);
         }
+
+        $price_data = self::bpwp_get_calc_bonusplus_price();
+
+        $fee = 0;
+
+        if (is_array($price_data) && isset($price_data['request']) && isset($price_data['request']['discount'])) {
+            foreach ($price_data['request']['discount'] as $discount) {
+                if (isset($discount['ids']) && !empty($discount['ids'])) {
+                    $fee += $discount['ids'];
+                }
+            }
+        }
+        
+        if (!empty($fee) && $fee > 0) {
+            $cart->add_fee( __( 'Скидка', 'bonus-plus-wp' ) , -$fee );
+		}
+
     }
     
     public static function bpwp_cart_updated($cart_updated) {
@@ -56,7 +73,6 @@ class BPWPApiHelper
         $ext = 0;
 
         foreach ($product_ids as $product_item) {
-
             $product = wc_get_product($product_item['id']);
             $quantity = $product_item['quantity'];
             
@@ -106,6 +122,7 @@ class BPWPApiHelper
      *  
      *  @return object CalcResult https://bonusplus.pro/api/Help/ResourceModel?modelName=CalcResult
      * 
+     * * На странице товара выводим начисление бонусов.
      */
     public static function bpwp_get_calc_bonusplus_price()
     {
@@ -120,21 +137,22 @@ class BPWPApiHelper
                 'quantity'  => $quantity
             );
         }
-
+        
         // Если находимся в корзине
         if (is_cart() || is_checkout()) {
             $cart = WC()->cart;
             $cart_items = $cart->get_cart();
+            
             foreach ($cart_items as $cart_item_key => $cart_item) {
                 $items[] = array(
-                    'id'        => $cart_item['product_id'],
+                    'id'        => $cart_item['variation_id'] ?: $cart_item['product_id'],
                     'quantity'  => $cart_item['quantity']
                 );
             }
         }
         
         $items = self::bpwp_product_to_retailitems($items);
-
+        
         $store = !empty(get_option('bpwp_shop_name')) ? esc_html(get_option('bpwp_shop_name')) : '';
 
         $billingPhone = bpwp_api_get_customer_phone();
@@ -275,7 +293,7 @@ class BPWPApiHelper
 
         if (is_cart() || is_checkout()) {
             $price_data = self::bpwp_get_calc_bonusplus_price();
-            
+
             $content = self::bpwp_render_calc_bonusplus_price($price_data);
         }
         return $content;

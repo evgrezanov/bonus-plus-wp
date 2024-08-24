@@ -52,11 +52,11 @@ class BPWPMenuSettings
      */
     public static function init()
     {
-        self::$bpwp_owner_url = 'https://bonusplus.pro/lk/Pages/Cabinet/Module/Loyalty/API_Preferences.aspx';
+        self::$bpwp_owner_url = 'https://bonusplus.pro/api/link/KEETCJEL';
 
         self::$bpwp_dev_doc_url = 'https://bonusplus.pro/api';
 
-        self::$bpwp_client_url = 'https://bonusplus.pro/lk';
+        self::$bpwp_client_url = 'https://bonusplus.pro/api/link/KEETCJEL';
 
         self::$url = $_SERVER['REQUEST_URI'];
 
@@ -168,15 +168,6 @@ class BPWPMenuSettings
             $section = 'bpwp_section_access'
         );
 
-        register_setting('bpwp-settings', 'bpwp_lk_url');
-        add_settings_field(
-            $id = 'bpwp_lk_url',
-            $title = __('URL Личного кабинета', 'bonus-plus-wp'),
-            $callback = array(__CLASS__, 'display_lk_url'),
-            $page = 'bpwp-settings',
-            $section = 'bpwp_section_access'
-        );
-        
         register_setting('bpwp-settings', 'bpwp_shop_name');
         add_settings_field(
             $id = 'bpwp_shop_name',
@@ -351,18 +342,6 @@ class BPWPMenuSettings
             '<p><small>%s</small></p>',
             esc_html(__('Отобразится для пользователей неавторизованных на сайте, либо не имеющих аккаунта в Бонус+', 'bonus-plus-wp')),
         );
-    }
-
-    /**
-     * display_lk_url
-     * 
-     *  @return mixed
-     */
-    public static function display_lk_url()
-    {
-        printf('<input class="regular-text" type="url" name="bpwp_lk_url" value="%s"/>', esc_url(get_option('bpwp_lk_url')));
-
-        printf('<p><small>%s</small></p>', esc_html(__('Ссылка на личный кабинет Бонус+', 'bonus-plus-wp')));
     }
 
     /**

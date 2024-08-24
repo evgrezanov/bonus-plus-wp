@@ -106,6 +106,12 @@ class BPWPRestApiEndpoints
                 'success' => false,
                 'message' => 'Код не отправлен!',
             );
+            $error_message = 'Код не отправлен. Подробнее: ' .
+                'User_id: ' . $user_id . ', ' .
+                'Phone: ' . $phone . ', ' .
+                'Response Code: ' . $res['code'];
+        
+            error_log($error_message);
         }
 
         wp_send_json($response);

@@ -1,0 +1,85 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "preferredVersions": {
+      "php": "8.2",
+      "wp": "6.6"
+    },
+    "features": {
+      "networking": true
+    },
+    "phpExtensionBundles": [
+      "kitchen-sink"
+    ],
+    "landingPage": "/wp-admin/",
+    "steps": [
+      {
+        "step": "login",
+        "username": "admin",
+        "password": "password"
+      },
+      {
+        "step": "installPlugin",
+        "pluginZipFile": {
+          "resource": "wordpress.org/plugins",
+          "slug": "bonus-plus-wp"
+        },
+        "options": {
+          "activate": true
+        }
+      },
+      {
+        "step": "installPlugin",
+        "pluginZipFile": {
+          "resource": "wordpress.org/plugins",
+          "slug": "woocommerce"
+        },
+        "options": {
+          "activate": true
+        }
+      },
+      {
+        "step": "importFile",
+        "file": {
+          "resource": "url",
+          "url": "https://raw.githubusercontent.com/evgrezanov/bonus-plus-wp/main/demo/demoproducts.xml"
+        }
+      },
+      {
+        "step": "setSiteOptions",
+        "options": {
+          "blogname": "тест",
+          "users_can_register": "0",
+          "admin_email": "redmonkey73@yandex.ru",
+          "start_of_week": "1",
+          "use_balanceTags": "0",
+          "use_smilies": "1",
+          "require_name_email": "1",
+          "comments_notify": "1",
+          "posts_per_rss": "10",
+          "rss_use_excerpt": "0"
+        }
+      },
+      {
+        "step": "setSiteOptions",
+        "options": {
+          "default_category": "1",
+          "default_comment_status": "open",
+          "default_ping_status": "open",
+          "default_pingback_flag": "0",
+          "posts_per_page": "10",
+          "date_format": "d.m.Y",
+          "time_format": "H:i",
+          "links_updated_date_format": "d.m.Y H:i",
+          "comment_moderation": "0",
+          "moderation_notify": "1"
+        }
+      },
+      {
+        "step": "setSiteOptions",
+        "options": {
+          "WPLANG": "ru_RU"
+        }
+      }
+    ]
+  }
+  

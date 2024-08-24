@@ -13,8 +13,8 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
- * Tested up to: 6.5
- * Version: 2.14
+ * Tested up to: 6.6.1
+ * Version: 2.15
  */
 namespace BPWP;
 
@@ -27,7 +27,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.14');
+        define('BPWP_PLUGIN_VERSION', '2.15');
 
         define('BPWP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -84,6 +84,7 @@ class BPWPBonusPlus_Core
         require_once __DIR__ . '/inc/ClientProfile.php';
         require_once __DIR__ . '/inc/WooProductCatExport.php';
         require_once __DIR__ . '/inc/CustomerBalance.php';
+        require_once __DIR__ . '/inc/PhoneRegistration.php';
     }   
 
     /**

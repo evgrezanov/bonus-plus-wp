@@ -1,10 +1,10 @@
 === WPBonusPlus ===
 Contributors: redmonkey73, mickuznetsov
 Donate link: https://ko-fi.com/evgeniyrezanov
-Tags: bonus, woocommerce, sync, integration
+Tags: bonus, woocommerce, sync, integration, loyalty program, connection
 Requires at least: 4.0
-Tested up to: 6.5
-Stable tag: 2.14
+Tested up to: 6.6.1
+Stable tag: 2.15
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -13,7 +13,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-Integration WordPress/WooCommerce & BonusPlus http://bonusplus.pro (for Russia)
+Integration WordPress/WooCommerce & BonusPlus [http://bonusplus.pro (for Russia)](https://bonusplus.pro/api/link/KEETCJEL)
 
 Интеграция приложения БонусПлюс (программа лояльности) и WordPress/WooCommerce
 
@@ -24,13 +24,13 @@ Integration WordPress/WooCommerce & BonusPlus http://bonusplus.pro (for Russia)
 *   WooCommerce добавлена новая вкладка в личном кабинете
 *   Генерация QR кода, для предъявления на кассе
 
-[Оффициальный сайт Бонус+](https://bonusplus.pro/new/#about)
+[Оффициальный сайт Бонус+](https://bonusplus.pro/api/link/KEETCJEL)
 
 [Обработка персональных данных](https://bonusplus.pro/new/data-processing/)
 
-Документация разработчика: [https://bonusplus.pro/api](https://bonusplus.pro/api)
+[Документация разработчика](https://bonusplus.pro/api)
 
-Примеры получаемых данных REST API Бонус+: [https://bonusplus.pro/api/Help](https://bonusplus.pro/api/Help)
+[Примеры получаемых данных REST API Бонус+](https://bonusplus.pro/api/Help)
 
 [Документация по началу работы](https://bonuspluswp.site/category/docs/)
 
@@ -91,6 +91,10 @@ PHP Рекомендуем 8.0 и выше
 4. Экспорт товаров и категорий в БонусПлюс
 
 == Changelog ==
+
+= 2.15 =
+- добавлена функция обязательного ввода номера телефона при регистрации
+- исправлена работа с бонусами джля вариативных товаров
 
 = 2.14 =
 - добавлены ссылки на документацию и форму обратной связи

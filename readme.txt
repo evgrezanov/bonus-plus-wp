@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/evgeniyrezanov
 Tags: bonus, woocommerce, sync, integration, loyalty program, connection
 Requires at least: 4.0
 Tested up to: 6.6.1
-Stable tag: 2.15
+Stable tag: 2.16
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,9 @@ PHP Рекомендуем 8.0 и выше
 4. Экспорт товаров и категорий в БонусПлюс
 
 == Changelog ==
+
+= 2.16 =
+- добавил blueprints.json
 
 = 2.15 =
 - добавлена функция обязательного ввода номера телефона при регистрации

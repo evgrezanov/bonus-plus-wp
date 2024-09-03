@@ -59,7 +59,7 @@
 * Tags: bonus, woocommerce, sync, integration, loyalty program
 * Requires at least: 4.0
 * Tested up to: 6.5
-* Stable tag: 2.18
+* Stable tag: 2.18.1
 * Requires PHP: 8.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -146,6 +146,11 @@ PHP Рекомендуем 8.0 и выше
 4. Экспорт товаров и категорий в БонусПлюс
 
 # Changelog
+
+## 2.18.1
+- Изменения на странице опций плагина
+- Проверка списания доступных бонусов
+- Опция делающая ителефон обязатеольным полем для регистрации
 
 ## 2.16
 - добавил blueprints.json

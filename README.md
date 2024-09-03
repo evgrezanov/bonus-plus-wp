@@ -59,7 +59,7 @@
 * Tags: bonus, woocommerce, sync, integration, loyalty program
 * Requires at least: 4.0
 * Tested up to: 6.5
-* Stable tag: 2.21
+* Stable tag: 2.22
 * Requires PHP: 8.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -143,7 +143,9 @@ PHP Рекомендуем 8.0 и выше
 1. Страница настроек
 2. Страница личного кабинета WooCommerce
 3. Шорткод для отображения бонусной карты клиента
-4. Экспорт товаров и категорий в БонусПлюс
+4. Экспорт товаров в БонусПлюс
+5. Коррекстный экспорт товаров в нескольких категориях в БонусПлюс
+6. Неправильный Экспорт категорий в БонусПлюс
 
 # Changelog
 

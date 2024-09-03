@@ -77,7 +77,7 @@ Manual installation method requires downloading the bonus-plus-wp plugin and upl
 = Какие минимальные требования? =
 
 WordPress 6.0
-PHP Рекомендуем 8.0 и выше
+PHP Рекомендуем 8.1
 
 = Будет работать без WooCommerce? =
 

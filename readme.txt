@@ -93,6 +93,9 @@ PHP Рекомендуем 8.1
 
 == Changelog ==
 
+= 2.21 =
+- fix bugs
+
 = 2.19 =
 - Добавлен blueprint.json
 

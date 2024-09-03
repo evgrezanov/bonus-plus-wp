@@ -147,6 +147,9 @@ PHP Рекомендуем 8.0 и выше
 
 # Changelog
 
+## 2.21
+- fix bugs
+
 ## 2.19
 - Добавлен blueprint.json
 

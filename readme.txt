@@ -9,6 +9,7 @@ Requires PHP: 8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: https://raw.githubusercontent.com/evgrezanov/bonus-plus-wp/main/blueprints/blueprint.json
+Requires Plugins:  woocommerce
 
 БонусПлюс (bonusplus.pro) and WordPress/WooCommerce - sync, integration, connection
 
@@ -53,7 +54,6 @@ In the search field type “bonus-plus-wp,” then click “Search Plugins.” O
 = Manual installation =
 
 Manual installation method requires downloading the bonus-plus-wp plugin and uploading it to your web server via your favorite FTP application. The WordPress codex contains [instructions on how to do this here](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
-
 
 
 == Frequently Asked Questions ==
@@ -151,6 +151,8 @@ PHP Рекомендуем 8.1
 
 = 2.0 =
 - add registration interface at my-account
+
+== Upgrade Notice ==
 
 = 1.10 =
 - fix warnings at export products page

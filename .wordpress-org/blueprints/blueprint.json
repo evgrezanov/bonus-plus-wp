@@ -50,7 +50,7 @@
         "step": "importWxr",
         "file": {
           "resource": "url",
-          "url": "https://raw.githubusercontent.com/evgrezanov/bonus-plus-wp/.wordpress-org/blueprints/demoproducts.xml"
+          "url": "https://raw.githubusercontent.com/evgrezanov/bonus-plus-wp/main/.wordpress-org/blueprints/demoproducts.xml"
         }
       },
       {

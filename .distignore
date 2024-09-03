@@ -13,7 +13,7 @@
 .DS_Store
 .*~
 .wordpress-org
-
+screenshots
 Thumbs.db
 behat.yml
 bitbucket-pipelines.yml

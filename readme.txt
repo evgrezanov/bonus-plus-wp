@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/evgeniyrezanov
 Tags: bonus, woocommerce, sync, integration, loyalty program
 Requires at least: 4.0
 Tested up to: 6.6.1
-Stable tag: 2.18.1
+Stable tag: 2.19
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -92,6 +92,9 @@ PHP Рекомендуем 8.1
 4. Экспорт товаров и категорий в БонусПлюс
 
 == Changelog ==
+
+= 2.19 =
+- Добавлен blueprint.json
 
 = 2.18.1 =
 - Изменения на странице опций плагина

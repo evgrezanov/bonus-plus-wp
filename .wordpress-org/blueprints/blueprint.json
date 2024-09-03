@@ -4,7 +4,7 @@
 		  "title": "WooCommerce product feed + bonusplus-wp",
 		  "description": "Blueprint to create a WooCommerce products and export an XML/CSV product feed",
 		  "author": "redmonkey73",
-		  "categories": ["WooCommerce", "Content"]
+		  "categories": ["WooCommerce", "categories", "reset", "log", "debug", "import", "content"]
 	  },
     "preferredVersions": {
       "php": "latest",
@@ -27,7 +27,7 @@
         "step": "installPlugin",
         "pluginZipFile": {
           "resource": "wordpress.org/plugins",
-          "slug": "bonus-plus-wp"
+          "slug": "woocommerce"
         },
         "options": {
           "activate": true
@@ -37,7 +37,7 @@
         "step": "installPlugin",
         "pluginZipFile": {
           "resource": "wordpress.org/plugins",
-          "slug": "woocommerce"
+          "slug": "bonus-plus-wp"
         },
         "options": {
           "activate": true

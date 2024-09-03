@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/evgeniyrezanov
 Tags: bonus, woocommerce, sync, integration, loyalty program
 Requires at least: 4.0
 Tested up to: 6.6.1
-Stable tag: 2.20
+Stable tag: 2.21
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

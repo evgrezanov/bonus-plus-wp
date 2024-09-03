@@ -10,7 +10,7 @@
     "phpExtensionBundles": [
       "kitchen-sink"
     ],
-    "landingPage": "/wp-admin/",
+    "landingPage": "/wp-admin/admin.php?page=bpwp-settings",
     "steps": [
       {
         "step": "login",
@@ -47,7 +47,7 @@
       {
         "step": "setSiteOptions",
         "options": {
-          "blogname": "тест",
+          "blogname": "Бонус+ WP Demo shop",
           "users_can_register": "0",
           "admin_email": "redmonkey73@yandex.ru",
           "start_of_week": "1",

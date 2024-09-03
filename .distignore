@@ -12,6 +12,8 @@
 .travis.yml
 .DS_Store
 .*~
+.wordpress-org
+/demo/demoproducts.xml
 Thumbs.db
 behat.yml
 bitbucket-pipelines.yml

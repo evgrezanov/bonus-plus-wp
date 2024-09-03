@@ -95,6 +95,11 @@
           "resource": "wordpress.org/themes",
           "slug": "storefront"
         }
+      },
+      {
+        "step": "writeFile",
+        "path": "/wordpress/wp-content/mu-plugins/bgnightly-notice.php",
+        "data": "<?php add_action('admin_notices', function() {  echo '<div class=\"notice notice-info is-dismissible\"><p>Hello from Playground.</p></div>'; });"
       }
     ]
   }

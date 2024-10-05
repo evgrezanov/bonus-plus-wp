@@ -15,7 +15,7 @@
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.6.1
- * Version: 2.22
+ * Version: 2.3.1
  */
 namespace BPWP;
 
@@ -28,9 +28,38 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.22');
+        define('BPWP_PLUGIN_VERSION', '2.3.1');
 
         define('BPWP_PLUGIN_DIR', plugin_dir_path(__FILE__));
+
+        // Plugin Folder Name.
+        if ( ! defined( 'BPWP_NAME' ) ) {
+            define( 'BPWP_NAME', trim( dirname( plugin_basename( __FILE__ ) ), '/' ) );
+        }
+
+        // Plugin Root File.
+        if ( ! defined( 'BPWP_PLUGIN_FILE' ) ) {
+            define( 'BPWP_PLUGIN_FILE', __FILE__ );
+        }
+
+        // Plugin Dir including the folder.
+        if ( ! defined('BPWP_DIR' ) ) {
+            define( 'BPWP_DIR', BPWP_PLUGIN_DIR . '/' . BPWP_NAME );
+        }
+
+        // Plugin URL including the folder.
+        if ( ! defined('BPWP_URL' ) ) {
+            define( 'BPWP_URL', WP_PLUGIN_URL . '/' . BPWP_NAME );
+        }
+
+        /**
+         * Welcome file.
+         *
+         * @since 2.3.0
+         */
+        if ( file_exists( BPWP_DIR . '/welcome/welcome-init.php' ) ) {
+            require_once( BPWP_DIR . '/welcome/welcome-init.php' );
+        }
 
         require_once __DIR__ . '/functions.php';
 

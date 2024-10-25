@@ -23,6 +23,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
+[![wakatime](https://wakatime.com/badge/github/evgrezanov/bonus-plus-wp.svg)](https://wakatime.com/badge/github/evgrezanov/bonus-plus-wp)
   
 </div>
 

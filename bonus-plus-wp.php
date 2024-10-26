@@ -15,7 +15,7 @@
  * PHP requires at least: 8.1
  * WP requires at least: 6.0
  * Tested up to: 6.6.1
- * Version: 2.3.1
+ * Version: 2.3.2
  */
 namespace BPWP;
 
@@ -28,7 +28,7 @@ class BPWPBonusPlus_Core
      */
     public static function init()
     {
-        define('BPWP_PLUGIN_VERSION', '2.3.1');
+        define('BPWP_PLUGIN_VERSION', '2.3.2');
 
         define('BPWP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -52,15 +52,6 @@ class BPWPBonusPlus_Core
             define( 'BPWP_URL', WP_PLUGIN_URL . '/' . BPWP_NAME );
         }
 
-        /**
-         * Welcome file.
-         *
-         * @since 2.3.0
-         */
-        if ( file_exists( BPWP_DIR . '/welcome/welcome-init.php' ) ) {
-            require_once( BPWP_DIR . '/welcome/welcome-init.php' );
-        }
-
         require_once __DIR__ . '/functions.php';
 
         /**
@@ -76,9 +67,14 @@ class BPWPBonusPlus_Core
 
         add_action('plugins_loaded', [__CLASS__, 'bpwp_true_load_plugin_textdomain']);
         add_action('plugins_loaded', [__CLASS__, 'bpwp_load_components']);
+
+        // Add to `admin_init` safe redirect to welcome page
+	    add_action( 'admin_init', [__CLASS__, 'bpwp_safe_welcome_redirect']);
         
         add_action('bpwp_activate', [__CLASS__, 'bpwp_plugin_activate']);
         add_action('bpwp_deactivate', [__CLASS__, 'bpwp_plugin_deactivate']);
+
+        add_action('bpwp_welcome_activate', [__CLASS__, 'bpwp_welcome_activate']);
 
         add_action('wp_enqueue_scripts', [__CLASS__, 'bpwp_shortcode_wp_enqueue_styles']);
 
@@ -108,8 +104,9 @@ class BPWPBonusPlus_Core
             require_once __DIR__ . '/inc/RestApiEndpoints.php';
             require_once __DIR__ . '/inc/WooAccount.php';
             require_once __DIR__ . '/inc/ApiHelper.php';
+
+            require_once __DIR__ . '/inc/MenuSettings.php';
         }
-        require_once __DIR__ . '/inc/MenuSettings.php';
         require_once __DIR__ . '/inc/Logger.php';
         require_once __DIR__ . '/inc/ClientProfile.php';
         require_once __DIR__ . '/inc/WooProductCatExport.php';
@@ -156,16 +153,45 @@ class BPWPBonusPlus_Core
     {
         flush_rewrite_rules();
         update_option('bpwp_plugin_permalinks_flushed', 0);
+
+        do_action('bpwp_welcome_activate');
     }
+
+    /**
+	 * Add the transient.
+	 *
+	 * Add the welcome page transient.
+	 *
+	 * @since 2.3.1
+	 */
+	public static function bpwp_welcome_activate() {
+		// Transient max age is 60 seconds.
+		set_transient( '_welcome_redirect_bpwp', true, 60 );
+	}
 
     /**
      *  Action fire at plugin deactivation
      *
      *  @return array
+     *  
+     *  @since   2.3.2
      */
     public static function bpwp_plugin_deactivate()
     {
         flush_rewrite_rules();
+
+        do_action('bpwp_welcome_deactivate');
+    }
+
+    /**
+	 * Delete the Transient on plugin deactivation.
+	 *
+	 * Delete the welcome page transient.
+	 *
+	 * @since   2.3.2
+	 */
+	public static function bpwp_welcome_deactivate() {
+        delete_transient( '_welcome_redirect_bpwp' );
     }
 
     /**
@@ -195,5 +221,38 @@ class BPWPBonusPlus_Core
         }
         return $links;
     }
+
+    /**
+	 * Safe Welcome Page Redirect.
+	 *
+	 * Safe welcome page redirect which happens only
+	 * once and if the site is not a network or MU.
+	 *
+	 * @since 	2.3.2
+	 */
+	public static function bpwp_safe_welcome_redirect() {
+		// Bail if no activation redirect transient is present. (if ! true).
+		if ( ! get_transient( '_welcome_redirect_bpwp' ) ) {
+			return;
+		}
+
+		// Delete the redirect transient.
+		delete_transient( '_welcome_redirect_bpwp' );
+
+		// Bail if activating from network or bulk sites.
+		if ( is_network_admin() || isset( $_GET['activate-multi'] ) ) {
+			return;
+		}
+
+		// Redirects to `your-domain.com/wp-admin/admin.php?page=bpwp-welcome-page`.
+		wp_safe_redirect( 
+			add_query_arg(
+				array(
+					'page' => 'bpwp-welcome-page'
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+	}
 }
 BPWPBonusPlus_Core::init();

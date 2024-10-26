@@ -116,7 +116,7 @@ class BPWPMenuSettings
             );
         }, 99 );
 
-        add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 10, $accepted_args = 1);
+        add_action('admin_init', [__CLASS__, 'settings_general'], 10, 1);
 
         add_action('bpwp_settings_after_header', [__CLASS__, 'render_nav_menu'], 10);
 

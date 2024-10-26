@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/evgeniyrezanov
 Tags: bonus, woocommerce, sync, integration, loyalty program
 Requires at least: 4.0
 Tested up to: 6.6.1
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -96,6 +96,9 @@ PHP Рекомендуем 8.1
 
 == Changelog ==
 
+= 2.3.2 =
+- Добавлена welcome admin page и редирект после установки и активации плагина
+
 = 2.21 =
 - fix bugs
 
@@ -105,7 +108,7 @@ PHP Рекомендуем 8.1
 = 2.18.1 =
 - Изменения на странице опций плагина
 - Проверка списания доступных бонусов
-- Опция делающая ителефон обязатеольным полем для регистрации
+- Опция делающая телефон обязательным полем для регистрации
 
 = 2.16 =
 - добавил blueprints.json

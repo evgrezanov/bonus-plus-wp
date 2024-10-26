@@ -111,7 +111,7 @@ class BPWPRestApiEndpoints
                 'Phone: ' . $phone . ', ' .
                 'Response Code: ' . $res['code'];
         
-            error_log($error_message);
+            //error_log($error_message);
         }
 
         wp_send_json($response);

@@ -69,19 +69,24 @@ class BPWPMenuSettings
             function () {
                 if (current_user_can('manage_options')) {
                     add_menu_page(
-                        $page_title = 'Настройки подключения БонусПлюс',
-                        $menu_title = 'Бонус+',
+                        $page_title = __('Начало работы с Бонус+', 'bonus-plus-wp'),
+                        $menu_title = __('Бонус+', 'bonus-plus-wp'),
                         $capability = 'manage_options',
-                        $menu_slug = 'bpwp-settings',
-                        $function = array(__CLASS__, 'display_settings'),
+                        $menu_slug = 'bpwp-welcome-page',
+                        $function = array(__CLASS__, 'bpwp_display_welcome_page_content'),
                         $icon = 'dashicons-forms',
                         '57.5'
                     );
-                }
-
-                if (current_user_can('manage_options')) {
                     add_submenu_page(
+                        'bpwp-welcome-page',
+                        'Настройки подключения БонусПлюс',
+                        'Настройки',
+                        'manage_options',
                         'bpwp-settings',
+                        array(__CLASS__, 'display_settings'),
+                    );
+                    add_submenu_page(
+                        'bpwp-welcome-page',
                         'Экспорт',
                         'Экспорт каталога',
                         'manage_options',
@@ -89,7 +94,7 @@ class BPWPMenuSettings
                         array(__CLASS__, 'display_control')
                     );
                     add_submenu_page(
-                        'bpwp-settings',
+                        'bpwp-welcome-page',
                         'Настройка виджета',
                         'Виджет',
                         'manage_options',
@@ -100,13 +105,25 @@ class BPWPMenuSettings
             }
         );
 
-        add_action('admin_init', array(__CLASS__, 'settings_general'), $priority = 10, $accepted_args = 1);
+        add_action( 'admin_enqueue_scripts', function(){
+            // Welcome page styles.
+            wp_enqueue_style(
+                'bpwp_style',
+                BPWP_URL . '/assets/welcome-page-style.css',
+                array(),
+                BPWP_PLUGIN_VERSION,
+                'all'
+            );
+        }, 99 );
+
+        add_action('admin_init', [__CLASS__, 'settings_general'], 10, 1);
 
         add_action('bpwp_settings_after_header', [__CLASS__, 'render_nav_menu'], 10);
 
         add_action('bpwp_settings_after_header', [__CLASS__, 'display_status'], 20);
 
         add_action('bpwp_widget_settings_after_header', [__CLASS__, 'render_widget_nav_menu'], 10);
+
     }
 
     /**
@@ -139,6 +156,9 @@ class BPWPMenuSettings
         );
     }
 
+    /**
+     * Render top menu at widget settings page
+     */
     public static function render_widget_nav_menu()
     {
         printf(
@@ -149,6 +169,7 @@ class BPWPMenuSettings
             )
         );
     }
+    
     /**
      *  Add sections to settiongs page
      * 
@@ -509,6 +530,22 @@ class BPWPMenuSettings
             </form>
         <?php
     }
+
+	/**
+	 * Welcome Page View.
+	 *
+	 * Welcome page content i.e. HTML/CSS/PHP.
+	 *
+	 * @since 	2.3.0
+	 */
+	public static function bpwp_display_welcome_page_content() {
+		// Welcome Page.
+		if (file_exists( BPWP_PLUGIN_DIR . '/templates/welcome-view.php') ) {
+		   require_once( BPWP_PLUGIN_DIR . '/templates/welcome-view.php' );
+		}
+	}
+
 }
+
 
 BPWPMenuSettings::init();

@@ -23,7 +23,9 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-  
+[![wakatime](https://wakatime.com/badge/github/evgrezanov/bonus-plus-wp.svg)](https://wakatime.com/badge/github/evgrezanov/bonus-plus-wp)
+[![WP compatibility](https://plugintests.com/plugins/wporg/bonus-plus-wp/wp-badge.svg)](https://plugintests.com/plugins/wporg/bonus-plus-wp/latest)
+[![PHP compatibility](https://plugintests.com/plugins/wporg/bonus-plus-wp/php-badge.svg)](https://plugintests.com/plugins/wporg/bonus-plus-wp/latest)  
 </div>
 
 
@@ -59,7 +61,7 @@
 * Tags: bonus, woocommerce, sync, integration, loyalty program
 * Requires at least: 4.0
 * Tested up to: 6.5
-* Stable tag: 2.22
+* Stable tag: 2.3.2
 * Requires PHP: 8.1
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -149,6 +151,10 @@ PHP Рекомендуем 8.0 и выше
 
 # Changelog
 
+## 2.3.2
+
+
+
 ## 2.21
 - fix bugs
 
@@ -158,7 +164,7 @@ PHP Рекомендуем 8.0 и выше
 ## 2.18.1
 - Изменения на странице опций плагина
 - Проверка списания доступных бонусов
-- Опция делающая ителефон обязатеольным полем для регистрации
+- Опция делающая телефон обязательным полем для регистрации
 
 ## 2.16
 - добавил blueprints.json

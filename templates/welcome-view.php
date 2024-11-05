@@ -69,23 +69,23 @@ $banner = BPWP_URL . '/assets/img/banner.png';
 	<div class="feature-section two-col">
 		<div class="col">
 			<h3><?php esc_html_e('Экспорт товаров и категорий в Бонус+', 'bonus-plus-wp' ); ?></h3>
-			<p><?php esc_html_e('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sed sapien quam. Sed dapibus est id enim facilisis, at posuere turpis adipiscing. Quisque sit amet dui dui.', 'bonus-plus-wp'  ); ?></p>
+			<p><?php esc_html_e('Автоматическая синхронизация каталога товаров и категорий с программой лояльности Бонус+. Все изменения цен, описаний и категорий будут автоматически отправлены в систему.', 'bonus-plus-wp'  ); ?></p>
 		</div>
 
 		<div class="col">
-			<h3><?php esc_html_e('Начисление и списание бонусов на сайте', 'bonus-plus-wp' ); ?></h3>
-			<p><?php esc_html_e( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sed sapien quam. Sed dapibus est id enim facilisis, at posuere turpis adipiscing. Quisque sit amet dui dui.', 'bonus-plus-wp'  ); ?></p>
+			<h3><?php esc_html_e('Начисление и списание бонусов на сайте', 'bonus-plus-wp'); ?></h3>
+			<p><?php esc_html_e('Клиенты могут использовать накопленные бонусы при оформлении заказа в вашем магазине. Бонусы автоматически начисляются за покупки согласно настроенным правилам программы лояльности.', 'bonus-plus-wp'  ); ?></p>
 		</div>
 	</div>
 
 	<div class="feature-section two-col">
 		<div class="col">
 			<h3><?php esc_html_e('Автоматическая регистрация пользователя в программе лояльности при регистрации на сайте', 'bonus-plus-wp' ); ?></h3>
-			<p><?php esc_html_e( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sed sapien quam. Sed dapibus est id enim facilisis, at posuere turpis adipiscing. Quisque sit amet dui dui.', 'bonus-plus-wp'  ); ?></p>
+			<p><?php esc_html_e( 'При регистрации на сайте пользователь автоматически становится участником бонусной программы. Все данные синхронизируются с личным кабинетом в системе Бонус+.', 'bonus-plus-wp'  ); ?></p>
 		</div>
 		<div class="col">
 			<h3><?php esc_html_e( 'Обязательное поле номер телефона', 'bonus-plus-wp' ); ?></h3>
-			<p><?php esc_html_e( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sed sapien quam. Sed dapibus est id enim facilisis, at posuere turpis adipiscing. Quisque sit amet dui dui.', 'bonus-plus-wp'  ); ?></p>
+			<p><?php esc_html_e( 'Номер телефона используется как уникальный идентификатор участника в программе лояльности. Это позволяет клиентам использовать накопленные бонусы как онлайн, так и в офлайн магазинах.', 'bonus-plus-wp'  ); ?></p>
 		</div>
 	</div>
 </div>
